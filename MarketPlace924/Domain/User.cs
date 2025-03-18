@@ -6,7 +6,63 @@ using System.Threading.Tasks;
 
 namespace MarketPlace924.Domain
 {
-    class User
+    public class User
     {
+        private int _userID, _role, _failedLogIns;
+        private string _username, _password, _email, _phoneNumber;
+        private DateTime? _bannedUntil;
+        private bool _isBanned;
+        public string Username
+        {
+            get => _username;
+            set => _username = value;
+        }
+
+        public string Password
+        {
+            get => _password;
+            set => _password = value;
+        }
+
+        public string Email
+        {
+            get => _email;
+            set => _email = value;
+        }
+        public string PhoneNumber
+        {
+            get => _phoneNumber;
+            set => _phoneNumber = value;
+        }
+
+        public DateTime? BannedUntil
+        {
+            get => _bannedUntil;
+            set => _bannedUntil = value;
+        }
+        public bool IsBanned
+        {
+            get => _isBanned;
+            set => _isBanned = value;
+
+        }
+
+        public int UserID
+        {
+            get => _userID;
+            set => _userID = value;
+        }
+        public int Role
+        {
+            get => _role;
+            set => _role = value;
+        }
+
+        public int FailedLogIns
+        {
+            get => _failedLogIns;
+            set => _failedLogIns = value;
+        }
+
     }
 }
