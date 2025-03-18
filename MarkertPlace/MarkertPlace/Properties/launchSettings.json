@@ -1,0 +1,10 @@
+{
+  "profiles": {
+    "MarkertPlace (Package)": {
+      "commandName": "MsixPackage"
+    },
+    "MarkertPlace (Unpackaged)": {
+      "commandName": "Project"
+    }
+  }
+}
