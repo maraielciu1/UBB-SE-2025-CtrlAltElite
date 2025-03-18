@@ -1,0 +1,10 @@
+{
+  "profiles": {
+    "MarketPlace924 (Package)": {
+      "commandName": "MsixPackage"
+    },
+    "MarketPlace924 (Unpackaged)": {
+      "commandName": "Project"
+    }
+  }
+}
