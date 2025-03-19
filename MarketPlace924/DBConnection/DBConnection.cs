@@ -20,7 +20,8 @@ namespace MarketPlace924.DBConnection
         }
         public void openConnection()
         {
-            dbConnection.Open();
+            if(dbConnection.State == System.Data.ConnectionState.Closed)
+                dbConnection.Open();
         }
         public void closeConnection()
         {
