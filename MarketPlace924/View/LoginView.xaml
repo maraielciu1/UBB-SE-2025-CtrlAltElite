@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Page
+    x:Class="MarketPlace924.View.LoginView"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:local="using:MarketPlace924.View"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    mc:Ignorable="d"
+    Background="{ThemeResource ApplicationPageBackgroundThemeBrush}">
+
+    <Grid>
+        <Border Background="White" Padding="50" CornerRadius="12" BorderBrush="#1565C0" BorderThickness="2" Width="550" HorizontalAlignment="Center" VerticalAlignment="Center">
+            <StackPanel Spacing="25">
+
+                <!-- Title -->
+                <TextBlock Text="Login Page" FontSize="42" FontWeight="Bold" TextAlignment="Center" Foreground="#0D47A1" FontFamily="Segoe UI Black"/>
+                <TextBlock Text="Welcome to our MarketPlace!" FontSize="24" Margin="0,5" TextAlignment="Center" Foreground="#1976D2" FontFamily="Segoe UI Semibold"/>
+                <TextBlock x:Name="ErrorMessage" Text="" FontSize="18" Foreground="Red" TextAlignment="Center"/>
+
+                <!-- Email Input -->
+                <StackPanel>
+                    <TextBlock Text="Enter your email below" FontSize="18" FontWeight="Bold" Foreground="#0D47A1"/>
+                    <TextBox x:Name="UserEmailBox" Width="Auto" Height="45" Padding="10" BorderBrush="#1976D2" BorderThickness="2" CornerRadius="8"/>
+                </StackPanel>
+
+                <!-- Password Input -->
+                <StackPanel>
+                    <TextBlock Text="Enter your password below" FontSize="18" FontWeight="Bold" Foreground="#0D47A1"/>
+                    <PasswordBox x:Name="PasswordTextBox" Width="Auto" Height="45" Padding="10" BorderBrush="#1976D2" BorderThickness="2" CornerRadius="8"/>
+                </StackPanel>
+
+                <!-- Captcha -->
+                <StackPanel>
+                    <TextBlock Text="Captcha Verification" FontSize="18" FontWeight="Bold" Foreground="#1565C0"/>
+
+                    <TextBox x:Name="CaptchaText" Width="Auto" Height="50" Padding="10" BorderBrush="#1976D2" BorderThickness="2" CornerRadius="8"
+                           FontFamily="Lucida Handwriting" FontSize="26" FontStyle="Italic" FontWeight="Bold" TextAlignment="Center"/>
+
+                    <TextBlock Text="Enter the code below:" FontSize="18" FontWeight="Bold" Foreground="#0D47A1"/>
+                    <TextBox x:Name="CaptchaEnteredCode" Width="Auto" Height="45" Padding="10" BorderBrush="#1976D2" BorderThickness="2" CornerRadius="8"/>
+                </StackPanel>
+
+                <!-- Login Button -->
+                <Button x:Name="LoginButton" Content="Login" Background="#1565C0" Foreground="White" Width="200" Height="55" CornerRadius="8" FontSize="20" FontWeight="Bold" Click="LoginButton_Click" HorizontalAlignment="Center" />
+
+                <!-- Register Link -->
+                <StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
+                    <TextBlock Text="Don't have an account? " FontSize="16" Foreground="#0D47A1"/>
+                    <TextBlock x:Name="RegisterButtonTextBlock" Text="Register now" Foreground="#1E88E5" FontSize="16" FontWeight="Bold" PointerPressed="RegisterButtonTextBlock_PointerPressed" />
+                </StackPanel>
+
+            </StackPanel>
+        </Border>
+    </Grid>
+</Page>
