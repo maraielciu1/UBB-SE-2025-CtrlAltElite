@@ -24,14 +24,28 @@ namespace MarketPlace924.Service
             return new User();
         }
         public bool validateLogin(string username, string password)
+
         {
-            return true;
+            
+            if(_userRepository.checkExistanceOfUsername(username))
+            {
+                User? user = getUserByEmail(username);
+                if (user.Password == hashPassword(password))
+                    return true;
+                else
+                    return false;
+                
+            }
+            else
+            {
+                return false;
+            }
         }
         public string hashPassword(string password) {
             return password;
         }
-        public User getUserByEmail(string email) {
-            return new User();
+        public User? getUserByEmail(string email) {
+            return _userRepository.GetUserByEmail(email);
         }
     }
 }

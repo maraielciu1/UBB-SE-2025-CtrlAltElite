@@ -10,7 +10,7 @@ namespace MarketPlace924.DBConnection
     class DBConnection
     {
         // here you can replace the connection string with your connection info from the local database
-        private static string dbConnectionString = @"Server=(localdb)\MSSQLLocalDB;Initial catalog=Store;Integrated Security=true;";
+        private static string dbConnectionString = "Data Source=DESKTOP-618UFK0\\SQLEXPRESS;Initial Catalog=IssDb;Integrated Security=True;TrustServerCertificate=True";
         private SqlConnection dbConnection = new SqlConnection(dbConnectionString);
 
         public DBConnection() { }
