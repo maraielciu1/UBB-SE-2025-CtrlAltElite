@@ -1,0 +1,34 @@
+﻿using System;
+using System.Collections.Generic;
+using Microsoft.Data.SqlClient;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+
+namespace MarketPlace924.DBConnection
+{
+    class DBConnection
+    {
+        // here you can replace the connection string with your connection info from the local database
+        private static string dbConnectionString = @"Server=(localdb)\MSSQLLocalDB;Initial catalog=Store;Integrated Security=true;";
+        private SqlConnection dbConnection = new SqlConnection(dbConnectionString);
+
+        public DBConnection() { }
+        public SqlConnection getConnection()
+        {
+            return dbConnection;
+        }
+        public void openConnection()
+        {
+            dbConnection.Open();
+        }
+        public void closeConnection()
+        {
+            dbConnection.Close();
+        }
+        public void executeProcedure()
+        {
+
+        }
+    }
+}

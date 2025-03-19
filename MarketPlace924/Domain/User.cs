@@ -12,6 +12,21 @@ namespace MarketPlace924.Domain
         private string _username, _password, _email, _phoneNumber;
         private DateTime? _bannedUntil;
         private bool _isBanned;
+
+        public User() { }
+        public User(int userID=0, string username, string email, string password, int role, int failedLogIns=0, DateTime? bannedUntil=null)
+        {
+            _bannedUntil = bannedUntil;
+            _username = username;
+            _email = email;
+            _password = password;
+            _role = role;
+            _failedLogIns = failedLogIns;
+            _username = username;
+            _userID = userID;
+
+        }
+
         public string Username
         {
             get => _username;
