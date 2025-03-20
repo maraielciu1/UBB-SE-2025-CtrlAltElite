@@ -18,9 +18,57 @@ namespace MarketPlace924.Repository
         }
         public User getUser(string username)
         {
-            return new User();
+            var Connection = this.connection.getConnection();
+            Connection.Open();
+            var command = Connection.CreateCommand();
+            command.CommandText = "SELECT * FROM Users WHERE Username = @Username";
+            command.Parameters.Add(new SqlParameter("@Username", username));
+
+            var reader = command.ExecuteReader();
+           
+                return new User(
+           reader.GetInt32(0), // UserID
+           reader.GetString(1), // Username
+           reader.GetString(2), // Email
+           reader.GetString(3), // PhoneNumber
+            reader.GetString(4), // Password (Handle NULL)
+           reader.GetInt32(5), // Role
+           reader.GetInt32(6), // FailedLogins
+           reader.IsDBNull(7) ? (DateTime?)null : reader.GetDateTime(7), // BannedUntil (Handle NULL)
+            reader.GetBoolean(8) // IsBanned
+
+            );
+               
         }
-        public void updateUser(User user) { }
+
+        public void updateUserFailedLogins(User user,int NewValueOfFailedLogIns)
+        {
+            var Connection = this.connection.getConnection();
+            Connection.Open();
+            var command = Connection.CreateCommand();
+            command.CommandText = "UPDATE Users SET FailedLogins = @FailedLogins WHERE UserID = @UserID";
+            user.FailedLogIns = NewValueOfFailedLogIns;
+            command.Parameters.Add(new SqlParameter("@FailedLogins", user.FailedLogIns));
+            command.Parameters.Add(new SqlParameter("@UserID", user.UserID));
+            command.ExecuteNonQuery();
+        }
+        public void updateUser(User user) {
+            var Connection = this.connection.getConnection();
+            Connection.Open();
+            var command = Connection.CreateCommand();
+            command.CommandText = "UPDATE Users SET Username = @Username, Email = @Email, PhoneNumber = @PhoneNumber, Password = @Password, Role = @Role, FailedLogins = @FailedLogins, BannedUntil = @BannedUntil, IsBanned = @IsBanned WHERE UserID = @UserID";
+            command.Parameters.Add(new SqlParameter("@Username", user.Username));
+            command.Parameters.Add(new SqlParameter("@Email", user.Email));
+            command.Parameters.Add(new SqlParameter("@PhoneNumber", user.PhoneNumber));
+            command.Parameters.Add(new SqlParameter("@Password", user.Password));
+            command.Parameters.Add(new SqlParameter("@Role", user.Role));
+            command.Parameters.Add(new SqlParameter("@FailedLogins", user.FailedLogIns));
+            command.Parameters.Add(new SqlParameter("@BannedUntil", user.BannedUntil));
+            command.Parameters.Add(new SqlParameter("@IsBanned", user.IsBanned));
+            command.Parameters.Add(new SqlParameter("@UserID", user.UserID));
+            command.ExecuteNonQuery();
+
+        }
         public void deleteUser(string username) { }
         public User? GetUserByEmail(string email)
         {
@@ -59,11 +107,22 @@ namespace MarketPlace924.Repository
             Connection.Open();
             var command = Connection.CreateCommand();
             command.CommandText = "SELECT count(1) FROM Users WHERE Email = @Email";
+            command.Parameters.Add(new SqlParameter("@Email", email));
             return (int)command.ExecuteScalar() > 0;
         }
         public bool checkExistanceOfUsername(string username)
         {
             return true;
+        }
+
+        public int getFaildLogInsOfUserByUserID(int userID)
+        {
+            var Connection = this.connection.getConnection();
+            Connection.Open();
+            var command = Connection.CreateCommand();
+            command.CommandText = "SELECT FailedLogins FROM Users WHERE UserID = @UserID";
+            command.Parameters.Add(new SqlParameter("@UserID", userID));
+            return (int)command.ExecuteScalar();
         }
 
     }

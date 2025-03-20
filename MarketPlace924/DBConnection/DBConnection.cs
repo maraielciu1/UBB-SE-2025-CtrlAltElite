@@ -16,7 +16,8 @@ namespace MarketPlace924.DBConnection
         public DBConnection() { }
         public SqlConnection getConnection()
         {
-            return dbConnection;
+            //return dbConnection;
+            return new SqlConnection(dbConnectionString);
         }
         public void openConnection()
         {
