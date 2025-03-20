@@ -29,6 +29,7 @@ namespace MarketPlace924.Domain
 
         }
 
+
         public string Username
         {
             get => _username;
