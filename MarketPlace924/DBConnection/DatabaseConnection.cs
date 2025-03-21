@@ -1,28 +1,23 @@
-﻿using System;
-using System.Collections.Generic;
-using Microsoft.Data.SqlClient;
-using System.Linq;
-using System.Text;
+﻿using Microsoft.Data.SqlClient;
 using System.Threading.Tasks;
 
 namespace MarketPlace924.DBConnection
 {
-    class DBConnection
+	public class DatabaseConnection
     {
         // here you can replace the connection string with your connection info from the local database
-        private static string dbConnectionString = "Data Source=DESKTOP-618UFK0\\SQLEXPRESS;Initial Catalog=IssDb;Integrated Security=True;TrustServerCertificate=True";
+        private static string dbConnectionString = "Data Source=localhost;Initial Catalog=IssDb;Integrated Security=True;TrustServerCertificate=True";
         private SqlConnection dbConnection = new SqlConnection(dbConnectionString);
 
-        public DBConnection() { }
+        public DatabaseConnection() { }
         public SqlConnection getConnection()
         {
-            //return dbConnection;
-            return new SqlConnection(dbConnectionString);
+			return dbConnection;
         }
-        public void openConnection()
+        public async Task openConnection()
         {
             if(dbConnection.State == System.Data.ConnectionState.Closed)
-                dbConnection.Open();
+                await dbConnection.OpenAsync();
         }
         public void closeConnection()
         {

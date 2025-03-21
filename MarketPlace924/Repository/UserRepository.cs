@@ -1,129 +1,138 @@
 ﻿using MarketPlace924.Domain;
 using Microsoft.Data.SqlClient;
 using System;
-using System.Diagnostics;
+using MarketPlace924.DBConnection;
+using System.Threading.Tasks;
 
 namespace MarketPlace924.Repository
 {
-    class UserRepository
-    {
-        private DBConnection.DBConnection connection;
-        public UserRepository(DBConnection.DBConnection connection)
-        {
-            this.connection = connection;
-        }
-        public void addUser(User user)
-        {
+	public class UserRepository
+	{
+		private DatabaseConnection _connection;
 
-        }
-        public User getUser(string username)
-        {
-            var Connection = this.connection.getConnection();
-            Connection.Open();
-            var command = Connection.CreateCommand();
-            command.CommandText = "SELECT * FROM Users WHERE Username = @Username";
-            command.Parameters.Add(new SqlParameter("@Username", username));
+		public UserRepository(DatabaseConnection connection)
+		{
+			_connection = connection;
+		}
 
-            var reader = command.ExecuteReader();
-           
-                return new User(
-           reader.GetInt32(0), // UserID
-           reader.GetString(1), // Username
-           reader.GetString(2), // Email
-           reader.GetString(3), // PhoneNumber
-            reader.GetString(4), // Password (Handle NULL)
-           reader.GetInt32(5), // Role
-           reader.GetInt32(6), // FailedLogins
-           reader.IsDBNull(7) ? (DateTime?)null : reader.GetDateTime(7), // BannedUntil (Handle NULL)
-            reader.GetBoolean(8) // IsBanned
+		public void AddUser(User user)
+		{
 
-            );
-               
-        }
+		}
 
-        public void updateUserFailedLogins(User user,int NewValueOfFailedLogIns)
-        {
-            var Connection = this.connection.getConnection();
-            Connection.Open();
-            var command = Connection.CreateCommand();
-            command.CommandText = "UPDATE Users SET FailedLogins = @FailedLogins WHERE UserID = @UserID";
-            user.FailedLogIns = NewValueOfFailedLogIns;
-            command.Parameters.Add(new SqlParameter("@FailedLogins", user.FailedLogIns));
-            command.Parameters.Add(new SqlParameter("@UserID", user.UserID));
-            command.ExecuteNonQuery();
-        }
-        public void updateUser(User user) {
-            var Connection = this.connection.getConnection();
-            Connection.Open();
-            var command = Connection.CreateCommand();
-            command.CommandText = "UPDATE Users SET Username = @Username, Email = @Email, PhoneNumber = @PhoneNumber, Password = @Password, Role = @Role, FailedLogins = @FailedLogins, BannedUntil = @BannedUntil, IsBanned = @IsBanned WHERE UserID = @UserID";
-            command.Parameters.Add(new SqlParameter("@Username", user.Username));
-            command.Parameters.Add(new SqlParameter("@Email", user.Email));
-            command.Parameters.Add(new SqlParameter("@PhoneNumber", user.PhoneNumber));
-            command.Parameters.Add(new SqlParameter("@Password", user.Password));
-            command.Parameters.Add(new SqlParameter("@Role", user.Role));
-            command.Parameters.Add(new SqlParameter("@FailedLogins", user.FailedLogIns));
-            command.Parameters.Add(new SqlParameter("@BannedUntil", user.BannedUntil));
-            command.Parameters.Add(new SqlParameter("@IsBanned", user.IsBanned));
-            command.Parameters.Add(new SqlParameter("@UserID", user.UserID));
-            command.ExecuteNonQuery();
+		public User? GetUserByUsername(string username)
+		{
+			// this needs to be awaited
+			_connection.openConnection();
+			var command = _connection.getConnection().CreateCommand();
 
-        }
-        public void deleteUser(string username) { }
-        public User? GetUserByEmail(string email)
-        {
-            var Connection = this.connection.getConnection();
-            Connection.Open();
-            var command = Connection.CreateCommand();
-            command.CommandText = "SELECT * FROM Users WHERE Email = @Email";
-            command.Parameters.Add(new SqlParameter("@Email", email));
+			command.CommandText = "SELECT * FROM Users WHERE Username = @Username";
+			command.Parameters.Add(new SqlParameter("@Username", username));
 
-            Debug.WriteLine("Im in login");
-            var reader = command.ExecuteReader();
-            if (reader.Read())
-            {
-                Debug.WriteLine($"UserID: {reader[0]}, Username: {reader[1]}, Email: {reader[2]}, Phone: {reader[3]}, Password: {reader[4]}, Role: {reader[5]}, FailedLogins: {reader[6]}, BannedUntil: {reader[7]} IsBanned:{reader[8]}");
-                return new User(
-           reader.GetInt32(0), // UserID
-           reader.GetString(1), // Username
-           reader.GetString(2), // Email
-           reader.GetString(3), // PhoneNumber
-            reader.GetString(4), // Password (Handle NULL)
-           reader.GetInt32(5), // Role
-           reader.GetInt32(6), // FailedLogins
-           reader.IsDBNull(7) ? (DateTime?)null : reader.GetDateTime(7), // BannedUntil (Handle NULL)
-            reader.GetBoolean(8) // IsBanned
+			var reader = command.ExecuteReader();
+			if (!reader.Read())
+			{
+				return null;
+			}
 
-       );
-                // return new User(reader.GetInt32(0), reader.GetString(1), reader.GetString(2), reader.GetString(3), reader.GetInt32(4), reader.GetInt32(5), reader.GetDateTime(6));
-                //return new User(reader.GetInt32(0), reader.GetString(1), reader.GetString(2), reader.GetString(3), reader.GetString(4),reader.GetInt32(5),reader.GetInt32(6),reader.GetDateTime(7));
+			var userId = reader.GetInt32(0);
+			var email = reader.GetString(2);
+			var phoneNumber = reader.GetString(3);
+			var password = reader.GetString(4);
+			var role = (UserRole)reader.GetInt32(5);
+			var failedLoginsCount = reader.GetInt32(6);
+			var bannedUntil = reader.IsDBNull(7) ? (DateTime?)null : reader.GetDateTime(7);
+			var isBanned = reader.GetBoolean(8);
 
-            }
-            return null;
-        }
-        public bool checkExistanceOfEmail(string email)
-        {
-            var Connection = this.connection.getConnection();
-            Connection.Open();
-            var command = Connection.CreateCommand();
-            command.CommandText = "SELECT count(1) FROM Users WHERE Email = @Email";
-            command.Parameters.Add(new SqlParameter("@Email", email));
-            return (int)command.ExecuteScalar() > 0;
-        }
-        public bool checkExistanceOfUsername(string username)
-        {
-            return true;
-        }
+			return new User(userId, username, email, phoneNumber, password, role, failedLoginsCount, bannedUntil, isBanned);
 
-        public int getFaildLogInsOfUserByUserID(int userID)
-        {
-            var Connection = this.connection.getConnection();
-            Connection.Open();
-            var command = Connection.CreateCommand();
-            command.CommandText = "SELECT FailedLogins FROM Users WHERE UserID = @UserID";
-            command.Parameters.Add(new SqlParameter("@UserID", userID));
-            return (int)command.ExecuteScalar();
-        }
+		}
 
-    }
+		public void UpdateUserFailedLoginsCount(User user, int NewValueOfFailedLogIns)
+		{
+			// this needs to be awaited
+			_connection.openConnection();
+			var command = _connection.getConnection().CreateCommand();
+
+			command.CommandText = "UPDATE Users SET FailedLogins = @FailedLogins WHERE UserID = @UserID";
+			user.FailedLogins = NewValueOfFailedLogIns;
+			command.Parameters.Add(new SqlParameter("@FailedLogins", user.FailedLogins));
+			command.Parameters.Add(new SqlParameter("@UserID", user.UserId));
+			command.ExecuteNonQuery();
+		}
+
+		public void UpdateUser(User user)
+		{
+			// this needs to be awaited
+			_connection.openConnection();
+			var command = _connection.getConnection().CreateCommand();
+
+			command.CommandText = "UPDATE Users SET Username = @Username, Email = @Email, PhoneNumber = @PhoneNumber, Password = @Password, Role = @Role, FailedLogins = @FailedLogins, BannedUntil = @BannedUntil, IsBanned = @IsBanned WHERE UserID = @UserID";
+			command.Parameters.Add(new SqlParameter("@Username", user.Username));
+			command.Parameters.Add(new SqlParameter("@Email", user.Email));
+			command.Parameters.Add(new SqlParameter("@PhoneNumber", user.PhoneNumber));
+			command.Parameters.Add(new SqlParameter("@Password", user.Password));
+			command.Parameters.Add(new SqlParameter("@Role", user.Role));
+			command.Parameters.Add(new SqlParameter("@FailedLogins", user.FailedLogins));
+			command.Parameters.Add(new SqlParameter("@BannedUntil", user.BannedUntil));
+			command.Parameters.Add(new SqlParameter("@IsBanned", user.IsBanned));
+			command.Parameters.Add(new SqlParameter("@UserID", user.UserId));
+			command.ExecuteNonQuery();
+		}
+
+		public void DeleteUser(string username) { }
+
+		public async Task<User?> GetUserByEmail(string email)
+		{
+			await _connection.openConnection();
+			var command = _connection.getConnection().CreateCommand();
+
+			command.CommandText = "SELECT * FROM Users WHERE Email = @Email";
+			command.Parameters.Add(new SqlParameter("@Email", email));
+
+			var reader = await command.ExecuteReaderAsync();
+			if (!await reader.ReadAsync())
+			{
+				return null;
+			}
+
+			var userId = reader.GetInt32(0);
+			var username = reader.GetString(1);
+			var phoneNumber = reader.GetString(3);
+			var password = reader.GetString(4);
+			var role = (UserRole)reader.GetInt32(5);
+			var failedLoginsCount = reader.GetInt32(6);
+			var bannedUntil = reader.IsDBNull(7) ? (DateTime?)null : reader.GetDateTime(7);
+			var isBanned = reader.GetBoolean(8);
+
+			await reader.CloseAsync();
+
+			return new User(userId, username, email, phoneNumber, password, role, failedLoginsCount, bannedUntil, isBanned);
+		}
+		public bool EmailExists(string email)
+		{
+			// this needs to be awaited
+			_connection.openConnection();
+			var command = _connection.getConnection().CreateCommand();
+
+			command.CommandText = "SELECT count(1) FROM Users WHERE Email = @Email";
+			command.Parameters.Add(new SqlParameter("@Email", email));
+			return (int)command.ExecuteScalar() > 0;
+		}
+		public bool UsernameExists(string username)
+		{
+			return true;
+		}
+
+		public int GetFailedLoginsCountByUserId(int userID)
+		{
+			// this needs to be awaited
+			_connection.openConnection();
+			var command = _connection.getConnection().CreateCommand();
+
+			command.CommandText = "SELECT FailedLogins FROM Users WHERE UserID = @UserID";
+			command.Parameters.Add(new SqlParameter("@UserID", userID));
+			return (int)command.ExecuteScalar();
+		}
+	}
 }

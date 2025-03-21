@@ -1,86 +1,31 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace MarketPlace924.Domain
 {
-    public class User
-    {
-        private int _userID, _role, _failedLogIns;
-        private string _username, _password, _email, _phoneNumber;
-        private DateTime? _bannedUntil;
-        private bool _isBanned;
+	public class User
+	{
 
-       // public User() { }
-        public User(int userID=0, string username="", string email = "",string phoneNumber="", string password = "", int role=0, int failedLogIns=0, DateTime? bannedUntil=null,bool isBanned=false)
-        {
-            _bannedUntil = bannedUntil;
-            _username = username;
-            _phoneNumber = phoneNumber;
-            _email = email;
-            _password = password;
-            _role = role;
-            _failedLogIns = failedLogIns;
-            _username = username;
-            _userID = userID;
-            _isBanned= isBanned;
+		public int UserId { get; set; }
+		public string Username { get; set; }
+		public string Email { get; set; }
+		public string Password { get; set; }
+		public UserRole Role { get; set; }
+		public string PhoneNumber { get; set; }
+		public DateTime? BannedUntil { get; set; }
+		public bool IsBanned { get; set; }
+		public int FailedLogins { get; set; }
 
-        }
-
-
-        public string Username
-        {
-            get => _username;
-            set => _username = value;
-        }
-
-        public string Password
-        {
-            get => _password;
-            set => _password = value;
-        }
-
-        public string Email
-        {
-            get => _email;
-            set => _email = value;
-        }
-        public string PhoneNumber
-        {
-            get => _phoneNumber;
-            set => _phoneNumber = value;
-        }
-
-        public DateTime? BannedUntil
-        {
-            get => _bannedUntil;
-            set => _bannedUntil = value;
-        }
-        public bool IsBanned
-        {
-            get => _isBanned;
-            set => _isBanned = value;
-
-        }
-
-        public int UserID
-        {
-            get => _userID;
-            set => _userID = value;
-        }
-        public int Role
-        {
-            get => _role;
-            set => _role = value;
-        }
-
-        public int FailedLogIns
-        {
-            get => _failedLogIns;
-            set => _failedLogIns = value;
-        }
-
-    }
+		public User(int userID = 0, string username = "", string email = "", string phoneNumber = "", string password = "", UserRole role = UserRole.Unassigned, int failedLogIns = 0, DateTime? bannedUntil = null, bool isBanned = false)
+		{
+			UserId = userID;
+			Username = username;
+			Email = email;
+			Password = password;
+			Role = role;
+			PhoneNumber = phoneNumber;
+			BannedUntil = bannedUntil;
+			IsBanned = isBanned;
+			FailedLogins = failedLogIns;
+		}
+	}
 }
