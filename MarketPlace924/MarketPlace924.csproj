@@ -49,6 +49,14 @@
       <Generator>MSBuild:Compile</Generator>
     </Page>
   </ItemGroup>
+  <ItemGroup>
+    <Compile Update="View\BuyerProfileView.cs">
+      <DependentUpon>BuyerProfileView.xaml</DependentUpon>
+    </Compile>
+    <Compile Update="View\BuyerAddressFormView.cs">
+      <DependentUpon>BuyerAddressFormView.xaml</DependentUpon>
+    </Compile>
+  </ItemGroup>
 
   <!--
     Defining the "HasPackageAndPublishMenuAddedByProject" property here allows the Solution

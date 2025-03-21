@@ -7,10 +7,10 @@ using System.Threading.Tasks;
 
 namespace MarketPlace924.DBConnection
 {
-    class DBConnection
+    public class DBConnection
     {
         // here you can replace the connection string with your connection info from the local database
-        private static string dbConnectionString = "Data Source=DESKTOP-618UFK0\\SQLEXPRESS;Initial Catalog=IssDb;Integrated Security=True;TrustServerCertificate=True";
+        private static string dbConnectionString = "Data Source=EDINGTON\\SQLEXPRESS;Initial Catalog=dbms_lab1;Integrated Security=True;TrustServerCertificate=True";
         private SqlConnection dbConnection = new SqlConnection(dbConnectionString);
 
         public DBConnection() { }

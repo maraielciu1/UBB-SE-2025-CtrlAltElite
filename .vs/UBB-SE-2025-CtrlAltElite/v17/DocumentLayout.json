@@ -1,7 +1,20 @@
 {
   "Version": 1,
-  "WorkspaceRootPath": "C:\\Users\\Mara\\source\\repos\\UBB-SE-2025-CtrlAltElite\\",
-  "Documents": [],
+  "WorkspaceRootPath": "C:\\Users\\Eduard\\RiderProjects\\UBB-SE-2025-CtrlAltElite\\",
+  "Documents": [
+    {
+      "AbsoluteMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|C:\\Users\\Eduard\\RiderProjects\\UBB-SE-2025-CtrlAltElite\\MarketPlace924\\View\\BuyerProfile.xaml||{F11ACC28-31D1-4C80-A34B-F4E09D3D753C}",
+      "RelativeMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|solutionrelative:MarketPlace924\\View\\BuyerProfile.xaml||{F11ACC28-31D1-4C80-A34B-F4E09D3D753C}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|C:\\Users\\Eduard\\RiderProjects\\UBB-SE-2025-CtrlAltElite\\MarketPlace924\\View\\BuyerProfile.xaml||{CD07C22A-D51F-4064-AFDB-10CD01D91020}",
+      "RelativeMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|solutionrelative:MarketPlace924\\View\\BuyerProfile.xaml||{CD07C22A-D51F-4064-AFDB-10CD01D91020}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|C:\\Users\\Eduard\\RiderProjects\\UBB-SE-2025-CtrlAltElite\\MarketPlace924\\View\\BuyerProfile.xaml||{FA3CD31E-987B-443A-9B81-186104E8DAC1}",
+      "RelativeMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|solutionrelative:MarketPlace924\\View\\BuyerProfile.xaml||{FA3CD31E-987B-443A-9B81-186104E8DAC1}"
+    }
+  ],
   "DocumentGroupContainers": [
     {
       "Orientation": 0,
@@ -9,8 +22,48 @@
       "DocumentGroups": [
         {
           "DockedWidth": 200,
-          "SelectedChildIndex": -1,
+          "SelectedChildIndex": 1,
           "Children": [
+            {
+              "$type": "Document",
+              "DocumentIndex": 1,
+              "Title": "BuyerProfile.xaml",
+              "DocumentMoniker": "C:\\Users\\Eduard\\RiderProjects\\UBB-SE-2025-CtrlAltElite\\MarketPlace924\\View\\BuyerProfile.xaml",
+              "RelativeDocumentMoniker": "MarketPlace924\\View\\BuyerProfile.xaml",
+              "ToolTip": "C:\\Users\\Eduard\\RiderProjects\\UBB-SE-2025-CtrlAltElite\\MarketPlace924\\View\\BuyerProfile.xaml",
+              "RelativeToolTip": "MarketPlace924\\View\\BuyerProfile.xaml",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.003549|",
+              "WhenOpened": "2025-03-21T12:06:46.36Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 0,
+              "Title": "BuyerProfile.xaml",
+              "DocumentMoniker": "C:\\Users\\Eduard\\RiderProjects\\UBB-SE-2025-CtrlAltElite\\MarketPlace924\\View\\BuyerProfile.xaml",
+              "RelativeDocumentMoniker": "MarketPlace924\\View\\BuyerProfile.xaml",
+              "ToolTip": "C:\\Users\\Eduard\\RiderProjects\\UBB-SE-2025-CtrlAltElite\\MarketPlace924\\View\\BuyerProfile.xaml",
+              "RelativeToolTip": "MarketPlace924\\View\\BuyerProfile.xaml",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAYAAABAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.003549|",
+              "WhenOpened": "2025-03-21T12:05:56.844Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 2,
+              "Title": "BuyerProfile.xaml",
+              "DocumentMoniker": "C:\\Users\\Eduard\\RiderProjects\\UBB-SE-2025-CtrlAltElite\\MarketPlace924\\View\\BuyerProfile.xaml",
+              "RelativeDocumentMoniker": "MarketPlace924\\View\\BuyerProfile.xaml",
+              "ToolTip": "C:\\Users\\Eduard\\RiderProjects\\UBB-SE-2025-CtrlAltElite\\MarketPlace924\\View\\BuyerProfile.xaml",
+              "RelativeToolTip": "MarketPlace924\\View\\BuyerProfile.xaml",
+              "ViewState": "AgIAAA8AAAAAAAAAAAAAAAcAAABGAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.003549|",
+              "WhenOpened": "2025-03-21T12:03:04.498Z"
+            },
+            {
+              "$type": "Bookmark",
+              "Name": "ST:0:0:{cce594b6-0c39-4442-ba28-10c64ac7e89f}"
+            },
             {
               "$type": "Bookmark",
               "Name": "ST:0:0:{aa2115a1-9712-457b-9047-dbb71ca2cdd2}"

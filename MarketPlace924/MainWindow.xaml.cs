@@ -16,6 +16,8 @@ using MarketPlace924.Repository;
 using MarketPlace924.Service;
 using MarketPlace924.View;
 using MarketPlace924.DBConnection;
+using MarketPlace924.Domain;
+using MarketPlace924.ViewModel;
 
 // To learn more about WinUI, the WinUI project structure,
 // and more about our project templates, see: http://aka.ms/winui-project-info.
@@ -25,8 +27,12 @@ namespace MarketPlace924
     /// <summary>
     /// An empty window that can be used on its own or navigated to within a Frame.
     /// </summary>
-    public sealed partial class MainWindow : Window
+    public sealed partial class MainWindow : Window, OnLoginSuccessCallback
     {
+        private UserService _userService;
+        private BuyerService _buyerService;
+        private User? _user;
+
         public MainWindow()
         {
             this.InitializeComponent();
@@ -34,19 +40,51 @@ namespace MarketPlace924
             // Initialize Database Connection and Services
             var dbConnection = new DBConnection.DBConnection(); // Using your DBConnection class
             var userRepo = new UserRepository(dbConnection);
-            var userService = new UserService(userRepo);
+            var buyerRepo = new BuyerRepository(dbConnection);
 
-            // Create a Frame and navigate to LoginView, passing the UserService
-            Frame rootFrame = new Frame();
-            rootFrame.Navigate(typeof(LoginView), userService);
+            _userService = new UserService(userRepo);
+            _buyerService = new BuyerService(buyerRepo, userRepo);
+
+            LoginView.ViewModel = new LoginViewModel(_userService, this);
+
+            // TODO Navigate to Login
+            // _user = new User(userID: 1, phoneNumber: "074322321", email: "admin@gmail.com");
+            // NavigateToBuyerProfile();
 
             // Set the content of the window
-            this.Content = rootFrame;
         }
 
-        private void myButton_Click(object sender, RoutedEventArgs e)
+        public Visibility MenuAndStageVisibility => _user != null ? Visibility.Visible : Visibility.Collapsed;
+        public Visibility LoginVisibility => _user == null ? Visibility.Visible : Visibility.Collapsed;
+
+        public void OnLoginSuccess(User user)
         {
-            myButton.Content = "Clicked";
+            LoginView.Visibility = Visibility.Collapsed;
+            MenuAndStage.Visibility = Visibility.Visible;
+            _user = user;
+            if (user.Role == 1)
+            {
+                NavigateToBuyerProfile();
+            }
+        }
+
+        private void NavigateToLogin()
+        {
+            Stage.Navigate(typeof(LoginView), new LoginViewModel(_userService, this));
+        }
+        
+        private void NavigateToHome()
+        {
+            NavigateToLogin();
+        }
+        
+        private void NavigateToMarketplace()
+        {
+            NavigateToLogin();
+        }
+        private void NavigateToBuyerProfile()
+        {
+            Stage.Navigate(typeof(BuyerProfileView), new BuyerProfileViewModel(_buyerService, _user));
         }
     }
 }

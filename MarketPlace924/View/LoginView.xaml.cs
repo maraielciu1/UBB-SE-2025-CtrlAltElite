@@ -1,19 +1,10 @@
 using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Linq;
-using System.Runtime.InteropServices.WindowsRuntime;
-using Windows.Foundation;
-using Windows.Foundation.Collections;
+using MarketPlace924.Service;
+using MarketPlace924.ViewModel;
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
-using Microsoft.UI.Xaml.Controls.Primitives;
-using Microsoft.UI.Xaml.Data;
 using Microsoft.UI.Xaml.Input;
-using Microsoft.UI.Xaml.Media;
 using Microsoft.UI.Xaml.Navigation;
-using MarketPlace924.Service;
-using Microsoft.IdentityModel.Tokens;
 
 // To learn more about WinUI, the WinUI project structure,
 // and more about our project templates, see: http://aka.ms/winui-project-info.
@@ -25,7 +16,7 @@ namespace MarketPlace924.View
     /// </summary>
     public sealed partial class LoginView : Page
     {
-        private UserService _userService;
+        public LoginViewModel ViewModel { get; set; }
         private DispatcherTimer _banTimer;
         private DateTime _banEndTime;
         private readonly CaptchaService _captchaService;
@@ -37,23 +28,21 @@ namespace MarketPlace924.View
             _captchaService = new CaptchaService();
 
             GenerateAndSetCaptcha();
-
-
-
         }
+
         private void GenerateAndSetCaptcha()
         {
             _generatedCaptcha = _captchaService.GenerateCaptcha();
             CaptchaText.Text = _generatedCaptcha;
         }
+
         private void LoginButton_Click(object sender, RoutedEventArgs e)
         {
             ErrorMessage.Text = "";
             string email = UserEmailBox.Text;
             string password = PasswordTextBox.Password;
 
-            string enteredCapthca=CaptchaEnteredCode.Text;
-
+            string enteredCapthca = CaptchaEnteredCode.Text;
 
 
             if (string.IsNullOrEmpty(email) || string.IsNullOrEmpty(password) || string.IsNullOrEmpty(enteredCapthca))
@@ -69,16 +58,17 @@ namespace MarketPlace924.View
                 GenerateAndSetCaptcha();
                 return;
             }
-            if (!_userService.checkExistanceOfEmail(email))
+
+            if (!ViewModel.UserService.checkExistanceOfEmail(email))
             {
                 ErrorMessage.Text = "Email does not exist";
                 return;
             }
 
-            var user = _userService.getUserByEmail(email); // Fetch user only once
+            var user = ViewModel.UserService.getUserByEmail(email); // Fetch user only once
 
             // **Check if the user is banned**
-            if (!_userService.canUserLogInNow(email)) // Corrected condition
+            if (!ViewModel.UserService.canUserLogInNow(email)) // Corrected condition
             {
                 ErrorMessage.Text = "Too many failed attempts. Please try again later.";
                 FailedLoginAttemptsText.Visibility = Visibility.Visible;
@@ -87,23 +77,24 @@ namespace MarketPlace924.View
             }
 
             // **Check Login Credentials**
-            if (_userService.validateLogin(email, password))
+            if (ViewModel.UserService.validateLogin(email, password))
             {
                 ErrorMessage.Text = "Login successful";
-                _userService.UpdateUserFailedLogins(user, 0); // Reset failed attempts
+                ViewModel.UserService.UpdateUserFailedLogins(user, 0); // Reset failed attempts
                 FailedLoginAttemptsText.Visibility = Visibility.Collapsed;
+                ViewModel.LoginSuccessCallback.OnLoginSuccess(user);
             }
             else
             {
                 int newFailedAttempts = user.FailedLogIns + 1;
-                _userService.UpdateUserFailedLogins(user, newFailedAttempts);
+                ViewModel.UserService.UpdateUserFailedLogins(user, newFailedAttempts);
 
                 FailedLoginAttemptsText.Text = $"Failed Login Attempts: {newFailedAttempts}";
                 FailedLoginAttemptsText.Visibility = Visibility.Visible;
 
                 if (newFailedAttempts >= 5) // **Ban user if they fail 5 times**
                 {
-                    _userService.BanUserTemporary(email, 5); // Ban for 5 seconds
+                    ViewModel.UserService.BanUserTemporary(email, 5); // Ban for 5 seconds
                     ErrorMessage.Text = "Too many failed attempts. Please try again later.";
                     _banEndTime = DateTime.Now.AddSeconds(5);
                     StartBanCountdown();
@@ -130,13 +121,11 @@ namespace MarketPlace924.View
                     _banTimer.Stop();
                     LoginButton.IsEnabled = true;
                     ErrorMessage.Text = "";
-                    FailedLoginAttemptsText.Text = "Failed Login Attempts: 0"; 
-                    var user = _userService.getUserByEmail(UserEmailBox.Text);
-                    _userService.UpdateUserFailedLogins(user, 0);
+                    FailedLoginAttemptsText.Text = "Failed Login Attempts: 0";
+                    var user = ViewModel.UserService.getUserByEmail(UserEmailBox.Text);
+                    ViewModel.UserService.UpdateUserFailedLogins(user, 0);
 
                     FailedLoginAttemptsText.Text = "Failed Login Attempts: 0";
-
-
                 }
                 else
                 {
@@ -147,20 +136,18 @@ namespace MarketPlace924.View
         }
 
 
-
         private void RegisterButtonTextBlock_PointerPressed(object sender, PointerRoutedEventArgs e)
         {
             ErrorMessage.Text = "";
-
         }
+
         protected override void OnNavigatedTo(NavigationEventArgs e)
         {
             base.OnNavigatedTo(e);
-            if (e.Parameter is UserService userService)
+            if (e.Parameter is LoginViewModel loginViewNavigateParams)
             {
-                _userService = userService;
+                ViewModel = loginViewNavigateParams;
             }
-            
         }
     }
 }

@@ -5,7 +5,7 @@ using System.Diagnostics;
 
 namespace MarketPlace924.Repository
 {
-    class UserRepository
+    public class UserRepository
     {
         private DBConnection.DBConnection connection;
         public UserRepository(DBConnection.DBConnection connection)
@@ -123,6 +123,21 @@ namespace MarketPlace924.Repository
             command.CommandText = "SELECT FailedLogins FROM Users WHERE UserID = @UserID";
             command.Parameters.Add(new SqlParameter("@UserID", userID));
             return (int)command.ExecuteScalar();
+        }
+        
+        //region: For Buyer
+        public void UpdateContactInfo(User user)
+        {
+            var conn = connection.getConnection();
+            conn.Open();
+            var command = conn.CreateCommand();
+            command.CommandText = "UPDATE Users SET PhoneNumber = @PhoneNumber WHERE UserID = @UserID";
+            
+            command.Parameters.Add(new SqlParameter("@PhoneNumber", user.PhoneNumber));
+            command.Parameters.Add(new SqlParameter("@UserID", user.UserID));
+            command.ExecuteNonQuery();
+            conn.Close();
+
         }
 
     }
