@@ -8,7 +8,7 @@ using System.Threading.Tasks;
 
 namespace MarketPlace924.Service
 {
-	class UserService
+	public class UserService
 	{
 		private UserRepository _userRepository;
 		public UserService(UserRepository userRepository)
@@ -65,8 +65,16 @@ namespace MarketPlace924.Service
 			if (await _userRepository.EmailExists(email))
 			{
 				var user = await GetUserByEmail(email);
-
-				return user?.Password == HashPassword(password);
+				if (user == null)
+				{
+					return false;
+				}
+				// Give possibility to have plain text passwords in DB for testing purposes
+				if (user.Password.StartsWith("plain:"))
+				{
+					return user.Password == "plain:" + password;
+				}
+				return user.Password == HashPassword(password);
 			}
 
 			return false;
@@ -179,7 +187,7 @@ namespace MarketPlace924.Service
 
 		public static bool VerifyCaptcha(string enteredCaptcha, string generatedCaptcha)
 		{
-            return enteredCaptcha == generatedCaptcha;
+			return enteredCaptcha == generatedCaptcha;
         }
 
     }

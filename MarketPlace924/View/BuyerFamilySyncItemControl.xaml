@@ -1,0 +1,47 @@
+﻿<UserControl
+    x:Class="MarketPlace924.View.BuyerFamilySyncItemControl"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    mc:Ignorable="d"
+    Width="Auto" Height="Auto">
+
+    <Border BorderThickness="2" BorderBrush="#1976D2" Padding="10"
+            Margin="5" CornerRadius="8" Background="White"
+            Height="Auto">
+        <StackPanel HorizontalAlignment="Stretch">
+            <Grid ColumnSpacing="5">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*" />
+                    <ColumnDefinition Width="180" />
+                </Grid.ColumnDefinitions>
+
+                <TextBlock FontSize="16"
+                           FontWeight="Bold"
+                           Foreground="#0D47A1" Text="{x:Bind ViewModel.DisplayName, Mode=OneWay}" />
+
+                <Grid Grid.Column="1" HorizontalAlignment="Right">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="*" />
+                        <ColumnDefinition Width="*" />
+                    </Grid.ColumnDefinitions>
+                    <Button Content="🗑" Width="35" Height="30" FontFamily="Segoe UI Symbols" FontSize="11"
+                            ToolTipService.ToolTip="Request sync"
+                            Visibility="{x:Bind ViewModel.RequestSyncVsbl,Mode=OneWay}"
+                            Click="{x:Bind ViewModel.RequestSync}" />
+                    <Button Content="🗑" Width="35" Height="30" FontFamily="Segoe UI Symbols"
+                            ToolTipService.ToolTip="Unsync" Visibility="{x:Bind ViewModel.UnsyncVsbl,Mode=OneWay}"
+                            Click="{x:Bind ViewModel.Unsync}" />
+                    <Button Grid.Column="0" Content="🛒" Width="35" Height="30" FontFamily="Segoe UI Symbols"
+                            FontSize="11"
+                            ToolTipService.ToolTip="Accept" Visibility="{x:Bind ViewModel.AcceptVsbl,Mode=OneWay}"
+                            Click="{x:Bind ViewModel.Accept}" />
+                    <Button Grid.Column="1" Content="🛒" Width="35" Height="30" FontFamily="Segoe UI Symbols"
+                            ToolTipService.ToolTip="Decline" Visibility="{x:Bind ViewModel.DeclineVsbl,Mode=OneWay}"
+                            Click="{x:Bind ViewModel.Decline}" />
+                </Grid>
+            </Grid>
+        </StackPanel>
+    </Border>
+</UserControl>

@@ -159,5 +159,36 @@ namespace MarketPlace924.Repository
             _connection.CloseConnection();
             return result;
         }
+        
+        //region: For Buyer
+        public void UpdateContactInfo(User user)
+        {
+	        _connection.OpenConnectionSync();
+	        var conn = _connection.getConnection();
+	        var command = conn.CreateCommand();
+	        command.CommandText = "UPDATE Users SET PhoneNumber = @PhoneNumber WHERE UserID = @UserID";
+            
+	        command.Parameters.Add(new SqlParameter("@PhoneNumber", user.PhoneNumber));
+	        command.Parameters.Add(new SqlParameter("@UserID", user.UserId));
+	        command.ExecuteNonQuery();
+        }
+
+        public void LoadUserContactById(User user)
+        {
+	        _connection.OpenConnectionSync();
+	        var conn = _connection.getConnection();
+	        var command = conn.CreateCommand();
+	        command.CommandText = "SELECT PhoneNumber, Email FROM Users WHERE UserID = @UserID";
+	        command.Parameters.Add(new SqlParameter("@UserID", user.UserId));
+	        var reader = command.ExecuteReader();
+	        if (!reader.Read())
+	        {
+		        return;
+	        }
+	        user.PhoneNumber = reader.GetString(reader.GetOrdinal("PhoneNumber"));
+	        user.Email = reader.GetString(reader.GetOrdinal("Email"));
+	        reader.Close();
+        }
+        //endregion
 	}
 }

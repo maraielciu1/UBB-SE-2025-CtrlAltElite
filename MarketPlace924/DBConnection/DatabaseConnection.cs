@@ -3,30 +3,36 @@ using System.Threading.Tasks;
 
 namespace MarketPlace924.DBConnection
 {
-	public class DatabaseConnection
+    public class DatabaseConnection
     {
-        // here you can replace the connection string with your connection info from the local database
-        private static readonly string dbConnectionString = "Server=MARA-DELL\\SQLEXPRESS01;Initial Catalog=IssDB;Integrated Security=True;TrustServerCertificate=True";
-        private readonly SqlConnection dbConnection = new(dbConnectionString);
+        private SqlConnection _dbConnection = new(Configuration.Instance.Properties["Database:ConnectionString"]);
 
-        public DatabaseConnection() { }
+
         public SqlConnection getConnection()
         {
-			return dbConnection;
+            return _dbConnection;
         }
+
+        public void OpenConnectionSync()
+        {
+            if (_dbConnection.State == System.Data.ConnectionState.Closed)
+                _dbConnection.Open();
+        }
+
         public async Task OpenConnection()
         {
-            if(dbConnection.State == System.Data.ConnectionState.Closed)
-                await dbConnection.OpenAsync();
+            if (_dbConnection.State == System.Data.ConnectionState.Closed)
+                await _dbConnection.OpenAsync();
         }
+
         public void CloseConnection()
         {
-            if (dbConnection.State == System.Data.ConnectionState.Open)
-                dbConnection.Close();
+            if (_dbConnection.State == System.Data.ConnectionState.Open)
+                _dbConnection.Close();
         }
+
         public void ExecuteProcedure()
         {
-
         }
     }
 }
