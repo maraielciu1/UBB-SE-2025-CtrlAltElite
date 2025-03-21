@@ -1,0 +1,36 @@
+﻿<UserControl
+    x:Class="MarketPlace924.View.BuyerAddressFormControl"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    mc:Ignorable="d"
+    Width="Auto" Height="Auto">
+
+    <Grid>
+        <StackPanel Spacing="25">
+            <StackPanel>
+                <TextBlock Text="Street Name" Style="{StaticResource PrimaryLabel}" />
+                <TextBox Text="{x:Bind ViewModel.Address.StreetLine, Mode=TwoWay}"
+                         Style="{StaticResource PrimaryTextBox}" />
+            </StackPanel>
+
+            <StackPanel>
+                <TextBlock Text="Postal Code" Style="{StaticResource PrimaryLabel}" />
+                <TextBox Text="{x:Bind ViewModel.Address.PostalCode, Mode=TwoWay}"
+                         Style="{StaticResource PrimaryTextBox}" />
+            </StackPanel>
+
+            <StackPanel>
+                <TextBlock Text="City" Style="{StaticResource PrimaryLabel}" />
+                <TextBox Text="{x:Bind ViewModel.Address.City, Mode=TwoWay}" Style="{StaticResource PrimaryTextBox}" />
+            </StackPanel>
+
+
+            <StackPanel>
+                <TextBlock Text="Country" Style="{StaticResource PrimaryLabel}" />
+                <TextBox Text="{x:Bind ViewModel.Address.Country, Mode=TwoWay}" Style="{StaticResource PrimaryTextBox}" />
+            </StackPanel>
+        </StackPanel>
+    </Grid>
+</UserControl>

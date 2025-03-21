@@ -1,16 +1,16 @@
-﻿using System;
+using System;
 using System.ComponentModel;
-using System.Runtime.CompilerServices;
 using System.Threading.Tasks;
 using System.Windows.Input;
 using MarketPlace924.Service;
-using MarketPlace924.Domain;
+using MarketPlace924.View;
 using Microsoft.UI.Xaml;
 
-class LoginViewModel : INotifyPropertyChanged
+public class LoginViewModel : INotifyPropertyChanged
 {
 
     public readonly UserService _userService;
+    private readonly OnLoginSuccessCallback _successCallback;
     private readonly CaptchaService _captchaService;
     private string _email;
     private string _password;
@@ -91,9 +91,10 @@ class LoginViewModel : INotifyPropertyChanged
     public ICommand LoginCommand { get; }
     
 
-    public LoginViewModel(UserService userService)
+    public LoginViewModel(UserService userService, OnLoginSuccessCallback successCallback)
     {
         _userService = userService ?? throw new ArgumentNullException(nameof(userService));
+        _successCallback = successCallback ?? throw new ArgumentNullException(nameof(successCallback));
         _captchaService = new CaptchaService();
 
         GenerateCaptcha();
@@ -111,7 +112,7 @@ class LoginViewModel : INotifyPropertyChanged
             return;
         }
 
-        if (UserService.VerifyCaptcha(CaptchaEnteredCode,CaptchaText))
+        if (!UserService.VerifyCaptcha(CaptchaEnteredCode,CaptchaText))
         {
             ErrorMessage = "Captcha verification failed.";
             GenerateCaptcha();
@@ -159,6 +160,7 @@ class LoginViewModel : INotifyPropertyChanged
             _failedAttempts = 0;
             await _userService.UpdateUserFailedLogins(user, 0);
             IsLoginEnabled = true;
+            _successCallback.OnLoginSuccess(user);
         }
         OnPropertyChanged(nameof(FailedAttemptsText));
     }

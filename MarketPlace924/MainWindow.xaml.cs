@@ -1,41 +1,75 @@
 using Microsoft.UI.Xaml;
-using Microsoft.UI.Xaml.Controls;
 using MarketPlace924.Repository;
 using MarketPlace924.Service;
 using MarketPlace924.View;
+using MarketPlace924.DBConnection;
+using MarketPlace924.Domain;
+using MarketPlace924.ViewModel;
 
 // To learn more about WinUI, the WinUI project structure,
 // and more about our project templates, see: http://aka.ms/winui-project-info.
 
 namespace MarketPlace924
 {
-	/// <summary>
-	/// An empty window that can be used on its own or navigated to within a Frame.
-	/// </summary>
-	public sealed partial class MainWindow : Window
+    /// <summary>
+    /// An empty window that can be used on its own or navigated to within a Frame.
+    /// </summary>
+    public sealed partial class MainWindow : Window, OnLoginSuccessCallback
     {
-		public static MainWindow _instance { get; set; }
-		public MainWindow()
+        private UserService _userService;
+        private BuyerService _buyerService;
+        private User? _user;
+
+        public MainWindow()
         {
             InitializeComponent();
-			_instance = this;
 
-            
-            var dbConnection = new DBConnection.DatabaseConnection(); 
-            var userRepository = new UserRepository(dbConnection);
-            var userService = new UserService(userRepository);
+            // Initialize Database Connection and Services
+            var dbConnection = new DatabaseConnection(); // Using your DBConnection class
+            var userRepo = new UserRepository(dbConnection);
+            var buyerRepo = new BuyerRepository(dbConnection);
 
-            
-            Frame rootFrame = new Frame();
-            rootFrame.Navigate(typeof(LoginView), userService);
+            _userService = new UserService(userRepo);
+            _buyerService = new BuyerService(buyerRepo, userRepo);
 
-            
-            Content = rootFrame;
+            LoginView.ViewModel = new LoginViewModel(_userService, this);
+
+            // To Start Logged in as Buyer ucomment bellow
+            // _user = new User(userID: 5, phoneNumber: "074322321", email: "admin@gmail.com");
+            // MenuAndStage.Visibility = Visibility.Visible;
+            // LoginView.Visibility = Visibility.Collapsed;
+            // NavigateToBuyerProfile();
+
         }
 
-		public static void SetContent(Frame newFrame)
-		{
-			_instance.Content = newFrame;
-		}
+        public void OnLoginSuccess(User user)
+        {
+            LoginView.Visibility = Visibility.Collapsed;
+            MenuAndStage.Visibility = Visibility.Visible;
+            _user = user;
+            if (user.Role == UserRole.Buyer)
+            {
+                NavigateToBuyerProfile();
+            }
+        }
+
+        private void NavigateToLogin()
+        {
+            Stage.Navigate(typeof(LoginView), new LoginViewModel(_userService, this));
+        }
+        
+        private void NavigateToHome()
+        {
+            NavigateToLogin();
+        }
+        
+        private void NavigateToMarketplace()
+        {
+            NavigateToLogin();
+        }
+        private void NavigateToBuyerProfile()
+        {
+            Stage.Navigate(typeof(BuyerProfileView), new BuyerProfileViewModel(_buyerService, _user, new BuyerWishlistItemDetailsProvider()));
+        }
     }
 }

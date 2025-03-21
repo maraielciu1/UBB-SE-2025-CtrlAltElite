@@ -1,0 +1,125 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<Page
+    x:Class="MarketPlace924.View.BuyerProfileView"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    xmlns:local="using:MarketPlace924.View"
+
+    mc:Ignorable="d"
+    Background="{ThemeResource ApplicationPageBackgroundThemeBrush}">
+    <Grid RowSpacing="20">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="150" />
+            <RowDefinition Height="450" />
+            <RowDefinition Height="50" />
+            <RowDefinition Height="*" />
+        </Grid.RowDefinitions>
+        <Grid Grid.Row="0" ColumnDefinitions="*, Auto">
+            <!-- Main Content (e.g., Title and Profile) -->
+            <StackPanel Grid.Column="0">
+                <TextBlock Text="Buyer Profile" FontSize="42" FontWeight="Bold" TextAlignment="Center"
+                           Foreground="#0D47A1" FontFamily="Segoe UI Black" />
+                <TextBlock Text="View and edit your profile details below" FontSize="24" Margin="0,5"
+                           TextAlignment="Center" Foreground="#1976D2" FontFamily="Segoe UI Semibold" />
+            </StackPanel>
+            <StackPanel Grid.Column="1" HorizontalAlignment="Right" VerticalAlignment="Top" Margin="10">
+                <local:BuyerBadgeControl Buyer="{x:Bind ViewModel.Buyer}" />
+            </StackPanel>
+        </Grid>
+        <StackPanel Grid.Row="1">
+            <Grid ColumnSpacing="80">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*" />
+                    <ColumnDefinition Width="*" />
+                    <ColumnDefinition Width="*" />
+                </Grid.ColumnDefinitions>
+                <StackPanel Spacing="30" Grid.Column="0">
+
+                    <TextBlock Text="Personal Information" Style="{StaticResource PrimaryLabel}" />
+
+                    <!-- First Name -->
+                    <StackPanel>
+                        <TextBlock Text="First Name" Style="{StaticResource PrimaryLabel}" />
+                        <TextBox Text="{x:Bind ViewModel.Buyer.FirstName, Mode=TwoWay}"
+                                 Style="{StaticResource PrimaryTextBox}" />
+                    </StackPanel>
+
+                    <!-- Last Name -->
+                    <StackPanel>
+                        <TextBlock Text="Last Name" Style="{StaticResource PrimaryLabel}" />
+                        <TextBox Text="{x:Bind ViewModel.Buyer.LastName, Mode=TwoWay}"
+                                 Style="{StaticResource PrimaryTextBox}" />
+                    </StackPanel>
+
+                    <!-- Email -->
+                    <StackPanel>
+                        <TextBlock Text="Email" Style="{StaticResource PrimaryLabel}" />
+                        <TextBox Text="{x:Bind ViewModel.Buyer.Email, Mode=TwoWay}"
+                                 Style="{StaticResource PrimaryTextBox}" />
+                    </StackPanel>
+
+                    <!-- Phone -->
+                    <StackPanel>
+                        <TextBlock Text="Phone" Style="{StaticResource PrimaryLabel}" />
+                        <TextBox Text="{x:Bind ViewModel.Buyer.PhoneNumber, Mode=TwoWay}"
+                                 Style="{StaticResource PrimaryTextBox}" />
+                    </StackPanel>
+
+                </StackPanel>
+
+                <StackPanel Grid.Column="1">
+                    <TextBlock Text="Billing Address" Style="{StaticResource PrimaryLabel}" />
+                    <local:BuyerAddressFormControl ViewModel="{x:Bind ViewModel.BillingAddress, Mode=OneWay}" />
+                </StackPanel>
+                <StackPanel Grid.Column="2">
+                    <Grid>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*" />
+                            <ColumnDefinition Width="*" />
+                        </Grid.ColumnDefinitions>
+                        <TextBlock Grid.Column="0" Text="Shipping Address"
+                                   Style="{StaticResource PrimaryLabel}" />
+                        <CheckBox Grid.Column="1" Content=" Same Address as Billing"
+                                  IsChecked="{x:Bind ViewModel.ShippingAddressDisabled, Mode=TwoWay}"
+                                  HorizontalAlignment="Center" VerticalAlignment="Center" />
+                    </Grid>
+
+                    <local:BuyerAddressFormControl ViewModel="{x:Bind ViewModel.ShippingAddress, Mode=OneWay}"
+                                                IsEnabled="{x:Bind ViewModel.ShippingAddressEnabled, Mode=OneWay}" />
+
+                </StackPanel>
+            </Grid>
+        </StackPanel>
+
+        <StackPanel Grid.Row="2">
+
+            <Grid>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*" />
+                    <ColumnDefinition Width="*" />
+                </Grid.ColumnDefinitions>
+                <Button Grid.Column="0" Content="Save" Click="{x:Bind ViewModel.SaveInfo}"
+                        Style="{StaticResource PrimaryButton}" />
+                <Button Grid.Column="1" Content="Reset" Click="{x:Bind ViewModel.ResetInfo}"
+                        Style="{StaticResource PrimaryButton}" />
+            </Grid>
+        </StackPanel>
+        
+        <Grid Grid.Row="3" Margin="0,30,0,0">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="3.5*" /> <!-- Wishlist -->
+                <ColumnDefinition Width="1.5*" /> <!-- Description & Sync Toggle -->
+            </Grid.ColumnDefinitions>
+
+          <local:BuyerWishlistControl ViewModel="{x:Bind ViewModel.Wishlist, Mode=OneWay}"/>
+          <local:BuyerFamilySyncControl Grid.Column="1" ViewModel="{x:Bind ViewModel.FamilySync, Mode=OneWay}"/>
+          
+        </Grid>
+
+
+    </Grid>
+
+</Page>
