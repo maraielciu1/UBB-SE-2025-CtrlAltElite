@@ -23,11 +23,12 @@ namespace MarketPlace924
             // Initialize Database Connection and Services
             var dbConnection = new DBConnection.DatabaseConnection(); // Using your DBConnection class
             var userRepository = new UserRepository(dbConnection);
+            var sellerRepository = new SellerRepository(dbConnection, userRepository);
             var userService = new UserService(userRepository);
 
             // Create a Frame and navigate to LoginView, passing the UserService
             Frame rootFrame = new Frame();
-            rootFrame.Navigate(typeof(LoginView), userService);
+            rootFrame.Navigate(typeof(SellerProfileView), userService);
 
             // Set the content of the window
             Content = rootFrame;

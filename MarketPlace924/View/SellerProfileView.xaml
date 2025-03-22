@@ -1,0 +1,228 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Page 
+    x:Class="MarketPlace924.View.SellerProfileView"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:local="using:MarketPlace924.View"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    mc:Ignorable="d"
+    Background="{ThemeResource ApplicationPageBackgroundThemeBrush}">
+
+    <Grid>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="200"/>
+            <!-- Sidebar -->
+            <ColumnDefinition Width="*"/>
+            <!-- Main Content -->
+        </Grid.ColumnDefinitions>
+
+        <!-- Sidebar -->
+        <StackPanel Grid.Column="0" Background="Black" Width="200" Height="Auto">
+            <Button Content="Home" Width="200"/>  
+           <Button Content="Profile" Width="200" Background="Gray"/>  
+        </StackPanel>
+
+        <!-- Main Content Grid -->
+        <Grid Grid.Column="1" Padding="20">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto"/>
+                <!-- Seller Info -->
+                <RowDefinition Height="Auto"/>
+                <!-- Controls (Search, Filter, etc.) -->
+                <RowDefinition Height="*"/>
+                <!-- Products Grid -->
+            </Grid.RowDefinitions>
+
+            <!-- Seller Profile Section -->
+            <Border Grid.Row="0" Padding="15" Background="Black" CornerRadius="10" Margin="0,0,0,10" 
+                   BorderBrush="Gray" BorderThickness="1">
+               <StackPanel Orientation="Horizontal">
+                    <StackPanel Orientation="Horizontal">
+                        <PersonPicture DisplayName="Ted Inc." Margin="0,0,10,0"/>
+                        <StackPanel MaxWidth="300">
+                            <TextBlock Text="Ted Inc." FontSize="24" FontWeight="Bold" TextWrapping="Wrap"/>
+                            <StackPanel Orientation="Horizontal">
+                                <TextBlock Text="Name:" FontWeight="Bold"/>
+                                <TextBlock Text=" SC Ted Inc. SRL" Margin="5,0,0,0" TextWrapping="Wrap"/>
+                            </StackPanel>
+                            <StackPanel Orientation="Horizontal">
+                                <TextBlock Text="Email:" FontWeight="Bold"/>
+                                <TextBlock Text=" ted@tedinc.com" Margin="5,0,0,0" TextWrapping="Wrap"/>
+                            </StackPanel>
+                            <StackPanel Orientation="Horizontal">
+                                <TextBlock Text="Phone:" FontWeight="Bold"/>
+                                <TextBlock Text=" +40***-***-***" Margin="5,0,0,0" TextWrapping="Wrap"/>
+                            </StackPanel>
+                            <StackPanel Orientation="Horizontal">
+                                <TextBlock Text="Address:" FontWeight="Bold"/>
+                                <TextBlock Text=" TedLand, 53 RailRoad" Margin="5,0,0,0" TextWrapping="Wrap"/>
+                            </StackPanel>
+                        </StackPanel>
+                        <StackPanel Orientation="Vertical" VerticalAlignment="Center" Margin="20,0,0,0">
+                            <StackPanel Orientation="Horizontal" Margin="10, 0, 0, 0">
+                                <TextBlock Text="Followers:" FontWeight="Bold" FontSize="18"/>
+                                <TextBlock Text=" 723" Margin="5,0,0,0" FontSize="18"/>
+                            </StackPanel>
+                            <StackPanel Orientation="Horizontal" Margin="10,0,0,0">
+                                <TextBlock Text="Trust Score:" FontWeight="Bold" FontSize="18"/>
+                                <ProgressBar Value="80" Width="100" Height="20" Margin="5,0,0,0"/>
+                            </StackPanel>
+                        </StackPanel>
+                        <StackPanel HorizontalAlignment="Right" VerticalAlignment="Bottom" Margin="10">  
+                            <Button Content="Update Profile" Width="150" Height="40" Margin="10,0,0,0"/>  
+                        </StackPanel>
+                    </StackPanel>
+                </StackPanel>
+            </Border>
+
+            <!-- Search & Controls Section -->
+            <Grid Grid.Row="1" Margin="0,10,0,10">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*"/>
+                    <!-- Search Box -->
+                    <ColumnDefinition Width="Auto"/>
+                    <!-- Buttons -->
+                </Grid.ColumnDefinitions>
+
+                <!-- Search Box -->
+                <TextBox PlaceholderText="Search" Grid.Column="0" Margin="0,0,10,0" Height="40" HorizontalAlignment="Stretch"/>
+
+                <!-- Buttons -->
+                <StackPanel Grid.Column="1" Orientation="Horizontal" HorizontalAlignment="Stretch">
+                    <Button Content="Filter" Margin="5" MinWidth="120" Width="Auto"/>
+                    <Button Content="Sort" Margin="5" MinWidth="120" Width="Auto"/>
+                    <Button Content="+ Add Product" Margin="5" MinWidth="170" Width="Auto"/>
+                </StackPanel>
+            </Grid>
+
+
+            <!-- Product Grid (Using Only Grid) -->
+            <ScrollViewer Grid.Row="2" VerticalScrollBarVisibility="Auto">
+                <StackPanel>
+                    <Grid Margin="10" MaxHeight="500">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*" />
+                            <ColumnDefinition Width="*" />
+                            <ColumnDefinition Width="*" />
+                        </Grid.ColumnDefinitions>
+
+                        <!-- Add rows dynamically -->
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="Auto" />
+                            <RowDefinition Height="Auto" />
+                            <RowDefinition Height="Auto" />
+                            <RowDefinition Height="Auto" />
+                            
+                        </Grid.RowDefinitions>
+
+                        <!-- Product Items -->
+                        <Border Grid.Row="0" Grid.Column="0" Background="LightGray" Padding="10" CornerRadius="10" Margin="5">
+                            <StackPanel>
+                                <TextBlock Text="Kitty" FontSize="16" FontWeight="Bold"/>
+                                <TextBlock Text="$10" Foreground="Green"/>
+                                <TextBlock Text="Used"/>
+                            </StackPanel>
+                        </Border>
+
+                        <Border Grid.Row="0" Grid.Column="1" Background="LightGray" Padding="10" CornerRadius="10" Margin="5">
+                            <StackPanel>
+                                <TextBlock Text="Teddy Bear" FontSize="16" FontWeight="Bold"/>
+                                <TextBlock Text="$50" Foreground="Green"/>
+                                <TextBlock Text="New"/>
+                            </StackPanel>
+                        </Border>
+
+                        <Border Grid.Row="0" Grid.Column="2" Background="LightGray" Padding="10" CornerRadius="10" Margin="5">
+                            <StackPanel>
+                                <TextBlock Text="Hanna" FontSize="16" FontWeight="Bold"/>
+                                <TextBlock Text="$15" Foreground="Green"/>
+                                <TextBlock Text="Used"/>
+                            </StackPanel>
+                        </Border>
+
+                        <Border Grid.Row="1" Grid.Column="0" Background="LightGray" Padding="10" CornerRadius="10" Margin="5">
+                            <StackPanel>
+                                <TextBlock Text="Joel" FontSize="16" FontWeight="Bold"/>
+                                <TextBlock Text="$12" Foreground="Green"/>
+                                <TextBlock Text="Used"/>
+                            </StackPanel>
+                        </Border>
+
+                        <Border Grid.Row="1" Grid.Column="1" Background="LightGray" Padding="10" CornerRadius="10" Margin="5">
+                            <StackPanel>
+                                <TextBlock Text="Bob" FontSize="16" FontWeight="Bold"/>
+                                <TextBlock Text="$40" Foreground="Green"/>
+                                <TextBlock Text="Used"/>
+                            </StackPanel>
+                        </Border>
+
+                        <Border Grid.Row="1" Grid.Column="2" Background="LightGray" Padding="10" CornerRadius="10" Margin="5">
+                            <StackPanel>
+                                <TextBlock Text="Sarah" FontSize="16" FontWeight="Bold"/>
+                                <TextBlock Text="$25" Foreground="Green"/>
+                                <TextBlock Text="Used"/>
+                            </StackPanel>
+                        </Border>
+
+                        <Border Grid.Row="2" Grid.Column="0" Background="LightGray" Padding="10" CornerRadius="10" Margin="5">
+                            <StackPanel>
+                                <TextBlock Text="Joel" FontSize="16" FontWeight="Bold"/>
+                                <TextBlock Text="$12" Foreground="Green"/>
+                                <TextBlock Text="Used"/>
+                            </StackPanel>
+                        </Border>
+
+                        <Border Grid.Row="2" Grid.Column="1" Background="LightGray" Padding="10" CornerRadius="10" Margin="5">
+                            <StackPanel>
+                                <TextBlock Text="Bob" FontSize="16" FontWeight="Bold"/>
+                                <TextBlock Text="$40" Foreground="Green"/>
+                                <TextBlock Text="Used"/>
+                            </StackPanel>
+                        </Border>
+
+                        <Border Grid.Row="2" Grid.Column="2" Background="LightGray" Padding="10" CornerRadius="10" Margin="5">
+                            <StackPanel>
+                                <TextBlock Text="Sarah" FontSize="16" FontWeight="Bold"/>
+                                <TextBlock Text="$25" Foreground="Green"/>
+                                <TextBlock Text="Used"/>
+                            </StackPanel>
+                        </Border>
+
+                        <Border Grid.Row="3" Grid.Column="0" Background="LightGray" Padding="10" CornerRadius="10" Margin="5">
+                            <StackPanel>
+                                <TextBlock Text="Kitty" FontSize="16" FontWeight="Bold"/>
+                                <TextBlock Text="$10" Foreground="Green"/>
+                                <TextBlock Text="Used"/>
+                            </StackPanel>
+                        </Border>
+                    </Grid>
+                </StackPanel>
+            </ScrollViewer>
+        </Grid>
+
+        <!-- Notifications Panel (Fixed to the Right) -->
+
+        <StackPanel  Grid.Column="1" Width="Auto" Height="Auto" HorizontalAlignment="Right" VerticalAlignment="Top" Margin="10" Padding="10">
+            <Expander
+                 IsExpanded="False"
+                 ExpandDirection="Down"
+                 VerticalAlignment="Top"
+                 Header="Notifications"
+                 Background="Black"
+                 Width="350"
+                 MaxHeight="200">
+                <Expander.Content>
+                    <ListView>
+                        <ListViewItem>• You have 4 new followers</ListViewItem>
+                        <ListViewItem>• You gained 12 followers in 24 hrs</ListViewItem>
+                        <ListViewItem>• Congratulations! You reached 50 followers</ListViewItem>
+                        <ListViewItem>• You have 23 new followers</ListViewItem>
+                        <ListViewItem>• You gained 12 followers in 24 hrs</ListViewItem>
+                    </ListView>
+                </Expander.Content>
+            </Expander>
+        </StackPanel>
+    </Grid>
+</Page>
+ 
