@@ -1,90 +1,93 @@
 ﻿using MarketPlace924.Domain;
 using MarketPlace924.Repository;
 using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
 
 namespace MarketPlace924.Service
 {
-    class UserService
-    {
-        private UserRepository _userRepository;
-        public UserService(UserRepository userRepository)
-        {
-            _userRepository = userRepository;
-        }
-        public void addUser(string username, string password, string email, int role)
-        {
+	class UserService
+	{
+		private UserRepository _userRepository;
+		public UserService(UserRepository userRepository)
+		{
+			_userRepository = userRepository;
+		}
+		public void addUser(string username, string password, string email, int role)
+		{
 
-        }
-        public User GetUser(string username)
-        {
-            return new User();
-        }
-        public bool validateLogin(string email, string password)
+		}
 
-        {
-            
-            if(_userRepository.checkExistanceOfEmail(email))
-            {
-                User? user = getUserByEmail(email);
-                if (user.Password == hashPassword(password))
-                    return true;
-                else
-                    return false;
-                
-            }
-            else
-            {
-                return false;
-            }
-        }
+		public User GetUser(string username)
+		{
+			return new User();
+		}
 
-        public void UpdateUserFailedLogins(User user, int NewValueOfFailedLogIns)
-        {
-            _userRepository.updateUserFailedLogins(user, NewValueOfFailedLogIns);
-        }
-        public string hashPassword(string password) {
-            return password;
-        }
-        public User? getUserByEmail(string email) {
-            return _userRepository.GetUserByEmail(email);
-        }
+		public async Task<bool> CanUserLogin(string email, string password)
+		{
+			if (_userRepository.UsernameExists(email))
+			{
+				var user = await GetUserByEmail(email);
 
-        public int getFaildLogInsOfUserByEmail(string email)
-        {
-            User user= this.getUserByEmail(email);
-            int userId = user.UserID;
-            return _userRepository.getFaildLogInsOfUserByUserID(userId);
-        }
+				return user?.Password == HashPassowrd(password);
+			}
 
-        public bool checkExistanceOfEmail(string email)
-        {
-            return _userRepository.checkExistanceOfEmail(email);
-        }
+			return false;
+		}
 
-        public bool canUserLogInNow(string email)
-        {
-            User user = getUserByEmail(email);
+		public void UpdateUserFailedLogins(User user, int NewValueOfFailedLogIns)
+		{
+			_userRepository.UpdateUserFailedLoginsCount(user, NewValueOfFailedLogIns);
+		}
 
-            // If `BannedUntil` is set and the ban time is in the future, user is still banned
-            if (user.BannedUntil.HasValue && user.BannedUntil > DateTime.Now)
-            {
-                return false; // ❌ User CANNOT log in
-            }
+		public string HashPassowrd(string password)
+		{
+			return password;
+		}
 
-            return true; // ✅ User CAN log in
-        }
+		public async Task<User?> GetUserByEmail(string email)
+		{
+			return await _userRepository.GetUserByEmail(email);
+		}
+
+		public async Task<int> GetFailedLoginsCountByEmail(string email)
+		{
+			var user = await GetUserByEmail(email);
+
+			if (user is null) throw new ArgumentNullException($"{email} is not a user");
+
+			int userId = user.UserId;
+			return _userRepository.GetFailedLoginsCountByUserId(userId);
+		}
+
+		public bool IsUser(string email)
+		{
+			return _userRepository.UsernameExists(email);
+		}
+
+		public async Task<bool> IsSuspended(string email)
+		{
+			var user = await GetUserByEmail(email);
+
+			if (user is null) throw new ArgumentNullException($"{email} is not a user");
+
+			if (user.BannedUntil.HasValue && user.BannedUntil > DateTime.Now)
+			{
+				return true;
+			}
+
+			return false;
+		}
 
 
-        public void BanUserTemporary(string email, int seconds)
-        {
-            User user = getUserByEmail(email);
-            user.BannedUntil = DateTime.Now.AddSeconds(seconds);
-            _userRepository.updateUser(user);
-        }
+		public async Task SuspendUserForSeconds(string email, int seconds)
+		{
+			var user = await GetUserByEmail(email);
 
-    }
+			if(user is null) throw new ArgumentNullException($"{email} is not a user");
+
+			user.BannedUntil = DateTime.Now.AddSeconds(seconds);
+			_userRepository.UpdateUser(user);
+		}
+
+	}
 }

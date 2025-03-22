@@ -1,166 +1,152 @@
 using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Linq;
-using System.Runtime.InteropServices.WindowsRuntime;
-using Windows.Foundation;
-using Windows.Foundation.Collections;
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
-using Microsoft.UI.Xaml.Controls.Primitives;
-using Microsoft.UI.Xaml.Data;
 using Microsoft.UI.Xaml.Input;
-using Microsoft.UI.Xaml.Media;
 using Microsoft.UI.Xaml.Navigation;
 using MarketPlace924.Service;
-using Microsoft.IdentityModel.Tokens;
+using MarketPlace924.Domain;
+using System.Threading.Tasks;
 
 // To learn more about WinUI, the WinUI project structure,
 // and more about our project templates, see: http://aka.ms/winui-project-info.
 
 namespace MarketPlace924.View
 {
-    /// <summary>
-    /// An empty page that can be used on its own or navigated to within a Frame.
-    /// </summary>
-    public sealed partial class LoginView : Page
-    {
-        private UserService _userService;
-        private DispatcherTimer _banTimer;
-        private DateTime _banEndTime;
-        private readonly CaptchaService _captchaService;
-        private string _generatedCaptcha;
+	/// <summary>
+	/// An empty page that can be used on its own or navigated to within a Frame.
+	/// </summary>
+	public sealed partial class LoginView : Page
+	{
+		private UserService _userService;
+		private DispatcherTimer _banTimer;
+		private DateTime _banEndTime;
+		private readonly CaptchaService _captchaService;
+		private string _generatedCaptcha;
 
-        public LoginView()
-        {
-            this.InitializeComponent();
-            _captchaService = new CaptchaService();
+		public LoginView()
+		{
+			InitializeComponent();
+			_captchaService = new CaptchaService();
 
-            GenerateAndSetCaptcha();
+			GenerateCaptcha();
+		}
 
+		private async void LoginButton_Click(object sender, RoutedEventArgs e)
+		{
+			ErrorMessage.Text = string.Empty;
+			var email = UserEmailBox.Text;
+			var password = PasswordTextBox.Password;
+			var enteredCapthca = CaptchaEnteredCode.Text;
 
+			ValidateInput(email, password, enteredCapthca);
 
-        }
-        private void GenerateAndSetCaptcha()
-        {
-            _generatedCaptcha = _captchaService.GenerateCaptcha();
-            CaptchaText.Text = _generatedCaptcha;
-        }
-        private void LoginButton_Click(object sender, RoutedEventArgs e)
-        {
-            ErrorMessage.Text = "";
-            string email = UserEmailBox.Text;
-            string password = PasswordTextBox.Password;
+			var user = await _userService.GetUserByEmail(email);
 
-            string enteredCapthca=CaptchaEnteredCode.Text;
+			if (await _userService.IsSuspended(email))
+			{
+				ErrorMessage.Text = "Too many failed attempts. Please try again later.";
+				FailedLoginAttemptsText.Visibility = Visibility.Visible;
+				FailedLoginAttemptsText.Text = $"Failed Login Attempts: {user.FailedLogins}";
+				return;
+			}
 
+			if (!await _userService.CanUserLogin(email, password))
+			{
+				var failedLoginCount = user.FailedLogins + 1;
+				_userService.UpdateUserFailedLogins(user, failedLoginCount);
 
+				FailedLoginAttemptsText.Text = $"Failed Login Attempts: {failedLoginCount}";
+				FailedLoginAttemptsText.Visibility = Visibility.Visible;
 
-            if (string.IsNullOrEmpty(email) || string.IsNullOrEmpty(password) || string.IsNullOrEmpty(enteredCapthca))
-            {
-                ErrorMessage.Text = "Please fill in all fields";
-                return;
-            }
+				if (failedLoginCount >= 5)
+				{
+					await _userService.SuspendUserForSeconds(email, 5);
+					ErrorMessage.Text = "Too many failed attempts. Please try again later.";
+					_banEndTime = DateTime.Now.AddSeconds(5);
+					StartBanCountdown(user);
+				}
+				else
+				{
+					ErrorMessage.Text = "Login failed";
+				}
 
+				return;
+			}
 
-            if (enteredCapthca != _generatedCaptcha)
-            {
-                ErrorMessage.Text = "Captcha is incorrect";
-                GenerateAndSetCaptcha();
-                return;
-            }
-            if (!_userService.checkExistanceOfEmail(email))
-            {
-                ErrorMessage.Text = "Email does not exist";
-                return;
-            }
+			ErrorMessage.Text = "Login successful";
+			_userService.UpdateUserFailedLogins(user, 0);
+			FailedLoginAttemptsText.Visibility = Visibility.Collapsed;
+		}
 
-            var user = _userService.getUserByEmail(email); // Fetch user only once
+		private void ValidateInput(string email, string password, string enteredCapthca)
+		{
+			if (string.IsNullOrEmpty(email) || string.IsNullOrEmpty(password) || string.IsNullOrEmpty(enteredCapthca))
+			{
+				ErrorMessage.Text = "Please fill in all fields";
+				return;
+			}
 
-            // **Check if the user is banned**
-            if (!_userService.canUserLogInNow(email)) // Corrected condition
-            {
-                ErrorMessage.Text = "Too many failed attempts. Please try again later.";
-                FailedLoginAttemptsText.Visibility = Visibility.Visible;
-                FailedLoginAttemptsText.Text = $"Failed Login Attempts: {user.FailedLogIns}";
-                return;
-            }
+			if (enteredCapthca != _generatedCaptcha)
+			{
+				ErrorMessage.Text = "Captcha is incorrect";
+				GenerateCaptcha();
+				return;
+			}
 
-            // **Check Login Credentials**
-            if (_userService.validateLogin(email, password))
-            {
-                ErrorMessage.Text = "Login successful";
-                _userService.UpdateUserFailedLogins(user, 0); // Reset failed attempts
-                FailedLoginAttemptsText.Visibility = Visibility.Collapsed;
-            }
-            else
-            {
-                int newFailedAttempts = user.FailedLogIns + 1;
-                _userService.UpdateUserFailedLogins(user, newFailedAttempts);
+			if (!_userService.IsUser(email))
+			{
+				ErrorMessage.Text = "Email does not exist";
+				return;
+			}
+		}
 
-                FailedLoginAttemptsText.Text = $"Failed Login Attempts: {newFailedAttempts}";
-                FailedLoginAttemptsText.Visibility = Visibility.Visible;
+		private void StartBanCountdown(User user)
+		{
+			LoginButton.IsEnabled = false;
+			ErrorMessage.Text = "Too many failed attempts. Please wait...";
 
-                if (newFailedAttempts >= 5) // **Ban user if they fail 5 times**
-                {
-                    _userService.BanUserTemporary(email, 5); // Ban for 5 seconds
-                    ErrorMessage.Text = "Too many failed attempts. Please try again later.";
-                    _banEndTime = DateTime.Now.AddSeconds(5);
-                    StartBanCountdown();
-                }
-                else
-                {
-                    ErrorMessage.Text = "Login failed";
-                }
-            }
-        }
+			_banTimer = new DispatcherTimer();
+			_banTimer.Interval = TimeSpan.FromSeconds(1);
+			_banTimer.Tick += (s, e) =>
+			{
+				TimeSpan remainingTime = _banEndTime - DateTime.Now;
+				if (remainingTime.TotalSeconds <= 0)
+				{
+					_banTimer.Stop();
+					LoginButton.IsEnabled = true;
+					ErrorMessage.Text = string.Empty;
+					FailedLoginAttemptsText.Text = "Failed Login Attempts: 0";
 
-        private void StartBanCountdown()
-        {
-            LoginButton.IsEnabled = false;
-            ErrorMessage.Text = "Too many failed attempts. Please wait...";
+					if (user is null)
+						return;
 
-            _banTimer = new DispatcherTimer();
-            _banTimer.Interval = TimeSpan.FromSeconds(1);
-            _banTimer.Tick += (s, e) =>
-            {
-                TimeSpan remainingTime = _banEndTime - DateTime.Now;
-                if (remainingTime.TotalSeconds <= 0)
-                {
-                    _banTimer.Stop();
-                    LoginButton.IsEnabled = true;
-                    ErrorMessage.Text = "";
-                    FailedLoginAttemptsText.Text = "Failed Login Attempts: 0"; 
-                    var user = _userService.getUserByEmail(UserEmailBox.Text);
-                    _userService.UpdateUserFailedLogins(user, 0);
+					_userService.UpdateUserFailedLogins(user, 0);
+				}
+				else
+				{
+					ErrorMessage.Text = $"Too many failed attempts. Try again in {remainingTime.Seconds}s";
+				}
+			};
+			_banTimer.Start();
+		}
 
-                    FailedLoginAttemptsText.Text = "Failed Login Attempts: 0";
+		private void GenerateCaptcha()
+		{
+			CaptchaText.Text = _captchaService.GenerateCaptcha();
+		}
 
+		private void RegisterButtonTextBlock_PointerPressed(object sender, PointerRoutedEventArgs e)
+		{
+			ErrorMessage.Text = "";
+		}
 
-                }
-                else
-                {
-                    ErrorMessage.Text = $"Too many failed attempts. Try again in {remainingTime.Seconds}s";
-                }
-            };
-            _banTimer.Start();
-        }
-
-
-
-        private void RegisterButtonTextBlock_PointerPressed(object sender, PointerRoutedEventArgs e)
-        {
-            ErrorMessage.Text = "";
-
-        }
-        protected override void OnNavigatedTo(NavigationEventArgs e)
-        {
-            base.OnNavigatedTo(e);
-            if (e.Parameter is UserService userService)
-            {
-                _userService = userService;
-            }
-            
-        }
-    }
+		protected override void OnNavigatedTo(NavigationEventArgs e)
+		{
+			base.OnNavigatedTo(e);
+			if (e.Parameter is UserService userService)
+			{
+				_userService = userService;
+			}
+		}
+	}
 }

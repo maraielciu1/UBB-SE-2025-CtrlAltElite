@@ -1,41 +1,40 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace MarketPlace924.Service
 {
-    public class CaptchaService
-    {
-        private static readonly Random _random = new Random();
-        public string GenerateCaptcha()
+	public class CaptchaService
+	{
+		private static readonly Random _random = new Random();
 
-        {
-            int lengthOfCaptchaCode = _random.Next(6, 8);
-            string captcha = "";
-            int totalSoFar = 0;
-            do
-            {
+		public string GenerateCaptcha()
+		{
+			var captchaCodeLength = _random.Next(6, 8);
+			var captchaCode = string.Empty;
 
-                int current_char_being_added = _random.Next(48, 123);
-                if ((current_char_being_added >= 48 && current_char_being_added <= 57) || (current_char_being_added >= 65 && current_char_being_added <= 90) || (current_char_being_added >= 97 && current_char_being_added <= 122))
-                {
-                    captcha = captcha + (char)current_char_being_added;
-                    totalSoFar++;
-                    if (totalSoFar == lengthOfCaptchaCode)
-                        break;
+			while (captchaCode.Length != captchaCodeLength)
+			{
+				var currentCharacterAscii = _random.Next(48, 123);
+				var currentCharacter = (char)currentCharacterAscii;
 
-                }
-            } while (true);
-            return captcha;
+				if (!IsAlphaNumeric(currentCharacter))
+					continue;
 
-        }
+				captchaCode += currentCharacter;
+			}
 
-        public bool validateEnteredCaptcha(string GeneratedCaptcha, string enterdCaptcha)
-        {
-            return GeneratedCaptcha == enterdCaptcha;
+			return captchaCode;
+		}
 
-        }
-    }
+		private static bool IsAlphaNumeric(char currentCharacter)
+		{
+			return (currentCharacter >= '0' && currentCharacter <= '9')
+				|| (currentCharacter >= 'a' && currentCharacter <= 'z')
+				|| (currentCharacter >= 'A' && currentCharacter <= 'Z');
+		}
+
+		public bool IsEnteredCaptchaValid(string generetedCaptcha, string currentCaptcha)
+		{
+			return generetedCaptcha == currentCaptcha;
+		}
+	}
 }
