@@ -8,7 +8,7 @@ using System.Threading.Tasks;
 
 namespace MarketPlace924.Service
 {
-    class UserService
+    public class UserService
     {
         private UserRepository _userRepository;
         public UserService(UserRepository userRepository)
