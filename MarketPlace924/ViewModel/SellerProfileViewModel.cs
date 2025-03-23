@@ -1,5 +1,7 @@
-﻿using System.Collections.ObjectModel;
+﻿using System;
+using System.Collections.ObjectModel;
 using System.ComponentModel;
+using System.Linq;
 using System.Runtime.CompilerServices;
 using System.Windows.Input;
 using MarketPlace924.Domain;
@@ -13,11 +15,16 @@ namespace MarketPlace924.ViewModel
         private SellerService _sellerService;
         private string _username;
 
+        private ObservableCollection<Product> _allProducts;
+        public ObservableCollection<Product> FilteredProducts { get; set; }
+
         public SellerProfileViewModel(UserService userService, SellerService sellerService, string username)
         {
             _userService = userService;
             _sellerService = sellerService;
             _username = username;
+            _allProducts = new ObservableCollection<Product>();
+            FilteredProducts = new ObservableCollection<Product>();
             LoadSellerProfile();
             LoadSellerProducts();
         }
@@ -56,14 +63,28 @@ namespace MarketPlace924.ViewModel
                 var products = _sellerService.GetAllProducts(_sellerService.GetSellerIDByUsername(_username));
                 if (products != null)
                 {
-                    Products.Clear();
+                    _allProducts.Clear();
                     foreach (var product in products)
                     {
-                        Products.Add(product);
+                        _allProducts.Add(product);
                     }
-                    OnPropertyChanged(nameof(Products));
+                    FilterProducts(string.Empty); // Update FilteredProducts after loading
                 }
             }
+        }
+
+        public void FilterProducts(string searchText)
+        {
+            if (string.IsNullOrEmpty(searchText))
+            {
+                FilteredProducts = new ObservableCollection<Product>(_allProducts);
+            }
+            else
+            {
+                var filtered = _allProducts.Where(p => p.Name.Contains(searchText, StringComparison.OrdinalIgnoreCase)).ToList();
+                FilteredProducts = new ObservableCollection<Product>(filtered);
+            }
+            OnPropertyChanged(nameof(FilteredProducts));
         }
 
         public event PropertyChangedEventHandler PropertyChanged;

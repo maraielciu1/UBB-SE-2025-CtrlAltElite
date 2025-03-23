@@ -19,8 +19,8 @@
 
         <!-- Sidebar -->
         <StackPanel Grid.Column="0" Background="Black" Width="200" Height="Auto">
-            <Button Content="Home" Width="200"/>  
-           <Button Content="Profile" Width="200" Background="Gray"/>  
+            <Button Content="Home" Width="200"/>
+            <Button Content="Profile" Width="200" Background="Gray"/>
         </StackPanel>
 
         <!-- Main Content Grid -->
@@ -86,7 +86,7 @@
                 </Grid.ColumnDefinitions>
 
                 <!-- Search Box -->
-                <TextBox PlaceholderText="Search" Grid.Column="0" Margin="0,0,10,0" Height="40" HorizontalAlignment="Stretch"/>
+                <TextBox PlaceholderText="Search" Grid.Column="0" Margin="0,0,10,0" Height="40" HorizontalAlignment="Stretch" TextChanged="OnSearchTextChanged"/>
 
                 <!-- Buttons -->
                 <StackPanel Grid.Column="1" Orientation="Horizontal" HorizontalAlignment="Stretch">
@@ -96,10 +96,9 @@
                 </StackPanel>
             </Grid>
 
-
             <!-- Product Grid (Using Only Grid) -->
             <ScrollViewer Grid.Row="2" VerticalScrollBarVisibility="Auto">
-                <ItemsControl ItemsSource="{Binding Products}">
+                <ItemsControl ItemsSource="{Binding FilteredProducts}">
                     <ItemsControl.ItemsPanel>
                         <ItemsPanelTemplate>
                             <WrapGrid ItemWidth="300" />
@@ -147,4 +146,4 @@
         </StackPanel>
     </Grid>
 </Page>
- 
+    

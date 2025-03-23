@@ -32,5 +32,15 @@ namespace MarketPlace924.View
             }
         }
 
+        private void OnSearchTextChanged(object sender, TextChangedEventArgs e)
+        {
+            var textBox = sender as TextBox;
+            var viewModel = DataContext as SellerProfileViewModel;
+            if (viewModel != null && textBox != null)
+            {
+                viewModel.FilterProducts(textBox.Text);
+            }
+        }
+
     }
 }
