@@ -6,7 +6,7 @@ namespace MarketPlace924.DBConnection
 	public class DatabaseConnection
     {
         // here you can replace the connection string with your connection info from the local database
-        private static string dbConnectionString = "Data Source=MELISA-ASUS\\SQLEXPRESS;Initial Catalog=ISS;Integrated Security=True;TrustServerCertificate=True";
+        private static string dbConnectionString = "Data Source=MELISA-ASUS\\SQLEXPRESS;Initial Catalog=ISS;Integrated Security=True;TrustServerCertificate=True;MultipleActiveResultSets=True;";
         private SqlConnection dbConnection = new SqlConnection(dbConnectionString);
 
         public DatabaseConnection() { }
@@ -14,10 +14,10 @@ namespace MarketPlace924.DBConnection
         {
 			return dbConnection;
         }
-        public async Task openConnection()
+        public void openConnection()
         {
-            if(dbConnection.State == System.Data.ConnectionState.Closed)
-                await dbConnection.OpenAsync();
+            if (dbConnection.State == System.Data.ConnectionState.Closed)
+                 dbConnection.Open();
         }
         public void closeConnection()
         {

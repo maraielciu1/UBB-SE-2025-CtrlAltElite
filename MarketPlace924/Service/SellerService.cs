@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace MarketPlace924.Service
 {
-    class SellerService
+    public class SellerService
     {
         private SellerRepository _sellerRepository;
         public SellerService(SellerRepository sellerRepository) 
@@ -15,9 +15,9 @@ namespace MarketPlace924.Service
             _sellerRepository = sellerRepository;
         }
 
-        public Seller? GetSeller(int sellerID)
+        public Seller? GetSeller(string username)
         {
-            return _sellerRepository.GetSeller(sellerID);
+            return _sellerRepository.GetSeller(username);
         }
 
         public List<String>? GetNotifications(int sellerID)

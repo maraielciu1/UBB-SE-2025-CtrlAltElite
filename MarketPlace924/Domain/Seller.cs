@@ -8,10 +8,10 @@ namespace MarketPlace924.Domain
         public string StoreName { get; set; }
         public string StoreDescription { get; set; }
         public  string StoreAddress { get; set; }
-        public float TrustScore { get; set; }
+        public double TrustScore { get; set; }
 
 
-        public Seller(User user, string storeName, string storeDescription, string storeAddress, int followersCount = 0, float trustScore = 0)
+        public Seller(User user, string storeName, string storeDescription, string storeAddress, int followersCount = 0, double trustScore = 0)
             : base(user.UserId, user.Username, user.Email, user.PhoneNumber, user.Password, user.Role, user.FailedLogins, user.BannedUntil, user.IsBanned)
         {
             StoreName = storeName;

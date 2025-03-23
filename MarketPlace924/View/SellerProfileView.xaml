@@ -5,7 +5,7 @@
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
     xmlns:local="using:MarketPlace924.View"
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
-    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" xmlns:viewmodel="using:MarketPlace924.ViewModel" d:DataContext="{d:DesignInstance Type=viewmodel:SellerProfileViewModel}"
     mc:Ignorable="d"
     Background="{ThemeResource ApplicationPageBackgroundThemeBrush}">
 
@@ -35,42 +35,42 @@
             </Grid.RowDefinitions>
 
             <!-- Seller Profile Section -->
-            <Border Grid.Row="0" Padding="15" Background="Black" CornerRadius="10" Margin="0,0,0,10" 
-                   BorderBrush="Gray" BorderThickness="1">
-               <StackPanel Orientation="Horizontal">
+            <Border>
+                <StackPanel Orientation="Horizontal">
                     <StackPanel Orientation="Horizontal">
-                        <PersonPicture DisplayName="Ted Inc." Margin="0,0,10,0"/>
+                        <!--" Profile Picture doesn't show right-->
+                        <PersonPicture x:Name="ProfilePicture" BadgeText="{Binding StoreName}" Margin="0,0,10,0" />
                         <StackPanel MaxWidth="300">
-                            <TextBlock Text="Ted Inc." FontSize="24" FontWeight="Bold" TextWrapping="Wrap"/>
+                            <TextBlock x:Name="DisplayName" Text="{Binding DisplayName}" FontSize="24" FontWeight="Bold" TextWrapping="Wrap" />
                             <StackPanel Orientation="Horizontal">
-                                <TextBlock Text="Name:" FontWeight="Bold"/>
-                                <TextBlock Text=" SC Ted Inc. SRL" Margin="5,0,0,0" TextWrapping="Wrap"/>
+                                <TextBlock Text="Name:" FontWeight="Bold" />
+                                <TextBlock x:Name="Name" Text="{Binding StoreName}" Margin="5,0,0,0" TextWrapping="Wrap" />
                             </StackPanel>
                             <StackPanel Orientation="Horizontal">
-                                <TextBlock Text="Email:" FontWeight="Bold"/>
-                                <TextBlock Text=" ted@tedinc.com" Margin="5,0,0,0" TextWrapping="Wrap"/>
+                                <TextBlock Text="Email:" FontWeight="Bold" />
+                                <TextBlock x:Name="Email" Text="{Binding Email}" Margin="5,0,0,0" TextWrapping="Wrap" />
                             </StackPanel>
                             <StackPanel Orientation="Horizontal">
-                                <TextBlock Text="Phone:" FontWeight="Bold"/>
-                                <TextBlock Text=" +40***-***-***" Margin="5,0,0,0" TextWrapping="Wrap"/>
+                                <TextBlock Text="Phone:" FontWeight="Bold" />
+                                <TextBlock x:Name="PhoneNumber" Text="{Binding PhoneNumber}" Margin="5,0,0,0" TextWrapping="Wrap" />
                             </StackPanel>
                             <StackPanel Orientation="Horizontal">
-                                <TextBlock Text="Address:" FontWeight="Bold"/>
-                                <TextBlock Text=" TedLand, 53 RailRoad" Margin="5,0,0,0" TextWrapping="Wrap"/>
+                                <TextBlock Text="Address:" FontWeight="Bold" />
+                                <TextBlock x:Name="Address" Text="{Binding Address}" Margin="5,0,0,0" TextWrapping="Wrap" />
                             </StackPanel>
                         </StackPanel>
                         <StackPanel Orientation="Vertical" VerticalAlignment="Center" Margin="20,0,0,0">
-                            <StackPanel Orientation="Horizontal" Margin="10, 0, 0, 0">
-                                <TextBlock Text="Followers:" FontWeight="Bold" FontSize="18"/>
-                                <TextBlock Text=" 723" Margin="5,0,0,0" FontSize="18"/>
+                            <StackPanel Orientation="Horizontal" Margin="10,0,0,0">
+                                <TextBlock Text="Followers:" FontWeight="Bold" FontSize="18" />
+                                <TextBlock x:Name="Followers" Text="{Binding FollowersCount}" Margin="5,0,0,0" FontSize="18" />
                             </StackPanel>
                             <StackPanel Orientation="Horizontal" Margin="10,0,0,0">
-                                <TextBlock Text="Trust Score:" FontWeight="Bold" FontSize="18"/>
-                                <ProgressBar Value="80" Width="100" Height="20" Margin="5,0,0,0"/>
+                                <TextBlock Text="Trust Score:" FontWeight="Bold" FontSize="18" />
+                                <ProgressBar x:Name="TrustScore" Value="{Binding TrustScore}" Maximum="100" Width="100" Height="20" Margin="5,0,0,0" />
                             </StackPanel>
                         </StackPanel>
-                        <StackPanel HorizontalAlignment="Right" VerticalAlignment="Bottom" Margin="10">  
-                            <Button Content="Update Profile" Width="150" Height="40" Margin="10,0,0,0"/>  
+                        <StackPanel HorizontalAlignment="Right" VerticalAlignment="Bottom" Margin="10">
+                            <Button Content="Update Profile" Command="{Binding UpdateProfileCommand}" Width="150" Height="40" Margin="10,0,0,0" />
                         </StackPanel>
                     </StackPanel>
                 </StackPanel>

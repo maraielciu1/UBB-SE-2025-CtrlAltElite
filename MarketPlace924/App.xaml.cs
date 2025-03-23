@@ -1,14 +1,16 @@
-﻿using Microsoft.UI.Xaml;
+﻿using MarketPlace924.Repository;
+using Microsoft.UI.Xaml;
+using System;
 
 // To learn more about WinUI, the WinUI project structure,
 // and more about our project templates, see: http://aka.ms/winui-project-info.
 
 namespace MarketPlace924
 {
-	/// <summary>
-	/// Provides application-specific behavior to supplement the default Application class.
-	/// </summary>
-	public partial class App : Application
+    /// <summary>
+    /// Provides application-specific behavior to supplement the default Application class.
+    /// </summary>
+    public partial class App : Application
     {
         /// <summary>
         /// Initializes the singleton application object.  This is the first line of authored code
@@ -30,5 +32,13 @@ namespace MarketPlace924
         }
 
         private Window? m_window;
+
+        //private void TestFunction()
+        //{
+        //    Console.WriteLine("TestFunction has been called.");
+        //    SellerRepository _sellerRepository = new SellerRepository();
+        //    string result = _sellerRepository.GetSeller(1);
+        //    Console.WriteLine(result);
+        //}
     }
 }

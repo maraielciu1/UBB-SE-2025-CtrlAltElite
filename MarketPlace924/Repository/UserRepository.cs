@@ -29,23 +29,24 @@ namespace MarketPlace924.Repository
 			command.CommandText = "SELECT * FROM Users WHERE Username = @Username";
 			command.Parameters.Add(new SqlParameter("@Username", username));
 
-			var reader = command.ExecuteReader();
-			if (!reader.Read())
+			using (var reader = command.ExecuteReader())
 			{
-				return null;
+				if (!reader.Read())
+				{
+					return null;
+				}
+
+				var userId = reader.GetInt32(0);
+				var email = reader.GetString(2);
+				var phoneNumber = reader.GetString(3);
+				var password = reader.GetString(4);
+				var role = (UserRole)reader.GetInt32(5);
+				var failedLoginsCount = reader.GetInt32(6);
+				var bannedUntil = reader.IsDBNull(7) ? (DateTime?)null : reader.GetDateTime(7);
+				var isBanned = reader.GetBoolean(8);
+
+				return new User(userId, username, email, phoneNumber, password, role, failedLoginsCount, bannedUntil, isBanned);
 			}
-
-			var userId = reader.GetInt32(0);
-			var email = reader.GetString(2);
-			var phoneNumber = reader.GetString(3);
-			var password = reader.GetString(4);
-			var role = (UserRole)reader.GetInt32(5);
-			var failedLoginsCount = reader.GetInt32(6);
-			var bannedUntil = reader.IsDBNull(7) ? (DateTime?)null : reader.GetDateTime(7);
-			var isBanned = reader.GetBoolean(8);
-
-			return new User(userId, username, email, phoneNumber, password, role, failedLoginsCount, bannedUntil, isBanned);
-
 		}
 
 		public void UpdateUserFailedLoginsCount(User user, int NewValueOfFailedLogIns)
@@ -82,16 +83,16 @@ namespace MarketPlace924.Repository
 
 		public void DeleteUser(string username) { }
 
-		public async Task<User?> GetUserByEmail(string email)
+		public User? GetUserByEmail(string email)
 		{
-			await _connection.openConnection();
+			_connection.openConnection();
 			var command = _connection.getConnection().CreateCommand();
 
 			command.CommandText = "SELECT * FROM Users WHERE Email = @Email";
 			command.Parameters.Add(new SqlParameter("@Email", email));
 
-			var reader = await command.ExecuteReaderAsync();
-			if (!await reader.ReadAsync())
+			var reader = command.ExecuteReader();
+			if (!reader.Read())
 			{
 				return null;
 			}
@@ -105,7 +106,7 @@ namespace MarketPlace924.Repository
 			var bannedUntil = reader.IsDBNull(7) ? (DateTime?)null : reader.GetDateTime(7);
 			var isBanned = reader.GetBoolean(8);
 
-			await reader.CloseAsync();
+			reader.Close();
 
 			return new User(userId, username, email, phoneNumber, password, role, failedLoginsCount, bannedUntil, isBanned);
 		}

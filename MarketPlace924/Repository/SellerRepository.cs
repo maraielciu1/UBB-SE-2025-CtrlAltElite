@@ -8,7 +8,7 @@ using System.Collections.Generic;
 
 namespace MarketPlace924.Repository
 {
-    class SellerRepository
+    public class SellerRepository
     {
         private DatabaseConnection _connection;
         private UserRepository _userRepository;
@@ -19,32 +19,35 @@ namespace MarketPlace924.Repository
             _userRepository = userRepository;
         }
 
-        public Seller? GetSeller(int sellerID)
+        public Seller? GetSeller(string sellerUsername)
         {
             _connection.openConnection();
             var command = _connection.getConnection().CreateCommand();
-            command.CommandText = "SELECT * FROM Sellers WHERE SellerID = @SellerID";
-            command.Parameters.Add(new SqlParameter("@SellerID", sellerID));
+            command.CommandText = "SELECT * FROM Sellers WHERE Username = @Username";
+            command.Parameters.Add(new SqlParameter("@Username", sellerUsername));
 
-            var reader = command.ExecuteReader();
-            if (!reader.Read())
+            using (var reader = command.ExecuteReader())
             {
-                return null;
-            }
-            var username = reader.GetString(2);
-            var storeName = reader.GetString(3);
-            var storeDescription = reader.GetString(4);
-            var storeAddress = reader.GetString(5);
-            var followersCount = reader.GetInt32(6);
-            var trustScore = reader.GetFloat(7);
+                if (!reader.Read())
+                {
+                    return null;
+                }
+                var username = reader.GetString(1);
+                var storeName = reader.GetString(2);
+                var storeDescription = reader.GetString(3);
+                var storeAddress = reader.GetString(4);
+                var followersCount = reader.GetInt32(5);
+                var trustScore = reader.GetDouble(6);
 
-            User? user = _userRepository.GetUserByUsername(username);
-            if (user == null)
-            {
-                return null;
-            }
+                User? user = _userRepository.GetUserByUsername(username);
+                if (user == null)
+                {
+                    return null;
+                }
 
-            return new Seller(user, storeName, storeDescription, storeAddress, followersCount, trustScore);
+                return new Seller(user, storeName.ToString(), storeDescription.ToString(), storeAddress.ToString(), followersCount, trustScore);
+
+            }
         }
 
         public List<String>? GetNotifications(int sellerID)
