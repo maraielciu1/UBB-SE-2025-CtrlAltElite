@@ -137,8 +137,8 @@ namespace MarketPlace924.View
 
 		private void RegisterButtonTextBlock_PointerPressed(object sender, PointerRoutedEventArgs e)
 		{
-			ErrorMessage.Text = "";
-		}
+            Frame.Navigate(typeof(SignUpPage), _userService);
+        }
 
 		protected override void OnNavigatedTo(NavigationEventArgs e)
 		{

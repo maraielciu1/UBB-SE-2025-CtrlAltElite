@@ -3,6 +3,7 @@ using Microsoft.Data.SqlClient;
 using System;
 using MarketPlace924.DBConnection;
 using System.Threading.Tasks;
+using System.Diagnostics;
 
 namespace MarketPlace924.Repository
 {
@@ -15,12 +16,31 @@ namespace MarketPlace924.Repository
 			_connection = connection;
 		}
 
-		public void AddUser(User user)
-		{
+        public async Task AddUser(User user)
+        {
+            await _connection.openConnection(); // ✅ Safe opening
 
-		}
+            var connection = _connection.getConnection();
+            var command = connection.CreateCommand();
 
-		public User? GetUserByUsername(string username)
+            command.CommandText = @"
+        INSERT INTO Users (Username, Email, PhoneNumber, Password, Role, FailedLogins, BannedUntil, IsBanned)
+        VALUES (@Username, @Email, @PhoneNumber, @Password, @Role, @FailedLogins, @BannedUntil, @IsBanned)";
+
+            command.Parameters.AddWithValue("@Username", user.Username);
+            command.Parameters.AddWithValue("@Email", user.Email);
+            command.Parameters.AddWithValue("@PhoneNumber", user.PhoneNumber);
+            command.Parameters.AddWithValue("@Password", user.Password);
+            command.Parameters.AddWithValue("@Role", (int)user.Role);
+            command.Parameters.AddWithValue("@FailedLogins", user.FailedLogins);
+            command.Parameters.AddWithValue("@BannedUntil", user.BannedUntil ?? (object)DBNull.Value);
+            command.Parameters.AddWithValue("@IsBanned", user.IsBanned);
+
+            command.ExecuteNonQuery();
+        }
+
+
+        public User? GetUserByUsername(string username)
 		{
 			// this needs to be awaited
 			_connection.openConnection();
@@ -117,12 +137,17 @@ namespace MarketPlace924.Repository
 
 			command.CommandText = "SELECT count(1) FROM Users WHERE Email = @Email";
 			command.Parameters.Add(new SqlParameter("@Email", email));
-			return (int)command.ExecuteScalar() > 0;
+			return (int) command.ExecuteScalar() > 0;
 		}
 		public bool UsernameExists(string username)
 		{
-			return true;
-		}
+            _connection.openConnection();
+            var command = _connection.getConnection().CreateCommand();
+
+            command.CommandText = "SELECT count(1) FROM Users WHERE Username = @Username";
+            command.Parameters.Add(new SqlParameter("@Username", username));
+            return (int)command.ExecuteScalar() > 0;
+        }
 
 		public int GetFailedLoginsCountByUserId(int userID)
 		{
