@@ -50,6 +50,17 @@ namespace MarketPlace924.Repository
             }
         }
 
+        public int GetSellerIDByUsername(string username)
+        {
+            _connection.openConnection();
+            var command = _connection.getConnection().CreateCommand();
+            command.CommandText = "SELECT SellerID FROM Sellers WHERE Username = @Username";
+            command.Parameters.Add(new SqlParameter("@Username", username));
+            var reader = command.ExecuteReader();
+            reader.Read();
+            return reader.GetInt32(0);
+        }
+
         public List<String>? GetNotifications(int sellerID)
         {
             _connection.openConnection();
@@ -95,8 +106,8 @@ namespace MarketPlace924.Repository
                 var productID = reader.GetInt32(0);
                 var productName = reader.GetString(2);
                 var productDescription = reader.GetString(3);
-                var productPrice = reader.GetFloat(4);
-                var productStock = reader.GetInt32(7);
+                var productPrice = reader.GetDouble(4);
+                var productStock = reader.GetInt32(5);
                 products.Add(new Product(productID, productName, productDescription, productPrice, productStock, sellerID));
             }
             return products;

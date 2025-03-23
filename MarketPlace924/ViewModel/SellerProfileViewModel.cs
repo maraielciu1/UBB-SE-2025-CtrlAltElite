@@ -1,6 +1,8 @@
-﻿using System.ComponentModel;
+﻿using System.Collections.ObjectModel;
+using System.ComponentModel;
 using System.Runtime.CompilerServices;
 using System.Windows.Input;
+using MarketPlace924.Domain;
 using MarketPlace924.Service;
 
 namespace MarketPlace924.ViewModel
@@ -17,6 +19,7 @@ namespace MarketPlace924.ViewModel
             _sellerService = sellerService;
             _username = username;
             LoadSellerProfile();
+            LoadSellerProducts();
         }
 
         public string DisplayName { get; set; }
@@ -27,9 +30,8 @@ namespace MarketPlace924.ViewModel
         public string PhoneNumber { get; set; }
         public string Address { get; set; }
         public double TrustScore { get; set; }
+        public ObservableCollection<Product> Products { get; set; } = new ObservableCollection<Product>();
         public ICommand UpdateProfileCommand { get; set; }
-
-
 
         private void LoadSellerProfile()
         {
@@ -43,6 +45,24 @@ namespace MarketPlace924.ViewModel
                 Address = currentSeller.StoreAddress;
                 FollowersCount = currentSeller.FollowersCount.ToString();
                 TrustScore = currentSeller.TrustScore;
+            }
+        }
+
+        private void LoadSellerProducts()
+        {
+            var currentSeller = _sellerService.GetSeller(_username);
+            if (currentSeller != null)
+            {
+                var products = _sellerService.GetAllProducts(_sellerService.GetSellerIDByUsername(_username));
+                if (products != null)
+                {
+                    Products.Clear();
+                    foreach (var product in products)
+                    {
+                        Products.Add(product);
+                    }
+                    OnPropertyChanged(nameof(Products));
+                }
             }
         }
 

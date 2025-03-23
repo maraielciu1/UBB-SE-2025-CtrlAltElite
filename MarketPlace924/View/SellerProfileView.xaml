@@ -99,106 +99,28 @@
 
             <!-- Product Grid (Using Only Grid) -->
             <ScrollViewer Grid.Row="2" VerticalScrollBarVisibility="Auto">
-                <StackPanel>
-                    <Grid Margin="10" MaxHeight="500">
-                        <Grid.ColumnDefinitions>
-                            <ColumnDefinition Width="*" />
-                            <ColumnDefinition Width="*" />
-                            <ColumnDefinition Width="*" />
-                        </Grid.ColumnDefinitions>
+                <ItemsControl ItemsSource="{Binding Products}">
+                    <ItemsControl.ItemsPanel>
+                        <ItemsPanelTemplate>
+                            <WrapGrid ItemWidth="300" />
+                        </ItemsPanelTemplate>
+                    </ItemsControl.ItemsPanel>
 
-                        <!-- Add rows dynamically -->
-                        <Grid.RowDefinitions>
-                            <RowDefinition Height="Auto" />
-                            <RowDefinition Height="Auto" />
-                            <RowDefinition Height="Auto" />
-                            <RowDefinition Height="Auto" />
-                            
-                        </Grid.RowDefinitions>
-
-                        <!-- Product Items -->
-                        <Border Grid.Row="0" Grid.Column="0" Background="LightGray" Padding="10" CornerRadius="10" Margin="5">
-                            <StackPanel>
-                                <TextBlock Text="Kitty" FontSize="16" FontWeight="Bold"/>
-                                <TextBlock Text="$10" Foreground="Green"/>
-                                <TextBlock Text="Used"/>
-                            </StackPanel>
-                        </Border>
-
-                        <Border Grid.Row="0" Grid.Column="1" Background="LightGray" Padding="10" CornerRadius="10" Margin="5">
-                            <StackPanel>
-                                <TextBlock Text="Teddy Bear" FontSize="16" FontWeight="Bold"/>
-                                <TextBlock Text="$50" Foreground="Green"/>
-                                <TextBlock Text="New"/>
-                            </StackPanel>
-                        </Border>
-
-                        <Border Grid.Row="0" Grid.Column="2" Background="LightGray" Padding="10" CornerRadius="10" Margin="5">
-                            <StackPanel>
-                                <TextBlock Text="Hanna" FontSize="16" FontWeight="Bold"/>
-                                <TextBlock Text="$15" Foreground="Green"/>
-                                <TextBlock Text="Used"/>
-                            </StackPanel>
-                        </Border>
-
-                        <Border Grid.Row="1" Grid.Column="0" Background="LightGray" Padding="10" CornerRadius="10" Margin="5">
-                            <StackPanel>
-                                <TextBlock Text="Joel" FontSize="16" FontWeight="Bold"/>
-                                <TextBlock Text="$12" Foreground="Green"/>
-                                <TextBlock Text="Used"/>
-                            </StackPanel>
-                        </Border>
-
-                        <Border Grid.Row="1" Grid.Column="1" Background="LightGray" Padding="10" CornerRadius="10" Margin="5">
-                            <StackPanel>
-                                <TextBlock Text="Bob" FontSize="16" FontWeight="Bold"/>
-                                <TextBlock Text="$40" Foreground="Green"/>
-                                <TextBlock Text="Used"/>
-                            </StackPanel>
-                        </Border>
-
-                        <Border Grid.Row="1" Grid.Column="2" Background="LightGray" Padding="10" CornerRadius="10" Margin="5">
-                            <StackPanel>
-                                <TextBlock Text="Sarah" FontSize="16" FontWeight="Bold"/>
-                                <TextBlock Text="$25" Foreground="Green"/>
-                                <TextBlock Text="Used"/>
-                            </StackPanel>
-                        </Border>
-
-                        <Border Grid.Row="2" Grid.Column="0" Background="LightGray" Padding="10" CornerRadius="10" Margin="5">
-                            <StackPanel>
-                                <TextBlock Text="Joel" FontSize="16" FontWeight="Bold"/>
-                                <TextBlock Text="$12" Foreground="Green"/>
-                                <TextBlock Text="Used"/>
-                            </StackPanel>
-                        </Border>
-
-                        <Border Grid.Row="2" Grid.Column="1" Background="LightGray" Padding="10" CornerRadius="10" Margin="5">
-                            <StackPanel>
-                                <TextBlock Text="Bob" FontSize="16" FontWeight="Bold"/>
-                                <TextBlock Text="$40" Foreground="Green"/>
-                                <TextBlock Text="Used"/>
-                            </StackPanel>
-                        </Border>
-
-                        <Border Grid.Row="2" Grid.Column="2" Background="LightGray" Padding="10" CornerRadius="10" Margin="5">
-                            <StackPanel>
-                                <TextBlock Text="Sarah" FontSize="16" FontWeight="Bold"/>
-                                <TextBlock Text="$25" Foreground="Green"/>
-                                <TextBlock Text="Used"/>
-                            </StackPanel>
-                        </Border>
-
-                        <Border Grid.Row="3" Grid.Column="0" Background="LightGray" Padding="10" CornerRadius="10" Margin="5">
-                            <StackPanel>
-                                <TextBlock Text="Kitty" FontSize="16" FontWeight="Bold"/>
-                                <TextBlock Text="$10" Foreground="Green"/>
-                                <TextBlock Text="Used"/>
-                            </StackPanel>
-                        </Border>
-                    </Grid>
-                </StackPanel>
+                    <ItemsControl.ItemTemplate>
+                        <DataTemplate>
+                            <Border Background="LightGray" Padding="10" CornerRadius="10" Margin="5">
+                                <StackPanel>
+                                    <TextBlock Text="{Binding Name}" FontSize="16" FontWeight="Bold"/>
+                                    <TextBlock Text="{Binding Price}" Foreground="Green"/>
+                                    <TextBlock Text="{Binding Description}"/>
+                                    <TextBlock Text="{Binding Stock}" Foreground="Red"/>
+                                </StackPanel>
+                            </Border>
+                        </DataTemplate>
+                    </ItemsControl.ItemTemplate>
+                </ItemsControl>
             </ScrollViewer>
+
         </Grid>
 
         <!-- Notifications Panel (Fixed to the Right) -->
