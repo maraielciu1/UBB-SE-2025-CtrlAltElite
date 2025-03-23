@@ -6,6 +6,7 @@
     xmlns:local="using:MarketPlace924.View"
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" xmlns:viewmodel="using:MarketPlace924.ViewModel" d:DataContext="{d:DesignInstance Type=viewmodel:SellerProfileViewModel}"
+    xmlns:sys="clr-namespace:System;assembly=mscorlib"
     mc:Ignorable="d"
     Background="{ThemeResource ApplicationPageBackgroundThemeBrush}">
 
@@ -41,10 +42,10 @@
                         <!--" Profile Picture doesn't show right-->
                         <PersonPicture x:Name="ProfilePicture" BadgeText="{Binding StoreName}" Margin="0,0,10,0" />
                         <StackPanel MaxWidth="300">
-                            <TextBlock x:Name="DisplayName" Text="{Binding DisplayName}" FontSize="24" FontWeight="Bold" TextWrapping="Wrap" />
+                            <TextBlock x:Name="DisplayName" Text="{Binding StoreName}" FontSize="24" FontWeight="Bold" TextWrapping="Wrap" />
                             <StackPanel Orientation="Horizontal">
                                 <TextBlock Text="Name:" FontWeight="Bold" />
-                                <TextBlock x:Name="Name" Text="{Binding StoreName}" Margin="5,0,0,0" TextWrapping="Wrap" />
+                                <TextBlock x:Name="Name" Text="{Binding Username}" Margin="5,0,0,0" TextWrapping="Wrap" />
                             </StackPanel>
                             <StackPanel Orientation="Horizontal">
                                 <TextBlock Text="Email:" FontWeight="Bold" />
@@ -70,7 +71,7 @@
                             </StackPanel>
                         </StackPanel>
                         <StackPanel HorizontalAlignment="Right" VerticalAlignment="Bottom" Margin="10">
-                            <Button Content="Update Profile" Command="{Binding UpdateProfileCommand}" Width="150" Height="40" Margin="10,0,0,0" />
+                            <Button Content="Update Profile" Click="OnUpdateProfileButtonClick" Width="150" Height="40" Margin="10,0,0,0" />
                         </StackPanel>
                     </StackPanel>
                 </StackPanel>
@@ -107,13 +108,13 @@
 
                     <ItemsControl.ItemTemplate>
                         <DataTemplate>
-                            <Border Background="LightGray" Padding="10" CornerRadius="10" Margin="5">
-                                <StackPanel>
-                                    <TextBlock Text="{Binding Name}" FontSize="16" FontWeight="Bold"/>
-                                    <TextBlock Text="{Binding Price}" Foreground="Green"/>
-                                    <TextBlock Text="{Binding Description}"/>
-                                    <TextBlock Text="{Binding Stock}" Foreground="Red"/>
-                                </StackPanel>
+                            <Border Background="LightGray" Padding="10" CornerRadius="10" Margin="5">  
+                               <StackPanel>  
+                                   <TextBlock Text="{Binding Name}" FontSize="16" FontWeight="Bold"/>  
+                                   <TextBlock Text="{Binding Price}" Foreground="Green"/>  
+                                   <TextBlock Text="{Binding Description}"/>
+                                    <TextBlock Text="{Binding Stock}" Foreground="{Binding Stock, Converter={StaticResource StockToColorConverter}}"/>
+                                </StackPanel>  
                             </Border>
                         </DataTemplate>
                     </ItemsControl.ItemTemplate>

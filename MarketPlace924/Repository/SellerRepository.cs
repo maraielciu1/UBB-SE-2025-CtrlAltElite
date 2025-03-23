@@ -83,13 +83,13 @@ namespace MarketPlace924.Repository
         {
             _connection.openConnection();
             var command = _connection.getConnection().CreateCommand();
-            command.CommandText = "UPDATE Sellers SET StoreName = @StoreName, StoreDescription = @StoreDescription, StoreAddress = @StoreAddress, FollowersCount = @FollowersCount, TrustScore = @TrustScore WHERE SellerID = @SellerID";
+            command.CommandText = "UPDATE Sellers SET StoreName = @StoreName, StoreDescription = @StoreDescription, StoreAddress = @StoreAddress, FollowersCount = @FollowersCount, TrustScore = @TrustScore WHERE Username = @Username";
             command.Parameters.Add(new SqlParameter("@StoreName", seller.StoreName));
             command.Parameters.Add(new SqlParameter("@StoreDescription", seller.StoreDescription));
             command.Parameters.Add(new SqlParameter("@StoreAddress", seller.StoreAddress));
             command.Parameters.Add(new SqlParameter("@FollowersCount", seller.FollowersCount));
             command.Parameters.Add(new SqlParameter("@TrustScore", seller.TrustScore));
-            command.Parameters.Add(new SqlParameter("@SellerID", seller.UserId));
+            command.Parameters.Add(new SqlParameter("@Username", seller.Username));
             command.ExecuteNonQuery();
         }
 

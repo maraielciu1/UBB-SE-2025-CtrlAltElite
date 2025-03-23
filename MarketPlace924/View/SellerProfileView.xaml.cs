@@ -1,7 +1,6 @@
 using Microsoft.UI.Xaml.Controls;
 using MarketPlace924.Service;
-using MarketPlace924.Repository;
-using System.Net;
+using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Navigation;
 using MarketPlace924.ViewModel;
 
@@ -42,5 +41,13 @@ namespace MarketPlace924.View
             }
         }
 
+        private void OnUpdateProfileButtonClick(object sender, RoutedEventArgs e)
+        {
+            var viewModel = DataContext as SellerProfileViewModel;
+            if (viewModel != null)
+            {
+                Frame.Navigate(typeof(UpdateProfileView), viewModel);
+            }
+        }
     }
 }

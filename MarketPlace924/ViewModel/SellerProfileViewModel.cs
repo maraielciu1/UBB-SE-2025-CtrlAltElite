@@ -6,6 +6,9 @@ using System.Runtime.CompilerServices;
 using System.Windows.Input;
 using MarketPlace924.Domain;
 using MarketPlace924.Service;
+using MarketPlace924.View;
+using Microsoft.UI.Xaml.Controls;
+using Microsoft.UI.Xaml;
 
 namespace MarketPlace924.ViewModel
 {
@@ -27,16 +30,18 @@ namespace MarketPlace924.ViewModel
             FilteredProducts = new ObservableCollection<Product>();
             LoadSellerProfile();
             LoadSellerProducts();
+            UpdateProfileCommand = new CustomCommand(UpdateProfile);
         }
 
         public string DisplayName { get; set; }
-        public string Name { get; set; }
+        public string Username { get; set; }
         public string FollowersCount { get; set; }
         public string StoreName { get; set; }
         public string Email { get; set; }
         public string PhoneNumber { get; set; }
         public string Address { get; set; }
         public double TrustScore { get; set; }
+        public string Description { get; set; }
         public ObservableCollection<Product> Products { get; set; } = new ObservableCollection<Product>();
         public ICommand UpdateProfileCommand { get; set; }
 
@@ -45,13 +50,22 @@ namespace MarketPlace924.ViewModel
             var currentSeller = _sellerService.GetSeller(_username);
             if (currentSeller != null)
             {
-                DisplayName = currentSeller.StoreName;
-                StoreName = currentSeller.Username;
+                StoreName = currentSeller.StoreName;
+                Username = currentSeller.Username;
                 Email = currentSeller.Email;
                 PhoneNumber = currentSeller.PhoneNumber;
                 Address = currentSeller.StoreAddress;
                 FollowersCount = currentSeller.FollowersCount.ToString();
                 TrustScore = currentSeller.TrustScore;
+                Description = currentSeller.StoreDescription;
+                OnPropertyChanged(nameof(DisplayName));
+                OnPropertyChanged(nameof(StoreName));
+                OnPropertyChanged(nameof(Email));
+                OnPropertyChanged(nameof(PhoneNumber));
+                OnPropertyChanged(nameof(Address));
+                OnPropertyChanged(nameof(Description));
+                OnPropertyChanged(nameof(FollowersCount));
+                OnPropertyChanged(nameof(TrustScore));
             }
         }
 
@@ -85,6 +99,32 @@ namespace MarketPlace924.ViewModel
                 FilteredProducts = new ObservableCollection<Product>(filtered);
             }
             OnPropertyChanged(nameof(FilteredProducts));
+        }
+
+        private void UpdateProfile()
+        {
+            var currentSeller = _sellerService.GetSeller(_username);
+            if (currentSeller != null)
+            {
+                currentSeller.StoreName = StoreName;
+                currentSeller.Email = Email;
+                currentSeller.PhoneNumber = PhoneNumber;
+                currentSeller.StoreAddress = Address;
+                currentSeller.StoreDescription = Description;
+                //_sellerService.UpdateSeller(currentSeller);
+
+                // Update the seller information in the database
+                var sellerID = _sellerService.GetSellerIDByUsername(_username);
+                if (sellerID > 0)
+                {
+                    _sellerService.UpdateSeller(currentSeller);
+                }
+                else
+                {
+                    // Handle the case where sellerID is not found
+                    System.Diagnostics.Debug.WriteLine("Seller ID not found. Cannot update seller information in the database.");
+                }
+            }
         }
 
         public event PropertyChangedEventHandler PropertyChanged;
