@@ -111,7 +111,7 @@ namespace MarketPlace924.Service
             if (!await CanUserLogin(email, password))
                 return "Login failed";
 
-            return "Success"; // Login is valid
+            return "Success"; 
         }
         public async Task HandleFailedLogin(string email)
         {
@@ -122,7 +122,7 @@ namespace MarketPlace924.Service
 			Debug.WriteLine(failedAttempts);
             await UpdateUserFailedLogins(user, failedAttempts);
 
-            if (failedAttempts >= 5) // Ban user if 5 failed attempts
+            if (failedAttempts >= 5) 
             {
                 await SuspendUserForSeconds(email, 5);
             }

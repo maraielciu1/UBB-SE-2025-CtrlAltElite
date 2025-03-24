@@ -174,65 +174,7 @@ class LoginViewModel : INotifyPropertyChanged
     }
 
 
-    //private async Task ExecuteLogin()
-    //{
-    //    ErrorMessage = "";
-
-    //    if (string.IsNullOrEmpty(Email) || string.IsNullOrEmpty(Password) || string.IsNullOrEmpty(CaptchaEnteredCode))
-    //    {
-    //        ErrorMessage = "Please fill in all fields.";
-    //        return;
-    //    }
-    //    if(_userService.VerifyCaptcha(CaptchaEnteredCode, CaptchaText))
-    //    {
-    //        ErrorMessage = "Captcha verification failed.";
-    //        GenerateCaptcha();
-    //        return;
-    //    }
-
-    //    if (await _userService.IsSuspended(Email))
-    //    {
-    //        TimeSpan remainingTime = _banEndTime - DateTime.Now;
-    //        ErrorMessage = $"Too many failed attempts. Try again in {remainingTime.Seconds}s";
-    //        return;
-    //    }
-
-
-    //    string validationMessage = await _userService.ValidateLogin(Email, Password, CaptchaEnteredCode, CaptchaText);
-
-    //    if (validationMessage != "Success")
-    //    {
-    //        ErrorMessage = validationMessage;
-
-    //        _failedAttempts = await _userService.GetFailedLoginsCountByEmail(Email); // 🔹 Always update from DB
-    //        OnPropertyChanged(nameof(FailedAttemptsText));
-
-    //        if (validationMessage.Contains("Too many failed attempts"))
-    //        {
-    //            _banEndTime = DateTime.Now.AddSeconds(5);
-    //            StartBanTimer();
-    //        }
-    //        else if (validationMessage == "Login failed")
-    //        {
-    //            await _userService.HandleFailedLogin(Email);
-    //            _failedAttempts = await _userService.GetFailedLoginsCountByEmail(Email); // 🔹 Fetch again after increment
-    //            OnPropertyChanged(nameof(FailedAttemptsText));
-    //        }
-
-    //        GenerateCaptcha();
-    //        return;
-    //    }
-
-
-    //    await _userService.ResetFailedLogins(Email);
-    //    _failedAttempts = 0; 
-    //    OnPropertyChanged(nameof(FailedAttemptsText));
-
-    //    ErrorMessage = "Login successful!";
-    //    IsLoginEnabled = true;
-    //}
-
-
+   
     private void StartBanTimer()
     {
         IsLoginEnabled = false;
