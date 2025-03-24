@@ -99,7 +99,6 @@ class LoginViewModel : INotifyPropertyChanged
         GenerateCaptcha();
 
         LoginCommand = new RelayCommand(async () => await ExecuteLogin());
-      //  RefreshCaptchaCommand = new RelayCommand(GenerateCaptcha);
     }
 
     private async Task ExecuteLogin()
