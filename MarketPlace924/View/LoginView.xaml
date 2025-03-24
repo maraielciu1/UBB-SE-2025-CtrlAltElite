@@ -44,7 +44,7 @@
 
                 <StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
                     <TextBlock Text="Don't have an account? " FontSize="16"/>
-                    <TextBlock Text="Register now" Foreground="Blue" FontSize="16" FontWeight="Bold"/>
+                    <TextBlock x:Name="RegisterButtonTextBlock" Text="Register now" Foreground="#1E88E5" FontSize="16" FontWeight="Bold" PointerPressed="RegisterButtonTextBlock_PointerPressed" />
                 </StackPanel>
 
             </StackPanel>

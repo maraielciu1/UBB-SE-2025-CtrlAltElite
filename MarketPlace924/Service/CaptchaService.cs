@@ -6,7 +6,7 @@ namespace MarketPlace924.Service
 	{
 		private static readonly Random _random = new Random();
 
-		public string GenerateCaptcha()
+		public static string GenerateCaptcha()
 		{
 			var captchaCodeLength = _random.Next(6, 8);
 			var captchaCode = string.Empty;
@@ -32,7 +32,7 @@ namespace MarketPlace924.Service
 				|| (currentCharacter >= 'A' && currentCharacter <= 'Z');
 		}
 
-		public bool IsEnteredCaptchaValid(string generetedCaptcha, string currentCaptcha)
+		public static bool IsEnteredCaptchaValid(string generetedCaptcha, string currentCaptcha)
 		{
 			return generetedCaptcha == currentCaptcha;
 		}

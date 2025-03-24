@@ -21,7 +21,7 @@ namespace MarketPlace924
 			_instance = this;
 
             
-            var dbConnection = new DBConnection.DatabaseConnection(); // Using your DBConnection class
+            var dbConnection = new DBConnection.DatabaseConnection(); 
             var userRepository = new UserRepository(dbConnection);
             var userService = new UserService(userRepository);
 
