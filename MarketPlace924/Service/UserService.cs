@@ -1,6 +1,7 @@
 ﻿using MarketPlace924.Domain;
 using MarketPlace924.Repository;
 using System;
+using System.Diagnostics;
 using System.Threading.Tasks;
 
 namespace MarketPlace924.Service
@@ -89,5 +90,61 @@ namespace MarketPlace924.Service
 			await _userRepository.UpdateUser(user);
 		}
 
-	}
+        public async Task<string> ValidateLogin(string email, string password, string enteredCaptcha, string generatedCaptcha)
+        {
+            if (string.IsNullOrEmpty(email) || string.IsNullOrEmpty(password) || string.IsNullOrEmpty(enteredCaptcha))
+                return "Please fill in all fields.";
+
+            if (enteredCaptcha != generatedCaptcha)
+                return "Captcha verification failed.";
+
+            if (!await IsUser(email))
+                return "Email does not exist.";
+
+            if (await IsSuspended(email))
+            {
+                var user = await GetUserByEmail(email);
+                TimeSpan remainingTime = (user.BannedUntil ?? DateTime.Now) - DateTime.Now;
+                return $"Too many failed attempts. Try again in {remainingTime.Seconds}s";
+            }
+
+            if (!await CanUserLogin(email, password))
+                return "Login failed";
+
+            return "Success"; // Login is valid
+        }
+        public async Task HandleFailedLogin(string email)
+        {
+            var user = await GetUserByEmail(email);
+            if (user == null) return;
+
+            int failedAttempts = await GetFailedLoginsCountByEmail(email) + 1;
+			Debug.WriteLine(failedAttempts);
+            await UpdateUserFailedLogins(user, failedAttempts);
+
+            if (failedAttempts >= 5) // Ban user if 5 failed attempts
+            {
+                await SuspendUserForSeconds(email, 5);
+            }
+        }
+        public async Task ResetFailedLogins(string email)
+        {
+            var user = await GetUserByEmail(email);
+            if (user != null)
+            {
+                await UpdateUserFailedLogins(user, 0);
+            }
+        }
+
+		public bool VerifyCaptcha(string enteredCaptcha, string generatedCaptcha)
+		{
+            return enteredCaptcha == generatedCaptcha;
+        }
+
+
+
+
+
+
+    }
 }

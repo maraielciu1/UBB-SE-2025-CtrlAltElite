@@ -121,13 +121,13 @@ class LoginViewModel : INotifyPropertyChanged
             return;
         }
 
-        if (CaptchaEnteredCode != CaptchaText)
+        if (_userService.VerifyCaptcha(CaptchaEnteredCode,CaptchaText))
         {
             ErrorMessage = "Captcha verification failed.";
             GenerateCaptcha();
             return;
         }
-        if(! await _userService.IsUser(Email))
+        if (!await _userService.IsUser(Email))
         {
             ErrorMessage = "Email does not exist.";
             return;
@@ -172,6 +172,67 @@ class LoginViewModel : INotifyPropertyChanged
         }
         OnPropertyChanged(nameof(FailedAttemptsText));
     }
+
+
+    //private async Task ExecuteLogin()
+    //{
+    //    ErrorMessage = "";
+
+    //    if (string.IsNullOrEmpty(Email) || string.IsNullOrEmpty(Password) || string.IsNullOrEmpty(CaptchaEnteredCode))
+    //    {
+    //        ErrorMessage = "Please fill in all fields.";
+    //        return;
+    //    }
+    //    if(_userService.VerifyCaptcha(CaptchaEnteredCode, CaptchaText))
+    //    {
+    //        ErrorMessage = "Captcha verification failed.";
+    //        GenerateCaptcha();
+    //        return;
+    //    }
+
+    //    if (await _userService.IsSuspended(Email))
+    //    {
+    //        TimeSpan remainingTime = _banEndTime - DateTime.Now;
+    //        ErrorMessage = $"Too many failed attempts. Try again in {remainingTime.Seconds}s";
+    //        return;
+    //    }
+
+
+    //    string validationMessage = await _userService.ValidateLogin(Email, Password, CaptchaEnteredCode, CaptchaText);
+
+    //    if (validationMessage != "Success")
+    //    {
+    //        ErrorMessage = validationMessage;
+
+    //        _failedAttempts = await _userService.GetFailedLoginsCountByEmail(Email); // 🔹 Always update from DB
+    //        OnPropertyChanged(nameof(FailedAttemptsText));
+
+    //        if (validationMessage.Contains("Too many failed attempts"))
+    //        {
+    //            _banEndTime = DateTime.Now.AddSeconds(5);
+    //            StartBanTimer();
+    //        }
+    //        else if (validationMessage == "Login failed")
+    //        {
+    //            await _userService.HandleFailedLogin(Email);
+    //            _failedAttempts = await _userService.GetFailedLoginsCountByEmail(Email); // 🔹 Fetch again after increment
+    //            OnPropertyChanged(nameof(FailedAttemptsText));
+    //        }
+
+    //        GenerateCaptcha();
+    //        return;
+    //    }
+
+
+    //    await _userService.ResetFailedLogins(Email);
+    //    _failedAttempts = 0; 
+    //    OnPropertyChanged(nameof(FailedAttemptsText));
+
+    //    ErrorMessage = "Login successful!";
+    //    IsLoginEnabled = true;
+    //}
+
+
     private void StartBanTimer()
     {
         IsLoginEnabled = false;
@@ -182,14 +243,15 @@ class LoginViewModel : INotifyPropertyChanged
         _banTimer.Tick += async (s, e) =>
         {
             TimeSpan remainingTime = _banEndTime - DateTime.Now;
+
             if (remainingTime.TotalSeconds <= 0)
             {
                 _banTimer.Stop();
                 IsLoginEnabled = true;
                 ErrorMessage = "";
-                _failedAttempts = 0;
-                var user = await _userService.GetUserByEmail(Email);
-                _userService.UpdateUserFailedLogins(user, 0);
+
+                await _userService.ResetFailedLogins(Email);
+                _failedAttempts = 0;  // Reset in UI
                 OnPropertyChanged(nameof(FailedAttemptsText));
             }
             else
