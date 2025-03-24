@@ -20,22 +20,19 @@ namespace MarketPlace924.Repository
 
 		}
 
-		public User? GetUserByUsername(string username)
+		public async Task<User?> GetUserByUsername(string username)
 		{
 			// this needs to be awaited
-			_connection.openConnection();
-			var command = _connection.getConnection().CreateCommand();
+			await _connection.openConnection();
+			using var command = _connection.getConnection().CreateCommand();
 
 			command.CommandText = "SELECT * FROM Users WHERE Username = @Username";
 			command.Parameters.Add(new SqlParameter("@Username", username));
 
-			var reader = command.ExecuteReader();
-			if (!reader.Read())
-			{
-				return null;
-			}
+			using var reader = await command.ExecuteReaderAsync();
+            if (!await reader.ReadAsync()) return null;
 
-			var userId = reader.GetInt32(0);
+            var userId = reader.GetInt32(0);
 			var email = reader.GetString(2);
 			var phoneNumber = reader.GetString(3);
 			var password = reader.GetString(4);
@@ -48,24 +45,24 @@ namespace MarketPlace924.Repository
 
 		}
 
-		public void UpdateUserFailedLoginsCount(User user, int NewValueOfFailedLogIns)
+		public async Task UpdateUserFailedLoginsCount(User user, int NewValueOfFailedLogIns)
 		{
-			// this needs to be awaited
-			_connection.openConnection();
+			
+			await _connection.openConnection();
 			var command = _connection.getConnection().CreateCommand();
 
 			command.CommandText = "UPDATE Users SET FailedLogins = @FailedLogins WHERE UserID = @UserID";
 			user.FailedLogins = NewValueOfFailedLogIns;
 			command.Parameters.Add(new SqlParameter("@FailedLogins", user.FailedLogins));
 			command.Parameters.Add(new SqlParameter("@UserID", user.UserId));
-			command.ExecuteNonQuery();
-		}
+			await command.ExecuteNonQueryAsync();
+        }
 
-		public void UpdateUser(User user)
+		public async Task UpdateUser(User user)
 		{
 			// this needs to be awaited
 			_connection.openConnection();
-			var command = _connection.getConnection().CreateCommand();
+			using var command = _connection.getConnection().CreateCommand();
 
 			command.CommandText = "UPDATE Users SET Username = @Username, Email = @Email, PhoneNumber = @PhoneNumber, Password = @Password, Role = @Role, FailedLogins = @FailedLogins, BannedUntil = @BannedUntil, IsBanned = @IsBanned WHERE UserID = @UserID";
 			command.Parameters.Add(new SqlParameter("@Username", user.Username));
@@ -109,30 +106,37 @@ namespace MarketPlace924.Repository
 
 			return new User(userId, username, email, phoneNumber, password, role, failedLoginsCount, bannedUntil, isBanned);
 		}
-		public bool EmailExists(string email)
-		{
-			// this needs to be awaited
-			_connection.openConnection();
+        public async Task<bool> EmailExists(string email)
+        {
+			
+			await _connection.openConnection();
 			var command = _connection.getConnection().CreateCommand();
 
 			command.CommandText = "SELECT count(1) FROM Users WHERE Email = @Email";
 			command.Parameters.Add(new SqlParameter("@Email", email));
-			return (int)command.ExecuteScalar() > 0;
-		}
-		public bool UsernameExists(string username)
-		{
-			return true;
-		}
+            return (int)(await command.ExecuteScalarAsync()) > 0;
+        }
+        public async Task<bool> UsernameExists(string username)
+        {
+            await _connection.openConnection();
+            var command = _connection.getConnection().CreateCommand();
 
-		public int GetFailedLoginsCountByUserId(int userID)
+            command.CommandText = "SELECT COUNT(1) FROM Users WHERE Username = @Username";
+            command.Parameters.Add(new SqlParameter("@Username", username));
+
+            var result = (int)await command.ExecuteScalarAsync();
+            return result > 0;
+        }
+
+        public async Task<int> GetFailedLoginsCountByUserId(int userID)
 		{
 			// this needs to be awaited
-			_connection.openConnection();
+			await _connection.openConnection();
 			var command = _connection.getConnection().CreateCommand();
 
 			command.CommandText = "SELECT FailedLogins FROM Users WHERE UserID = @UserID";
 			command.Parameters.Add(new SqlParameter("@UserID", userID));
-			return (int)command.ExecuteScalar();
-		}
+            return (int)(await command.ExecuteScalarAsync());
+        }
 	}
 }

@@ -24,7 +24,7 @@ namespace MarketPlace924.Service
 
 		public async Task<bool> CanUserLogin(string email, string password)
 		{
-			if (_userRepository.UsernameExists(email))
+			if (await _userRepository.EmailExists(email))
 			{
 				var user = await GetUserByEmail(email);
 
@@ -34,9 +34,9 @@ namespace MarketPlace924.Service
 			return false;
 		}
 
-		public void UpdateUserFailedLogins(User user, int NewValueOfFailedLogIns)
+		public async Task UpdateUserFailedLogins(User user, int NewValueOfFailedLogIns)
 		{
-			_userRepository.UpdateUserFailedLoginsCount(user, NewValueOfFailedLogIns);
+			await _userRepository.UpdateUserFailedLoginsCount(user, NewValueOfFailedLogIns);
 		}
 
 		public string HashPassowrd(string password)
@@ -56,12 +56,12 @@ namespace MarketPlace924.Service
 			if (user is null) throw new ArgumentNullException($"{email} is not a user");
 
 			int userId = user.UserId;
-			return _userRepository.GetFailedLoginsCountByUserId(userId);
+			return await  _userRepository.GetFailedLoginsCountByUserId(userId);
 		}
 
-		public bool IsUser(string email)
+		public async Task<bool> IsUser(string email)
 		{
-			return _userRepository.UsernameExists(email);
+			return await _userRepository.EmailExists(email);
 		}
 
 		public async Task<bool> IsSuspended(string email)
@@ -86,7 +86,7 @@ namespace MarketPlace924.Service
 			if(user is null) throw new ArgumentNullException($"{email} is not a user");
 
 			user.BannedUntil = DateTime.Now.AddSeconds(seconds);
-			_userRepository.UpdateUser(user);
+			await _userRepository.UpdateUser(user);
 		}
 
 	}
