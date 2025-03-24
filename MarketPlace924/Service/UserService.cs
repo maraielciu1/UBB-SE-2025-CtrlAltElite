@@ -18,7 +18,47 @@ namespace MarketPlace924.Service
 
 		}
 
-		public User GetUser(string username)
+        public bool RegisterUser(string username, string password, string email, string phoneNumber, int role)
+        {
+
+            if (!UserValidator.validateUsername(username))
+            {
+                throw new Exception("Username must be at least 4 characters long.");
+            }
+            if (!UserValidator.validateEmail(email))
+            {
+                throw new Exception("Invalid email address format.");
+            }
+            if (!UserValidator.validatePassword(password))
+            {
+                throw new Exception("The password must be at least 8 characters long, have at least 1 uppercase letter, at least 1 digit and at least 1 special character.");
+            }
+            if (!UserValidator.validatePhone(phoneNumber))
+            {
+                throw new Exception("The phone number should start with +40 area code followed by 9 digits.");
+            }
+            if (_userRepository.UsernameExists(username))
+            {
+                throw new Exception("Username already exists.");
+            }
+            if (_userRepository.EmailExists(email))
+            {
+                throw new Exception("Email is already in use.");
+            }
+
+            string hashedPassword = HashPassword(password);
+            Debug.WriteLine($"Role passed in: {role}");
+
+            UserRole userRole = (UserRole)role;
+            User newUser = new User(0, username, email, phoneNumber, hashedPassword, userRole, 0, null, false);
+            Debug.WriteLine($"Parsed userRole: {userRole}");
+
+            _userRepository.AddUser(newUser);
+
+            return true;
+        }
+
+        public User GetUser(string username)
 		{
 			return new User();
 		}
@@ -42,8 +82,12 @@ namespace MarketPlace924.Service
 
 		public string HashPassowrd(string password)
 		{
-			return password;
-		}
+            using (SHA256 sha256 = SHA256.Create())
+            {
+                byte[] hashedBytes = sha256.ComputeHash(Encoding.UTF8.GetBytes(password));
+                return Convert.ToBase64String(hashedBytes);
+            }
+        }
 
 		public async Task<User?> GetUserByEmail(string email)
 		{

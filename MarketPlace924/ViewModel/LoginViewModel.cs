@@ -9,15 +9,7 @@ using Microsoft.UI.Xaml;
 
 class LoginViewModel : INotifyPropertyChanged
 {
-    //private readonly UserService _userService;
-    //private readonly CaptchaService _captchaService;
-    //private string _email;
-    //private string _password;
-    //private string _generatedCaptcha;
-    //private string _enteredCaptcha;
-    //private string _errorMessage;
-    //private int _failedLoginAttempts;
-    //private bool _isLoginButtonEnabled = true;
+
     private readonly UserService _userService;
     private readonly CaptchaService _captchaService;
     private string _email;
@@ -31,9 +23,6 @@ class LoginViewModel : INotifyPropertyChanged
     private DateTime _banEndTime;
 
     public event PropertyChangedEventHandler PropertyChanged;
-
-
-
 
     public string Email
     {

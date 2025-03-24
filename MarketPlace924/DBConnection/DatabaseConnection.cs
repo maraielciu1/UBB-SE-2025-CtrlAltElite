@@ -6,7 +6,7 @@ namespace MarketPlace924.DBConnection
 	public class DatabaseConnection
     {
         // here you can replace the connection string with your connection info from the local database
-        private static string dbConnectionString = "Data Source=DESKTOP-618UFK0\\SQLEXPRESS;Initial Catalog=IssDb;Integrated Security=True;TrustServerCertificate=True";
+        private static string dbConnectionString = "Server=MARA-DELL\\SQLEXPRESS01;Initial Catalog=IssDB;Integrated Security=True;TrustServerCertificate=True";
         private SqlConnection dbConnection = new SqlConnection(dbConnectionString);
 
         public DatabaseConnection() { }
@@ -21,7 +21,8 @@ namespace MarketPlace924.DBConnection
         }
         public void closeConnection()
         {
-            dbConnection.Close();
+            if (dbConnection.State == System.Data.ConnectionState.Open)
+                dbConnection.Close();
         }
         public void executeProcedure()
         {
