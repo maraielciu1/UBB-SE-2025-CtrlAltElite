@@ -19,40 +19,86 @@ namespace MarketPlace924.Repository
             _userRepository = userRepository;
         }
 
-        public Seller? GetSeller(string sellerUsername)
+        public async Task<Seller?> GetSellerAsync(string sellerUsername)
         {
-            _connection.openConnection();
+            await EnsureConnectionOpenAsync();
             var command = _connection.getConnection().CreateCommand();
-            command.CommandText = "SELECT * FROM Sellers WHERE Username = @Username";
+            command.CommandText = @"
+            SELECT u.UserId, u.Username, u.Email, u.PhoneNumber, u.Password, u.Role, u.FailedLogins, u.BannedUntil, u.IsBanned,
+                   s.StoreName, s.StoreDescription, s.StoreAddress, s.FollowersCount, s.TrustScore
+            FROM Users u
+            INNER JOIN Sellers s ON u.Username = s.Username
+            WHERE u.Username = @Username";
             command.Parameters.Add(new SqlParameter("@Username", sellerUsername));
 
-            using (var reader = command.ExecuteReader())
+            using (var reader = await command.ExecuteReaderAsync())
             {
                 if (!reader.Read())
                 {
                     return null;
                 }
+
+                var userId = reader.GetInt32(0);
                 var username = reader.GetString(1);
-                var storeName = reader.GetString(2);
-                var storeDescription = reader.GetString(3);
-                var storeAddress = reader.GetString(4);
-                var followersCount = reader.GetInt32(5);
-                var trustScore = reader.GetDouble(6);
+                var email = reader.GetString(2);
+                var phoneNumber = reader.GetString(3);
+                var password = reader.GetString(4);
+                var role = (UserRole)reader.GetInt32(5);
+                var failedLogins = reader.GetInt32(6);
+                var bannedUntil = reader.IsDBNull(7) ? (DateTime?)null : reader.GetDateTime(7);
+                var isBanned = reader.GetBoolean(8);
 
-                User? user = _userRepository.GetUserByUsername(username);
-                if (user == null)
+                var storeName = reader.GetString(9);
+                var storeDescription = reader.GetString(10);
+                var storeAddress = reader.GetString(11);
+                var followersCount = reader.GetInt32(12);
+                var trustScore = reader.GetDouble(13);
+
+                var user = new User
                 {
-                    return null;
-                }
+                    UserId = userId,
+                    Username = username,
+                    Email = email,
+                    PhoneNumber = phoneNumber,
+                    Password = password,
+                    Role = role,
+                    FailedLogins = failedLogins,
+                    BannedUntil = bannedUntil,
+                    IsBanned = isBanned
+                };
 
-                return new Seller(user, storeName.ToString(), storeDescription.ToString(), storeAddress.ToString(), followersCount, trustScore);
-
+                return new Seller(user, storeName, storeDescription, storeAddress, followersCount, trustScore);
             }
         }
 
-        public int GetSellerIDByUsername(string username)
+        private async Task EnsureConnectionOpenAsync()
         {
-            _connection.openConnection();
+            int retryCount = 3;
+            while (_connection.getConnection().State != System.Data.ConnectionState.Open && retryCount > 0)
+            {
+                if (_connection.getConnection().State == System.Data.ConnectionState.Closed)
+                {
+                    await _connection.openConnection();
+                }
+                else
+                {
+                    await Task.Delay(100); // Wait for a short period before retrying
+                }
+                retryCount--;
+            }
+
+            if (_connection.getConnection().State != System.Data.ConnectionState.Open)
+            {
+                throw new InvalidOperationException("Unable to open the database connection.");
+            }
+        }
+
+
+
+
+        public async Task<int> GetSellerIDByUsernameAsync(string username)
+        {
+            await _connection.openConnection();
             var command = _connection.getConnection().CreateCommand();
             command.CommandText = "SELECT SellerID FROM Sellers WHERE Username = @Username";
             command.Parameters.Add(new SqlParameter("@Username", username));
@@ -61,9 +107,9 @@ namespace MarketPlace924.Repository
             return reader.GetInt32(0);
         }
 
-        public List<String>? GetNotifications(int sellerID)
+        public async Task<List<string>?> GetNotificationsAsync(int sellerID)
         {
-            _connection.openConnection();
+            await _connection.openConnection();
             var command = _connection.getConnection().CreateCommand();
             command.CommandText = "SELECT * FROM Notifications WHERE SellerID = @SellerID";
             command.Parameters.Add(new SqlParameter("@SellerID", sellerID));
@@ -79,9 +125,9 @@ namespace MarketPlace924.Repository
             return notifications;
         }
 
-        public void UpdateSeller(Seller seller)
+        public async Task UpdateSellerAsync(Seller seller)
         {
-            _connection.openConnection();
+            await _connection.openConnection();
             var command = _connection.getConnection().CreateCommand();
             command.CommandText = "UPDATE Sellers SET StoreName = @StoreName, StoreDescription = @StoreDescription, StoreAddress = @StoreAddress, FollowersCount = @FollowersCount, TrustScore = @TrustScore WHERE Username = @Username";
             command.Parameters.Add(new SqlParameter("@StoreName", seller.StoreName));
@@ -93,9 +139,9 @@ namespace MarketPlace924.Repository
             command.ExecuteNonQuery();
         }
 
-        public List<Product>? GetProducts(int sellerID)
+        public async Task<List<Product>?> GetProductsAsync(int sellerID)
         {
-            _connection.openConnection();
+            await _connection.openConnection();
             var command = _connection.getConnection().CreateCommand();
             command.CommandText = "SELECT * FROM Products WHERE SellerID = @SellerID";
             command.Parameters.Add(new SqlParameter("@SellerID", sellerID));

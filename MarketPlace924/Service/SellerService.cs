@@ -15,29 +15,29 @@ namespace MarketPlace924.Service
             _sellerRepository = sellerRepository;
         }
 
-        public Seller? GetSeller(string username)
+        public async Task<Seller?> GetSellerAsync(string username)
         {
-            return _sellerRepository.GetSeller(username);
+            return await _sellerRepository.GetSellerAsync(username);
         }
 
-        public List<String>? GetNotifications(int sellerID)
+        public async Task<List<string>?> GetNotificationsAsync(int sellerID)
         {
-            return _sellerRepository.GetNotifications(sellerID);
+            return await _sellerRepository.GetNotificationsAsync(sellerID);
         }
 
-        public List<Product> GetAllProducts(int sellerID)
+        public async Task<List<Product>> GetAllProductsAsync(int sellerID)
         {
-            return _sellerRepository.GetProducts(sellerID);
+            return await _sellerRepository.GetProductsAsync(sellerID);
         }
 
-        public int GetSellerIDByUsername(string username)
+        public async Task<int> GetSellerIDByUsernameAsync(string username)
         {
-            return _sellerRepository.GetSellerIDByUsername(username);
+            return await _sellerRepository.GetSellerIDByUsernameAsync(username);
         }
 
-        public void UpdateSeller(Seller seller)
+        public async Task UpdateSellerAsync(Seller seller)
         {
-            _sellerRepository.UpdateSeller(seller);
+            await _sellerRepository.UpdateSellerAsync(seller);
         }
     }
 }

@@ -38,7 +38,7 @@ namespace MarketPlace924.View
 			var password = PasswordTextBox.Password;
 			var enteredCapthca = CaptchaEnteredCode.Text;
 
-			ValidateInput(email, password, enteredCapthca);
+			ValidateInputAsync(email, password, enteredCapthca);
 
 			var user = await _userService.GetUserByEmail(email);
 
@@ -53,7 +53,7 @@ namespace MarketPlace924.View
 			if (!await _userService.CanUserLogin(email, password))
 			{
 				var failedLoginCount = user.FailedLogins + 1;
-				_userService.UpdateUserFailedLogins(user, failedLoginCount);
+				await _userService.UpdateUserFailedLogins(user, failedLoginCount);
 
 				FailedLoginAttemptsText.Text = $"Failed Login Attempts: {failedLoginCount}";
 				FailedLoginAttemptsText.Visibility = Visibility.Visible;
@@ -74,33 +74,34 @@ namespace MarketPlace924.View
 			}
 
 			ErrorMessage.Text = "Login successful";
-			_userService.UpdateUserFailedLogins(user, 0);
+			await _userService.UpdateUserFailedLogins(user, 0);
 			FailedLoginAttemptsText.Visibility = Visibility.Collapsed;
 		}
 
-		private void ValidateInput(string email, string password, string enteredCapthca)
-		{
-			if (string.IsNullOrEmpty(email) || string.IsNullOrEmpty(password) || string.IsNullOrEmpty(enteredCapthca))
-			{
-				ErrorMessage.Text = "Please fill in all fields";
-				return;
-			}
+		private async Task ValidateInputAsync(string email, string password, string enteredCapthca)
+        {
+            if (string.IsNullOrEmpty(email) || string.IsNullOrEmpty(password) || string.IsNullOrEmpty(enteredCapthca))
+            {
+                ErrorMessage.Text = "Please fill in all fields";
+                return;
+            }
 
-			if (enteredCapthca != _generatedCaptcha)
-			{
-				ErrorMessage.Text = "Captcha is incorrect";
-				GenerateCaptcha();
-				return;
-			}
+            if (enteredCapthca != _generatedCaptcha)
+            {
+                ErrorMessage.Text = "Captcha is incorrect";
+                GenerateCaptcha();
+                return;
+            }
 
-			if (!_userService.IsUser(email))
-			{
-				ErrorMessage.Text = "Email does not exist";
-				return;
-			}
-		}
+            if (await _userService.IsUser(email))
+            {
+                return;
+            }
+            ErrorMessage.Text = "Email does not exist";
+            return;
+        }
 
-		private void StartBanCountdown(User user)
+        private void StartBanCountdown(User user)
 		{
 			LoginButton.IsEnabled = false;
 			ErrorMessage.Text = "Too many failed attempts. Please wait...";

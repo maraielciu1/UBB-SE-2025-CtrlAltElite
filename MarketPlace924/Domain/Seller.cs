@@ -20,11 +20,5 @@ namespace MarketPlace924.Domain
             FollowersCount = followersCount;
             TrustScore = trustScore;
         }
-
-        //User user = new User(1, "username", "email@example.com", "1234567890", "password", UserRole.Seller);
-        //Address address = new Address { ID = 1, StreetLine = "123 Main St", City = "Anytown", Country = "USA", PostalCode = "12345" };
-
-        //Seller seller = new Seller(user, "My Store", "Best store in town", address, 100);
-
     }
 }

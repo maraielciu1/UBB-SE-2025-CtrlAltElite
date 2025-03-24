@@ -30,21 +30,21 @@ namespace MarketPlace924.ViewModel
             UpdateProfileCommand = new CustomCommand(UpdateProfile);
         }
 
-        public string DisplayName { get; set; }
-        public string Username { get; set; }
-        public string FollowersCount { get; set; }
-        public string StoreName { get; set; }
-        public string Email { get; set; }
-        public string PhoneNumber { get; set; }
-        public string Address { get; set; }
+        public string DisplayName { get; set; } = string.Empty;
+        public string Username { get; set; } = string.Empty;
+        public string FollowersCount { get; set; } = string.Empty;
+        public string StoreName { get; set; } = string.Empty;
+        public string Email { get; set; } = string.Empty;
+        public string PhoneNumber { get; set; } = string.Empty;
+        public string Address { get; set; } = string.Empty;
         public double TrustScore { get; set; }
-        public string Description { get; set; }
+        public string Description { get; set; } = string.Empty;
         public ObservableCollection<Product> Products { get; set; } = new ObservableCollection<Product>();
         public ICommand UpdateProfileCommand { get; set; }
 
-        private void LoadSellerProfile()
+        private async void LoadSellerProfile()
         {
-            var currentSeller = _sellerService.GetSeller(_username);
+            var currentSeller = await _sellerService.GetSellerAsync(_username);
             if (currentSeller != null)
             {
                 StoreName = currentSeller.StoreName;
@@ -56,6 +56,7 @@ namespace MarketPlace924.ViewModel
                 TrustScore = currentSeller.TrustScore;
                 Description = currentSeller.StoreDescription;
                 OnPropertyChanged(nameof(DisplayName));
+
                 OnPropertyChanged(nameof(StoreName));
                 OnPropertyChanged(nameof(Email));
                 OnPropertyChanged(nameof(PhoneNumber));
@@ -66,12 +67,12 @@ namespace MarketPlace924.ViewModel
             }
         }
 
-        private void LoadSellerProducts()
+        private async void LoadSellerProducts()
         {
-            var currentSeller = _sellerService.GetSeller(_username);
+            var currentSeller = await _sellerService.GetSellerAsync(_username);
             if (currentSeller != null)
             {
-                var products = _sellerService.GetAllProducts(_sellerService.GetSellerIDByUsername(_username));
+                var products = await _sellerService.GetAllProductsAsync(await _sellerService.GetSellerIDByUsernameAsync(_username));
                 if (products != null)
                 {
                     _allProducts.Clear();
@@ -98,9 +99,9 @@ namespace MarketPlace924.ViewModel
             OnPropertyChanged(nameof(FilteredProducts));
         }
 
-        private void UpdateProfile()
+        private async void UpdateProfile()
         {
-            var currentSeller = _sellerService.GetSeller(_username);
+            var currentSeller = await _sellerService.GetSellerAsync(_username);
             if (currentSeller != null)
             {
                 currentSeller.StoreName = StoreName;
@@ -108,13 +109,12 @@ namespace MarketPlace924.ViewModel
                 currentSeller.PhoneNumber = PhoneNumber;
                 currentSeller.StoreAddress = Address;
                 currentSeller.StoreDescription = Description;
-                //_sellerService.UpdateSeller(currentSeller);
 
                 // Update the seller information in the database
-                var sellerID = _sellerService.GetSellerIDByUsername(_username);
+                var sellerID = await _sellerService.GetSellerIDByUsernameAsync(_username);
                 if (sellerID > 0)
                 {
-                    _sellerService.UpdateSeller(currentSeller);
+                    await _sellerService.UpdateSellerAsync(currentSeller);
                 }
                 else
                 {
@@ -124,7 +124,7 @@ namespace MarketPlace924.ViewModel
             }
         }
 
-        public event PropertyChangedEventHandler PropertyChanged;
+        public event PropertyChangedEventHandler? PropertyChanged;
         protected void OnPropertyChanged([CallerMemberName] string propertyName = null)
         {
             PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));

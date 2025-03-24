@@ -12,12 +12,12 @@ namespace MarketPlace924.DBConnection
         public DatabaseConnection() { }
         public SqlConnection getConnection()
         {
-			return dbConnection;
+            return dbConnection;
         }
-        public void openConnection()
+        public async Task openConnection()
         {
             if (dbConnection.State == System.Data.ConnectionState.Closed)
-                 dbConnection.Open();
+                await dbConnection.OpenAsync();
         }
         public void closeConnection()
         {
