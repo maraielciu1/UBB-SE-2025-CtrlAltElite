@@ -10,7 +10,7 @@ using Microsoft.UI.Xaml;
 class LoginViewModel : INotifyPropertyChanged
 {
 
-    private readonly UserService _userService;
+    public readonly UserService _userService;
     private readonly CaptchaService _captchaService;
     private string _email;
     private string _password;
@@ -21,6 +21,8 @@ class LoginViewModel : INotifyPropertyChanged
     private string _captchaEnteredCode;
     private DispatcherTimer _banTimer;
     private DateTime _banEndTime;
+
+    public Action? NavigateToSignUp { get; set; }
 
     public event PropertyChangedEventHandler PropertyChanged;
 
@@ -110,7 +112,7 @@ class LoginViewModel : INotifyPropertyChanged
             return;
         }
 
-        if (_userService.VerifyCaptcha(CaptchaEnteredCode,CaptchaText))
+        if (UserService.VerifyCaptcha(CaptchaEnteredCode,CaptchaText))
         {
             ErrorMessage = "Captcha verification failed.";
             GenerateCaptcha();
@@ -196,7 +198,7 @@ class LoginViewModel : INotifyPropertyChanged
 
     private void GenerateCaptcha()
     {
-        CaptchaText = _captchaService.GenerateCaptcha();
+        CaptchaText = CaptchaService.GenerateCaptcha();
     }
 
     private void OnPropertyChanged(string propertyName)

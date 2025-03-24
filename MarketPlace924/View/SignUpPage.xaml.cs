@@ -27,7 +27,6 @@ namespace MarketPlace924.View
     /// </summary>
     public sealed partial class SignUpPage : Page
     {
-        private SignUpViewModel _viewModel;
         public SignUpPage()
         {
             this.InitializeComponent();

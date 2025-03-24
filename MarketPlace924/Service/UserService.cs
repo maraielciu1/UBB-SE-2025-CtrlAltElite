@@ -2,6 +2,8 @@
 using MarketPlace924.Repository;
 using System;
 using System.Diagnostics;
+using System.Security.Cryptography;
+using System.Text;
 using System.Threading.Tasks;
 
 namespace MarketPlace924.Service
@@ -13,35 +15,30 @@ namespace MarketPlace924.Service
 		{
 			_userRepository = userRepository;
 		}
-		public void addUser(string username, string password, string email, int role)
-		{
 
-		}
-
-        public bool RegisterUser(string username, string password, string email, string phoneNumber, int role)
+        public async Task<bool> RegisterUser(string username, string password, string email, string phoneNumber, int role)
         {
-
-            if (!UserValidator.validateUsername(username))
+            if (!UserValidator.ValidateUsername(username))
             {
                 throw new Exception("Username must be at least 4 characters long.");
             }
-            if (!UserValidator.validateEmail(email))
+            if (!UserValidator.ValidateEmail(email))
             {
                 throw new Exception("Invalid email address format.");
             }
-            if (!UserValidator.validatePassword(password))
+            if (!UserValidator.ValidatePassword(password))
             {
                 throw new Exception("The password must be at least 8 characters long, have at least 1 uppercase letter, at least 1 digit and at least 1 special character.");
             }
-            if (!UserValidator.validatePhone(phoneNumber))
+            if (!UserValidator.ValidatePhone(phoneNumber))
             {
                 throw new Exception("The phone number should start with +40 area code followed by 9 digits.");
             }
-            if (_userRepository.UsernameExists(username))
+            if (await _userRepository.UsernameExists(username))
             {
                 throw new Exception("Username already exists.");
             }
-            if (_userRepository.EmailExists(email))
+            if (await _userRepository.EmailExists(email))
             {
                 throw new Exception("Email is already in use.");
             }
@@ -53,12 +50,12 @@ namespace MarketPlace924.Service
             User newUser = new User(0, username, email, phoneNumber, hashedPassword, userRole, 0, null, false);
             Debug.WriteLine($"Parsed userRole: {userRole}");
 
-            _userRepository.AddUser(newUser);
+            await _userRepository.AddUser(newUser);
 
             return true;
         }
 
-        public User GetUser(string username)
+        public static User GetUser(string username)
 		{
 			return new User();
 		}
@@ -69,7 +66,7 @@ namespace MarketPlace924.Service
 			{
 				var user = await GetUserByEmail(email);
 
-				return user?.Password == HashPassowrd(password);
+				return user?.Password == HashPassword(password);
 			}
 
 			return false;
@@ -80,9 +77,9 @@ namespace MarketPlace924.Service
 			await _userRepository.UpdateUserFailedLoginsCount(user, NewValueOfFailedLogIns);
 		}
 
-		public string HashPassowrd(string password)
+		public static string HashPassword(string password)
 		{
-            using (SHA256 sha256 = SHA256.Create())
+            using (System.Security.Cryptography.SHA256 sha256 = SHA256.Create())
             {
                 byte[] hashedBytes = sha256.ComputeHash(Encoding.UTF8.GetBytes(password));
                 return Convert.ToBase64String(hashedBytes);
@@ -180,15 +177,10 @@ namespace MarketPlace924.Service
             }
         }
 
-		public bool VerifyCaptcha(string enteredCaptcha, string generatedCaptcha)
+		public static bool VerifyCaptcha(string enteredCaptcha, string generatedCaptcha)
 		{
             return enteredCaptcha == generatedCaptcha;
         }
-
-
-
-
-
 
     }
 }

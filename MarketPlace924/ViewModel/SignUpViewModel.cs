@@ -14,13 +14,16 @@ namespace MarketPlace924.ViewModel
     class SignUpViewModel : INotifyPropertyChanged
     {
         private UserService _userService;
-        public Action NavigateToLogin { get; set; }
-
+        public Action? NavigateToLogin { get; set; }
 
         public SignUpViewModel(UserService userService)
         {
             _userService = userService;
             SignupCommand = new RelayCommand(ExecuteSignup);
+            _username = string.Empty;
+            _email = string.Empty;
+            _phoneNumber = string.Empty;
+            _password = string.Empty;
         }
 
         private string _username;
@@ -41,7 +44,7 @@ namespace MarketPlace924.ViewModel
         {
             try
             {
-                _userService.RegisterUser(Username, Password, Email, PhoneNumber, Role);
+                await _userService.RegisterUser(Username, Password, Email, PhoneNumber, Role);
                 await ShowDialog("Success", "Your account has been created successfully!");
                 NavigateToLogin?.Invoke();
             }
@@ -58,13 +61,13 @@ namespace MarketPlace924.ViewModel
                 Title = title,
                 Content = message,
                 CloseButtonText = "OK",
-                XamlRoot = App.mWindow.Content.XamlRoot
+                XamlRoot = App.m_window.Content.XamlRoot
             };
 
             await dialog.ShowAsync();
         }
 
-        public event PropertyChangedEventHandler PropertyChanged;
+        public event PropertyChangedEventHandler? PropertyChanged;
         protected void OnPropertyChanged([CallerMemberName] string name = null)
         {
             PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(name));

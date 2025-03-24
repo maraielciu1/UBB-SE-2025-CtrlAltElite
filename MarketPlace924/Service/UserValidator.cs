@@ -9,7 +9,7 @@ namespace MarketPlace924.Service
 {
     internal class UserValidator
     {
-        public static bool validateUsername(string username)
+        public static bool ValidateUsername(string username)
         {
             if (string.IsNullOrWhiteSpace(username) || username.Length < 4)
             {
@@ -18,7 +18,7 @@ namespace MarketPlace924.Service
             return true;
         }
 
-        public static bool validateEmail(string email)
+        public static bool ValidateEmail(string email)
         {
             if (string.IsNullOrWhiteSpace(email))
             {
@@ -32,7 +32,7 @@ namespace MarketPlace924.Service
             return true;
         }
 
-        public static bool validatePhone(string phoneNo)
+        public static bool ValidatePhone(string phoneNo)
         {
             if (string.IsNullOrWhiteSpace(phoneNo))
             {
@@ -47,7 +47,7 @@ namespace MarketPlace924.Service
             return true;
         }
 
-        public static bool validatePassword(string password)
+        public static bool ValidatePassword(string password)
         {
             if (string.IsNullOrWhiteSpace(password) || password.Length < 8)
             {

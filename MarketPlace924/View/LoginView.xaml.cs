@@ -164,6 +164,7 @@ using MarketPlace924.Repository;
 using MarketPlace924.Service;
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
+using Microsoft.UI.Xaml.Input;
 
 namespace MarketPlace924.View
 {
@@ -181,6 +182,10 @@ namespace MarketPlace924.View
             _viewModel = new LoginViewModel(userService);
 
             DataContext = _viewModel;
+        }
+        private void RegisterButtonTextBlock_PointerPressed(object sender, PointerRoutedEventArgs e)
+        {
+            Frame.Navigate(typeof(SignUpPage), _viewModel._userService);
         }
     }
 }

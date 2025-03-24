@@ -17,7 +17,7 @@ namespace MarketPlace924.Repository
 
 		public async Task AddUser(User user)
 		{
-            await _connection.openConnection();
+            await _connection.OpenConnection();
 
             var connection = _connection.getConnection();
             var command = connection.CreateCommand();
@@ -36,13 +36,13 @@ namespace MarketPlace924.Repository
             command.Parameters.AddWithValue("@IsBanned", user.IsBanned);
 
             command.ExecuteNonQuery();
-			_connection.closeConnection();
+			_connection.CloseConnection();
         }
 
 		public async Task<User?> GetUserByUsername(string username)
 		{
 			
-			await _connection.openConnection();
+			await _connection.OpenConnection();
 			using var command = _connection.getConnection().CreateCommand();
 
 			command.CommandText = "SELECT * FROM Users WHERE Username = @Username";
@@ -59,7 +59,7 @@ namespace MarketPlace924.Repository
 			var failedLoginsCount = reader.GetInt32(6);
 			var bannedUntil = reader.IsDBNull(7) ? (DateTime?)null : reader.GetDateTime(7);
 			var isBanned = reader.GetBoolean(8);
-			_connection.closeConnection();
+			_connection.CloseConnection();
 			return new User(userId, username, email, phoneNumber, password, role, failedLoginsCount, bannedUntil, isBanned);
 
 		}
@@ -67,7 +67,7 @@ namespace MarketPlace924.Repository
 		public async Task UpdateUserFailedLoginsCount(User user, int NewValueOfFailedLogIns)
 		{
 			
-			await _connection.openConnection();
+			await _connection.OpenConnection();
 			var command = _connection.getConnection().CreateCommand();
 
 			command.CommandText = "UPDATE Users SET FailedLogins = @FailedLogins WHERE UserID = @UserID";
@@ -75,12 +75,12 @@ namespace MarketPlace924.Repository
 			command.Parameters.Add(new SqlParameter("@FailedLogins", user.FailedLogins));
 			command.Parameters.Add(new SqlParameter("@UserID", user.UserId));
 			await command.ExecuteNonQueryAsync();
-			_connection.closeConnection();
+			_connection.CloseConnection();
         }
 
 		public async Task UpdateUser(User user)
 		{
-			await _connection.openConnection();
+			await _connection.OpenConnection();
 			using var command = _connection.getConnection().CreateCommand();
 
 			command.CommandText = "UPDATE Users SET Username = @Username, Email = @Email, PhoneNumber = @PhoneNumber, Password = @Password, Role = @Role, FailedLogins = @FailedLogins, BannedUntil = @BannedUntil, IsBanned = @IsBanned WHERE UserID = @UserID";
@@ -94,14 +94,13 @@ namespace MarketPlace924.Repository
 			command.Parameters.Add(new SqlParameter("@IsBanned", user.IsBanned));
 			command.Parameters.Add(new SqlParameter("@UserID", user.UserId));
 			command.ExecuteNonQuery();
-			_connection.closeConnection();
+			_connection.CloseConnection();
 		}
 
-		public void DeleteUser(string username) { }
 
 		public async Task<User?> GetUserByEmail(string email)
 		{
-			await _connection.openConnection();
+			await _connection.OpenConnection();
 			var command = _connection.getConnection().CreateCommand();
 
 			command.CommandText = "SELECT * FROM Users WHERE Email = @Email";
@@ -123,43 +122,41 @@ namespace MarketPlace924.Repository
 			var isBanned = reader.GetBoolean(8);
 
 			await reader.CloseAsync();
-			_connection.closeConnection();
+			_connection.CloseConnection();
 			return new User(userId, username, email, phoneNumber, password, role, failedLoginsCount, bannedUntil, isBanned);
 		}
         public async Task<bool> EmailExists(string email)
         {
-			
-			await _connection.openConnection();
-			var command = _connection.getConnection().CreateCommand();
+            await _connection.OpenConnection();
+            var command = _connection.getConnection().CreateCommand();
 
-			command.CommandText = "SELECT count(1) FROM Users WHERE Email = @Email";
-			command.Parameters.Add(new SqlParameter("@Email", email));
-			var result = (int)await command.ExecuteScalarAsync();
-			_connection.closeConnection();
+            command.CommandText = "SELECT count(1) FROM Users WHERE Email = @Email";
+            command.Parameters.Add(new SqlParameter("@Email", email));
+            var result = (int)(await command.ExecuteScalarAsync() ?? 0);
+            _connection.CloseConnection();
             return result > 0;
         }
         public async Task<bool> UsernameExists(string username)
         {
-            await _connection.openConnection();
+            await _connection.OpenConnection();
             var command = _connection.getConnection().CreateCommand();
 
             command.CommandText = "SELECT COUNT(1) FROM Users WHERE Username = @Username";
             command.Parameters.Add(new SqlParameter("@Username", username));
 
-            var result = (int)await command.ExecuteScalarAsync();
+            var result = (int)(await command.ExecuteScalarAsync() ?? 0);
             return result > 0;
         }
 
         public async Task<int> GetFailedLoginsCountByUserId(int userID)
-		{
-			// this needs to be awaited
-			await _connection.openConnection();
-			var command = _connection.getConnection().CreateCommand();
+        {
+            await _connection.OpenConnection();
+            var command = _connection.getConnection().CreateCommand();
 
-			command.CommandText = "SELECT FailedLogins FROM Users WHERE UserID = @UserID";
-			command.Parameters.Add(new SqlParameter("@UserID", userID));
-			var result = (int)await command.ExecuteScalarAsync();
-			_connection.closeConnection();
+            command.CommandText = "SELECT FailedLogins FROM Users WHERE UserID = @UserID";
+            command.Parameters.Add(new SqlParameter("@UserID", userID));
+            var result = (int)(await command.ExecuteScalarAsync() ?? 0);
+            _connection.CloseConnection();
             return result;
         }
 	}
