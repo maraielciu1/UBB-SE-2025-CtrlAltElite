@@ -108,21 +108,21 @@
 
                     <ItemsControl.ItemTemplate>
                         <DataTemplate>
-                            <Border Background="LightGray" Padding="10" CornerRadius="10" Margin="5">  
-                               <StackPanel>  
-                                   <TextBlock Text="{Binding Name}" FontSize="16" FontWeight="Bold"/>  
-                                   <TextBlock Text="{Binding Price}" Foreground="Green"/>  
-                                   <TextBlock Text="{Binding Description}"/>
+                            <Border Background="LightGray" Padding="10" CornerRadius="10" Margin="5">
+                                <StackPanel>
+                                    <TextBlock Text="{Binding Name}" FontSize="16" FontWeight="Bold"/>
+                                    <TextBlock Text="{Binding Price}" Foreground="Green"/>
+                                    <TextBlock Text="{Binding Description}"/>
                                     <TextBlock Text="{Binding Stock}" Foreground="{Binding Stock, Converter={StaticResource StockToColorConverter}}"/>
-                                </StackPanel>  
+                                </StackPanel>
                             </Border>
                         </DataTemplate>
                     </ItemsControl.ItemTemplate>
                 </ItemsControl>
             </ScrollViewer>
-
+            
         </Grid>
-
+        
         <!-- Notifications Panel (Fixed to the Right) -->
 
         <StackPanel  Grid.Column="1" Width="Auto" Height="Auto" HorizontalAlignment="Right" VerticalAlignment="Top" Margin="10" Padding="10">

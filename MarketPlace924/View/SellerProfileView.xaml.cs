@@ -49,5 +49,16 @@ namespace MarketPlace924.View
                 Frame.Navigate(typeof(UpdateProfileView), viewModel);
             }
         }
+        //private void OnProductItemClick(object sender, ItemClickEventArgs e)
+        //{
+        //    var selectedProduct = e.ClickedItem as ProductViewModel;
+        //    if (selectedProduct != null)
+        //    {
+        //        // Implement the logic to delete the selected product
+        //        // For example, you can call a method in the ViewModel to remove the product from the collection
+        //        var viewModel = this.DataContext as SellerProfileViewModel;
+        //        viewModel?.DeleteProductCommand.Execute(selectedProduct);
+        //    }
+        //}
     }
 }

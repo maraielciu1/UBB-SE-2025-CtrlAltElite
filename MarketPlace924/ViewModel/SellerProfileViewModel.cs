@@ -6,9 +6,6 @@ using System.Runtime.CompilerServices;
 using System.Windows.Input;
 using MarketPlace924.Domain;
 using MarketPlace924.Service;
-using MarketPlace924.View;
-using Microsoft.UI.Xaml.Controls;
-using Microsoft.UI.Xaml;
 
 namespace MarketPlace924.ViewModel
 {
