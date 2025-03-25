@@ -1,3 +1,4 @@
+using MarketPlace924.ViewModel;
 using Microsoft.UI.Xaml.Controls;
 using Microsoft.UI.Xaml.Input;
 using Microsoft.UI.Xaml.Navigation;
@@ -21,8 +22,11 @@ namespace MarketPlace924.View
 
         private void RegisterButtonTextBlock_PointerPressed(object sender, PointerRoutedEventArgs e)
         {
-
-            Frame.Navigate(typeof(SignUpPage), ViewModel.UserService);
+            var signUpViewModel = new SignUpViewModel(ViewModel.UserService);
+            signUpViewModel.NavigateToLogin = () => {
+                Frame.Navigate(typeof(LoginView), ViewModel);
+            };
+            Frame.Navigate(typeof(SignUpPage), signUpViewModel);
         }
 
         protected override void OnNavigatedTo(NavigationEventArgs e)
