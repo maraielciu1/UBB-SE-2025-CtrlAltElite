@@ -111,6 +111,11 @@ public class LoginViewModel : INotifyPropertyChanged
             ErrorMessage = "Please fill in all fields.";
             return;
         }
+        if(UserService.CheckEmailInLogIn(Email))
+        {
+            ErrorMessage = "Email does not have the right format!";
+            return;
+        }
 
         if (!UserService.VerifyCaptcha(CaptchaEnteredCode,CaptchaText))
         {
