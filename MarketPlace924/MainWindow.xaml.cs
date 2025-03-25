@@ -1,8 +1,11 @@
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
+using MarketPlace924.Domain;
 using MarketPlace924.Repository;
 using MarketPlace924.Service;
 using MarketPlace924.View;
+using MarketPlace924.DBConnection;
+using MarketPlace924.ViewModel;
 
 // To learn more about WinUI, the WinUI project structure,
 // and more about our project templates, see: http://aka.ms/winui-project-info.
@@ -15,27 +18,45 @@ namespace MarketPlace924
 	public sealed partial class MainWindow : Window
     {
 		public static MainWindow _instance { get; set; }
-		public MainWindow()
+        private UserService _userService;
+        private BuyerService _buyerService;
+        private User? _user;
+
+
+        // Controls the visibility of the menu and content stage.
+        public Visibility MenuAndStageVisibility => _user != null ? Visibility.Visible : Visibility.Collapsed;
+
+        // Controls the visibility of the login section.
+        public Visibility LoginVisibility => _user == null ? Visibility.Visible : Visibility.Collapsed;
+
+
+        public MainWindow()
         {
             InitializeComponent();
 			_instance = this;
 
             // Initialize Database Connection and Services
-            var dbConnection = new DBConnection.DatabaseConnection(); // Using your DBConnection class
-            var userRepository = new UserRepository(dbConnection);
-            var userService = new UserService(userRepository);
+            var dbConnection = new DatabaseConnection(); // Using your DBConnection class
+            var userRepo = new UserRepository(dbConnection);
+            var buyerRepo = new BuyerRepository(dbConnection);
 
-            // Create a Frame and navigate to LoginView, passing the UserService
-            Frame rootFrame = new Frame();
-            rootFrame.Navigate(typeof(LoginView), userService);
+            // Initialize Services
+            _userService = new UserService(userRepo);
+            _buyerService = new BuyerService(buyerRepo, userRepo);
 
-            // Set the content of the window
-            Content = rootFrame;
+            // Temporary hardcoded user for testing purposes
+            _user = new User(userID: 3, phoneNumber: "074322321", email: "admin@gmail.com");
+
+            // Ensure menu and content area is visible
+            MenuAndStage.Visibility = Visibility.Visible;
+
+            // Navigate to the Buyer's Profile page
+            NavigateToBuyerProfile();
         }
 
-		public static void SetContent(Frame newFrame)
-		{
-			_instance.Content = newFrame;
-		}
+        private void NavigateToBuyerProfile()
+        {
+            Stage.Navigate(typeof(MyMarketView), new MyMarketViewModel(_buyerService, _user));
+        }
     }
 }
