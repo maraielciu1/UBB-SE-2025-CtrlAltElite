@@ -17,6 +17,7 @@ namespace MarketPlace924.DBConnection
 			return dbConnection;
         }
 
+
         // Opens the database connection asynchronously if it is closed.
         public async Task OpenConnection()
         {
@@ -25,12 +26,13 @@ namespace MarketPlace924.DBConnection
 
         }
 
+
         // Closes the database connection.
         public void CloseConnection()
         {
-            dbConnection.Close();
+            if (dbConnection.State == System.Data.ConnectionState.Open)
+                dbConnection.Close();
         }
-
 
         public void ExecuteProcedure()
         {

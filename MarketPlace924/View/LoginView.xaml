@@ -8,52 +8,42 @@
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     mc:Ignorable="d"
     Background="{ThemeResource ApplicationPageBackgroundThemeBrush}">
-
     <Grid>
         <Border Background="White" Padding="50" CornerRadius="12" BorderBrush="#1565C0" BorderThickness="2" Width="550" HorizontalAlignment="Center" VerticalAlignment="Center">
             <StackPanel Spacing="25">
 
-                <!-- Title -->
-                <TextBlock Text="Login Page" FontSize="42" FontWeight="Bold" TextAlignment="Center" Foreground="#0D47A1" FontFamily="Segoe UI Black"/>
-                <TextBlock Text="Welcome to our MarketPlace!" FontSize="24" Margin="0,5" TextAlignment="Center" Foreground="#1976D2" FontFamily="Segoe UI Semibold"/>
-                <TextBlock x:Name="ErrorMessage" Text="" FontSize="18" Foreground="Red" TextAlignment="Center"/>
-                
-                 <!-- Failed Login Attempts -->
-                <TextBlock x:Name="FailedLoginAttemptsText" Text="Failed Login Attempts: 0" FontSize="18" Foreground="Red" TextAlignment="Center" Visibility="Collapsed"/>
+                <TextBlock Text="Login Page" FontSize="42" FontWeight="Bold" TextAlignment="Center" Foreground="#0D47A1"/>
+                <TextBlock Text="Welcome to our MarketPlace!" FontSize="24" Margin="0,5" TextAlignment="Center" Foreground="#1976D2"/>
+                <TextBlock Text="{Binding ErrorMessage}" FontSize="18" Foreground="Red" TextAlignment="Center"/>
 
-                <!-- Email Input -->
-                <StackPanel>
-                    <TextBlock Text="Enter your email below" FontSize="18" FontWeight="Bold" Foreground="#0D47A1"/>
-                    <TextBox x:Name="UserEmailBox" Width="Auto" Height="45" Padding="10" BorderBrush="#1976D2" BorderThickness="2" CornerRadius="8"/>
-                </StackPanel>
+                <TextBlock Text="{Binding FailedAttemptsText}" FontSize="18" Foreground="Red" TextAlignment="Center"/>
 
-                <!-- Password Input -->
-                <StackPanel>
-                    <TextBlock Text="Enter your password below" FontSize="18" FontWeight="Bold" Foreground="#0D47A1"/>
-                    <PasswordBox x:Name="PasswordTextBox" Width="Auto" Height="45" Padding="10" BorderBrush="#1976D2" BorderThickness="2" CornerRadius="8"/>
-                </StackPanel>
+                <TextBox PlaceholderText="Enter your email" Text="{Binding Email, Mode=TwoWay}" Width="Auto" Height="45"/>
+                <PasswordBox PlaceholderText="Enter your password" Password="{Binding Password, Mode=TwoWay}" Width="Auto" Height="45"/>
 
                 <!-- Captcha -->
-                <StackPanel>
-                    <TextBlock Text="Captcha Verification" FontSize="18" FontWeight="Bold" Foreground="#1565C0"/>
-
-                    <TextBox x:Name="CaptchaText" Width="Auto" Height="60" Padding="10" 
+                <TextBlock Text="Captcha Verification" FontSize="18" FontWeight="Bold"/>
+                <TextBox Text="{Binding CaptchaText}" 
+                         Width="Auto" Height="60" Padding="10" 
          BorderBrush="#1976D2" BorderThickness="3" CornerRadius="8"
          FontFamily="Lucida Handwriting" FontSize="24" FontStyle="Italic" 
          FontWeight="Bold" TextAlignment="Center" 
          Foreground="DarkBlue" Background="LightGray"
-         IsReadOnly="True"/>
+         IsReadOnly="True" IsHitTestVisible="False"
+                         
+                         />
 
-                    <TextBlock Text="Enter the code below:" FontSize="18" FontWeight="Bold" Foreground="#0D47A1"/>
-                    <TextBox x:Name="CaptchaEnteredCode" Width="Auto" Height="45" Padding="10" BorderBrush="#1976D2" BorderThickness="2" CornerRadius="8"/>
-                </StackPanel>
 
-                <!-- Login Button -->
-                <Button x:Name="LoginButton" Content="Login" Background="#1565C0" Foreground="White" Width="200" Height="55" CornerRadius="8" FontSize="20" FontWeight="Bold" Click="LoginButton_Click" HorizontalAlignment="Center" />
 
-                <!-- Register Link -->
+                <TextBox PlaceholderText="Enter Captcha" Text="{Binding CaptchaEnteredCode, Mode=TwoWay}" Width="Auto" Height="45"/>
+
+                <Button Content="Login" Command="{Binding LoginCommand}" IsEnabled="{Binding IsLoginEnabled}" Width="200" Height="55" Background="#1565C0" Foreground="White"
+                        HorizontalAlignment="Center"
+                        
+                        />
+
                 <StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
-                    <TextBlock Text="Don't have an account? " FontSize="16" Foreground="#0D47A1"/>
+                    <TextBlock Text="Don't have an account? " FontSize="16"/>
                     <TextBlock x:Name="RegisterButtonTextBlock" Text="Register now" Foreground="#1E88E5" FontSize="16" FontWeight="Bold" PointerPressed="RegisterButtonTextBlock_PointerPressed" />
                 </StackPanel>
 
