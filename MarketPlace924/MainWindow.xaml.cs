@@ -32,8 +32,7 @@ namespace MarketPlace924
             _userService = new UserService(userRepo);
             _buyerService = new BuyerService(buyerRepo, userRepo);
 
-            LoginView.ViewModel = new LoginViewModel(_userService, this);
-
+            LoginFrame.Navigate(typeof(LoginView), new LoginViewModel(_userService, this));
             // To Start Logged in as Buyer ucomment bellow
             // _user = new User(userID: 5, phoneNumber: "074322321", email: "admin@gmail.com");
             // MenuAndStage.Visibility = Visibility.Visible;
@@ -44,7 +43,7 @@ namespace MarketPlace924
 
         public void OnLoginSuccess(User user)
         {
-            LoginView.Visibility = Visibility.Collapsed;
+            LoginFrame.Visibility = Visibility.Collapsed;
             MenuAndStage.Visibility = Visibility.Visible;
             _user = user;
             if (user.Role == UserRole.Buyer)

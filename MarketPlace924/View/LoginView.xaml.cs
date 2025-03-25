@@ -9,6 +9,7 @@ namespace MarketPlace924.View
 
         public LoginView()
         {
+
             InitializeComponent();
         }
         
@@ -20,7 +21,8 @@ namespace MarketPlace924.View
 
         private void RegisterButtonTextBlock_PointerPressed(object sender, PointerRoutedEventArgs e)
         {
-            Frame.Navigate(typeof(SignUpPage), ViewModel);
+
+            Frame.Navigate(typeof(SignUpPage), ViewModel.UserService);
         }
 
         protected override void OnNavigatedTo(NavigationEventArgs e)

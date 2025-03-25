@@ -9,7 +9,7 @@ using Microsoft.UI.Xaml;
 public class LoginViewModel : INotifyPropertyChanged
 {
 
-    public readonly UserService _userService;
+    public UserService UserService { get; private set; }
     private readonly OnLoginSuccessCallback _successCallback;
     private readonly CaptchaService _captchaService;
     private string _email;
@@ -93,7 +93,7 @@ public class LoginViewModel : INotifyPropertyChanged
 
     public LoginViewModel(UserService userService, OnLoginSuccessCallback successCallback)
     {
-        _userService = userService ?? throw new ArgumentNullException(nameof(userService));
+        UserService = userService ?? throw new ArgumentNullException(nameof(userService));
         _successCallback = successCallback ?? throw new ArgumentNullException(nameof(successCallback));
         _captchaService = new CaptchaService();
 
@@ -118,13 +118,13 @@ public class LoginViewModel : INotifyPropertyChanged
             GenerateCaptcha();
             return;
         }
-        if (!await _userService.IsUser(Email))
+        if (!await UserService.IsUser(Email))
         {
             ErrorMessage = "Email does not exist.";
             return;
         }
 
-        var user = await _userService.GetUserByEmail(Email);
+        var user = await UserService.GetUserByEmail(Email);
 
 
         if (user == null)
@@ -133,22 +133,22 @@ public class LoginViewModel : INotifyPropertyChanged
             return;
         }
 
-        if (await _userService.IsSuspended(Email))
+        if (await UserService.IsSuspended(Email))
         {
             TimeSpan remainingTime = _banEndTime - DateTime.Now;
             ErrorMessage = $"Too many failed attempts. Try again in {remainingTime.Seconds}s";
             return;
         }
 
-        if (!await _userService.CanUserLogin(Email, Password))
+        if (!await UserService.CanUserLogin(Email, Password))
         {
             _failedAttempts++;
-            await _userService.UpdateUserFailedLogins(user, _failedAttempts);
+            await UserService.UpdateUserFailedLogins(user, _failedAttempts);
             ErrorMessage = $"Login failed";
 
             if (_failedAttempts >= 5)
             {
-                await _userService.SuspendUserForSeconds(Email, 5);
+                await UserService.SuspendUserForSeconds(Email, 5);
                 _banEndTime = DateTime.Now.AddSeconds(5);
                 StartBanTimer();
             }
@@ -158,7 +158,7 @@ public class LoginViewModel : INotifyPropertyChanged
 
             ErrorMessage = "Login successful!";
             _failedAttempts = 0;
-            await _userService.UpdateUserFailedLogins(user, 0);
+            await UserService.UpdateUserFailedLogins(user, 0);
             IsLoginEnabled = true;
             _successCallback.OnLoginSuccess(user);
         }
@@ -184,7 +184,7 @@ public class LoginViewModel : INotifyPropertyChanged
                 IsLoginEnabled = true;
                 ErrorMessage = "";
 
-                await _userService.ResetFailedLogins(Email);
+                await UserService.ResetFailedLogins(Email);
                 _failedAttempts = 0;  // Reset in UI
                 OnPropertyChanged(nameof(FailedAttemptsText));
             }
