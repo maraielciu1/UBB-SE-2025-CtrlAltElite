@@ -100,9 +100,19 @@ public class BuyerProfileViewModel : INotifyPropertyChanged, OnBuyerLinkageUpdat
         }
     }
 
+    public bool CreationMode { get; set; }
+
     public void SaveInfo()
     {
-        _buyerService.SaveInfo(_buyer);
+        if (CreationMode)
+        {
+            _buyerService.CreateBuyer(_buyer);
+            
+        }
+        else
+        {
+            _buyerService.SaveInfo(_buyer);
+        }
         LoadBuyerProfile();
     }
 
@@ -123,6 +133,16 @@ public class BuyerProfileViewModel : INotifyPropertyChanged, OnBuyerLinkageUpdat
     private Buyer LoadBuyerProfile()
     {
         _buyer = _buyerService.GetBuyerByUser(_user);
+      
+        CreationMode = _buyer.FirstName == null;
+
+        if (CreationMode)
+        {
+            _buyer.BillingAddress = new Address();
+            _buyer.ShippingAddress = _buyer.BillingAddress;
+            _buyer.UseSameAddress = true;
+        }
+        OnPropertyChanged(nameof(CreationMode));
         _billingAddress = new BuyerAddressViewModel(_buyer.BillingAddress);
         _shippingAddress = new BuyerAddressViewModel(_buyer.ShippingAddress);
         OnPropertyChanged(nameof(Buyer));
@@ -130,6 +150,8 @@ public class BuyerProfileViewModel : INotifyPropertyChanged, OnBuyerLinkageUpdat
         OnPropertyChanged(nameof(ShippingAddress));
         OnPropertyChanged(nameof(ShippingAddressDisabled));
         OnPropertyChanged(nameof(ShippingAddressEnabled));
+        _familySync = null; // will be assigned on next FamilySync get
+        OnPropertyChanged(nameof(FamilySync));
         return _buyer;
     }
 

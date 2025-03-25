@@ -69,7 +69,7 @@ public class BuyerRepository
 
         var address = new Address
         {
-            ID = addressId,
+            Id = addressId,
             StreetLine = reader.GetString(reader.GetOrdinal("StreetLine")),
             City = reader.GetString(reader.GetOrdinal("City")),
             Country = reader.GetString(reader.GetOrdinal("Country")),
@@ -108,9 +108,9 @@ public class BuyerRepository
 
         command.Parameters.AddWithValue("@FirstName", buyer.FirstName);
         command.Parameters.AddWithValue("@LastName", buyer.LastName);
-        command.Parameters.AddWithValue("@BillingAddressId", buyer.BillingAddress.ID);
+        command.Parameters.AddWithValue("@BillingAddressId", buyer.BillingAddress.Id);
         command.Parameters.AddWithValue("@UseSameAddress", buyer.UseSameAddress);
-        command.Parameters.AddWithValue("@ShippingAddressId", buyer.ShippingAddress.ID);
+        command.Parameters.AddWithValue("@ShippingAddressId", buyer.ShippingAddress.Id);
         command.Parameters.Add(new SqlParameter("@UserID", buyer.User.UserId));
         command.ExecuteNonQuery();
     }
@@ -234,7 +234,7 @@ public class BuyerRepository
 
     private void PersistAddress(Address address, SqlConnection conn)
     {
-        if (address.ID == 0)
+        if (address.Id == 0)
         {
             InsertAddress(address, conn);
         }
@@ -259,7 +259,7 @@ public class BuyerRepository
         cmd.Parameters.AddWithValue("@City", address.City);
         cmd.Parameters.AddWithValue("@Country", address.Country);
         cmd.Parameters.AddWithValue("@PostalCode", address.PostalCode);
-        cmd.Parameters.AddWithValue("@ID", address.ID);
+        cmd.Parameters.AddWithValue("@ID", address.Id);
         cmd.ExecuteNonQuery();
     }
 
@@ -272,7 +272,7 @@ public class BuyerRepository
         cmd.Parameters.AddWithValue("@City", address.City);
         cmd.Parameters.AddWithValue("@Country", address.Country);
         cmd.Parameters.AddWithValue("@PostalCode", address.PostalCode);
-        address.ID = Convert.ToInt32(cmd.ExecuteScalar());
+        address.Id = Convert.ToInt32(cmd.ExecuteScalar());
     }
 
     public List<Buyer> FindBuyersWithShippingAddress(Address shippingAddress)
@@ -287,7 +287,7 @@ public class BuyerRepository
                 AND lower(BA.Country) = lower(@Country)
                 AND lower(BA.PostalCode) = lower(@PostalCode)
                 ";
-        command.Parameters.AddWithValue("@StreetLine", shippingAddress.StreetLine);
+        command.Parameters.AddWithValue("@StreetLine",shippingAddress.StreetLine);
         command.Parameters.AddWithValue("@City", shippingAddress.City);
         command.Parameters.AddWithValue("@Country", shippingAddress.Country);
         command.Parameters.AddWithValue("@PostalCode", shippingAddress.PostalCode);
@@ -306,5 +306,30 @@ public class BuyerRepository
                 UserId = buyerId
             }
         }).ToList();
+    }
+
+    public void CreateBuyer(Buyer buyer)
+    {
+        _connection.OpenConnectionSync();
+        var conn = _connection.getConnection();
+        var command = conn.CreateCommand();
+        PersistAddress(buyer.BillingAddress, conn);
+        if (!buyer.UseSameAddress)
+        {
+            PersistAddress(buyer.ShippingAddress, conn);
+        }
+
+        command.CommandText = @"INSERT INTO Buyers (UserId, FirstName, LastName, BillingAddressId, ShippingAddressId, UseSameAddress, Badge,
+                    TotalSpending, NumberOfPurchases, Discount)
+                                VALUES (@UserID, @FirstName, @LastName,  @BillingAddressId, @ShippingAddressId, @UseSameAddress, @Badge, 0, 0,0) ";
+
+        command.Parameters.AddWithValue("@UserId", buyer.Id);
+        command.Parameters.AddWithValue("@FirstName", buyer.FirstName);
+        command.Parameters.AddWithValue("@LastName", buyer.LastName);
+        command.Parameters.AddWithValue("@BillingAddressId", buyer.BillingAddress.Id);
+        command.Parameters.AddWithValue("@UseSameAddress", buyer.UseSameAddress);
+        command.Parameters.AddWithValue("@ShippingAddressId", buyer.ShippingAddress.Id);
+        command.Parameters.AddWithValue("@Badge", BuyerBadge.BRONZE.ToString());
+        command.ExecuteNonQuery();
     }
 }

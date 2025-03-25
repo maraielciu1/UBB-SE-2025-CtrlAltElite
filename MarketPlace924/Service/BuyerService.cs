@@ -27,6 +27,14 @@ public class BuyerService
         return buyer;
     }
 
+    
+    public void CreateBuyer(Buyer buyer)
+    {
+        //TODO run this atomically. put the A in ACID
+        _buyerRepo.CreateBuyer(buyer);
+        _userRepo.UpdateContactInfo(buyer.User);
+    }
+    
     public void SaveInfo(Buyer buyer)
     {
         //TODO run this atomically. put the A in ACID
@@ -37,6 +45,10 @@ public class BuyerService
 
     public List<Buyer> FindBuyersWithShippingAddress(Address currentBuyerShippingAddress)
     {
+        if (currentBuyerShippingAddress.Country == null) //i.e. its an empty address
+        {
+            return new List<Buyer>();
+        }
         var buyers = _buyerRepo.FindBuyersWithShippingAddress(currentBuyerShippingAddress);
         buyers.ForEach(buyer => LoadBuyer(buyer, BuyerDataSegments.BasicInfo | BuyerDataSegments.User));
         return buyers;
