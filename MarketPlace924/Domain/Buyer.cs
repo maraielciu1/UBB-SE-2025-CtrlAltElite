@@ -4,7 +4,11 @@ namespace MarketPlace924.Domain
 {
     public class Buyer
     {
+        // The user associated with this buyer.
         public User User { get; set; }
+
+
+        
 
         public string PhoneNumber
         {
@@ -18,6 +22,7 @@ namespace MarketPlace924.Domain
             set => User.Email = value;
         }
 
+        // The unique identifier of the buyer, derived from the User ID.
         public int Id => User.UserId;
 
         public string FirstName { get; set; }
@@ -33,9 +38,14 @@ namespace MarketPlace924.Domain
         public BuyerWishlist Wishlist { get; set; }
         public List<BuyerLinkage> Linkages { get; set; }
 
+        // List of user IDs that this buyer is following.
+        public List<int> FollowingUsersIds { get; set; }
+
         public Buyer()
         {
             Wishlist = new BuyerWishlist();
+            FollowingUsersIds = new List<int>();
         }
     }
 }
+
