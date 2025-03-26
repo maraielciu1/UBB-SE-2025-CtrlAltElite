@@ -220,8 +220,10 @@ namespace MarketPlace924.Service
             if(user.IsBanned)
                 return (false, "User is banned.", null);
             return (true, "Success", user);
-
-
         }
-    }
+		public async Task<List<User>> GetAll()
+		{
+			return await _userRepository.GetAll();
+		}
+	}
 }
