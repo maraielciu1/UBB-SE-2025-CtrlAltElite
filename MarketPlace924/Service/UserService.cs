@@ -1,6 +1,8 @@
 ﻿using MarketPlace924.Domain;
 using MarketPlace924.Repository;
 using System;
+using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.Diagnostics;
 using System.Security.Cryptography;
 using System.Text;
@@ -198,5 +200,9 @@ namespace MarketPlace924.Service
 			return enteredCaptcha == generatedCaptcha;
         }
 
-    }
+		public async Task<List<User>> GetAll()
+		{
+			return await _userRepository.GetAll();
+		}
+	}
 }
