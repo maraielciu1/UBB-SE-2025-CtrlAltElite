@@ -31,6 +31,7 @@ namespace MarketPlace924
             var userRepo = new UserRepository(dbConnection);
             var buyerRepo = new BuyerRepository(dbConnection);
 
+            // Initialize Services
             _userService = new UserService(userRepo);
             _buyerService = new BuyerService(buyerRepo, userRepo);
 			_adminService = new AdminService(userRepo);
@@ -41,7 +42,6 @@ namespace MarketPlace924
             // MenuAndStage.Visibility = Visibility.Visible;
             // LoginView.Visibility = Visibility.Collapsed;
             // NavigateToBuyerProfile();
-
         }
 
         public void OnLoginSuccess(User user)
@@ -65,15 +65,15 @@ namespace MarketPlace924
         {
             Stage.Navigate(typeof(LoginView), new LoginViewModel(_userService, this));
         }
-        
+
         private void NavigateToHome()
         {
             NavigateToLogin();
         }
-        
+
         private void NavigateToMarketplace()
         {
-            NavigateToLogin();
+            Stage.Navigate(typeof(MyMarketView), new MyMarketViewModel(_buyerService, _user));
         }
         private void NavigateToBuyerProfile()
         {

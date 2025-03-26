@@ -21,6 +21,7 @@ public class LoginViewModel : INotifyPropertyChanged
     private string _captchaEnteredCode;
     private DispatcherTimer _banTimer;
     private DateTime _banEndTime;
+    private bool _hasAttemptedLogin = false;
 
     public Action? NavigateToSignUp { get; set; }
 
@@ -35,6 +36,7 @@ public class LoginViewModel : INotifyPropertyChanged
             OnPropertyChanged(nameof(Email));
         }
     }
+    public string FailedAttemptsText => _hasAttemptedLogin ? $"Failed Login Attempts: {_failedAttempts}" : "";
 
     public string Password
     {
@@ -56,7 +58,7 @@ public class LoginViewModel : INotifyPropertyChanged
         }
     }
 
-    public string FailedAttemptsText => $"Failed Login Attempts: {_failedAttempts}";
+    // public string FailedAttemptsText => $"Failed Login Attempts: {_failedAttempts}";
 
     public bool IsLoginEnabled
     {
@@ -105,38 +107,47 @@ public class LoginViewModel : INotifyPropertyChanged
     private async Task ExecuteLogin()
     {
         ErrorMessage = "";
+        _hasAttemptedLogin = true;  // Mark that the user has attempted to log in
+       
 
-        if (string.IsNullOrEmpty(Email) || string.IsNullOrEmpty(Password) || string.IsNullOrEmpty(CaptchaEnteredCode))
+        //if (string.IsNullOrEmpty(Email) || string.IsNullOrEmpty(Password) || string.IsNullOrEmpty(CaptchaEnteredCode))
+        //{
+        //    ErrorMessage = "Please fill in all fields.";
+        //    return;
+        //}
+        //if(!UserService.CheckEmailInLogIn(Email))
+        //{
+        //    ErrorMessage = "Email does not have the right format!";
+        //    return;
+        //}
+
+        //if (!UserService.VerifyCaptcha(CaptchaEnteredCode,CaptchaText))
+        //{
+        //    ErrorMessage = "Captcha verification failed.";
+        //    GenerateCaptcha();
+        //    return;
+        //}
+        //if (!await UserService.IsUser(Email))
+        //{
+        //    ErrorMessage = "Email does not exist.";
+        //    return;
+        //}
+
+
+        // var user = await UserService.GetUserByEmail(Email);
+        var (success, message, user) = await UserService.LoginAsync(Email, Password, CaptchaEnteredCode, CaptchaText);
+
+
+        if(!success)
         {
-            ErrorMessage = "Please fill in all fields.";
+            ErrorMessage = message;
+            if(message == "Captcha verification failed.")
+            {
+                GenerateCaptcha();
+            }
             return;
         }
-        if(UserService.CheckEmailInLogIn(Email))
-        {
-            ErrorMessage = "Email does not have the right format!";
-            return;
-        }
-
-        if (!UserService.VerifyCaptcha(CaptchaEnteredCode,CaptchaText))
-        {
-            ErrorMessage = "Captcha verification failed.";
-            GenerateCaptcha();
-            return;
-        }
-        if (!await UserService.IsUser(Email))
-        {
-            ErrorMessage = "Email does not exist.";
-            return;
-        }
-
-        var user = await UserService.GetUserByEmail(Email);
-
-
-        if (user == null)
-        {
-            ErrorMessage = "Email does not exist.";
-            return;
-        }
+       
 
         if (await UserService.IsSuspended(Email))
         {
@@ -147,7 +158,7 @@ public class LoginViewModel : INotifyPropertyChanged
 
         if (!await UserService.CanUserLogin(Email, Password))
         {
-            _failedAttempts++;
+            _failedAttempts = await UserService.GetFailedLoginsCountByEmail(Email) + 1;
             await UserService.UpdateUserFailedLogins(user, _failedAttempts);
             ErrorMessage = $"Login failed";
 

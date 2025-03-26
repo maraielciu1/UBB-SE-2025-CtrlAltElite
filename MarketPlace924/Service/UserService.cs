@@ -10,13 +10,13 @@ using System.Threading.Tasks;
 
 namespace MarketPlace924.Service
 {
-	public class UserService
-	{
-		private UserRepository _userRepository;
-		public UserService(UserRepository userRepository)
-		{
-			_userRepository = userRepository;
-		}
+    public class UserService
+    {
+        private UserRepository _userRepository;
+        public UserService(UserRepository userRepository)
+        {
+            _userRepository = userRepository;
+        }
 
         public async Task<bool> RegisterUser(string username, string password, string email, string phoneNumber, int role)
         {
@@ -65,38 +65,34 @@ namespace MarketPlace924.Service
         }
 
         public static User GetUser(string username)
-		{
-			return new User();
-		}
+        {
+            return new User();
+        }
 
-		public async Task<bool> CanUserLogin(string email, string password)
-		{
+        public async Task<bool> CanUserLogin(string email, string password)
+        {
 
-			if (await _userRepository.EmailExists(email))
-			{
-				var user = await GetUserByEmail(email);
-				if (user == null)
-				{
-					return false;
-				}
-				// Give possibility to have plain text passwords in DB for testing purposes
-				if (user.Password.StartsWith("plain:"))
-				{
-					return user.Password == "plain:" + password;
-				}
-				return user.Password == HashPassword(password);
-			}
+            if (await _userRepository.EmailExists(email))
+            {
+                var user = await GetUserByEmail(email);
+                if (user == null)
+                {
+                    return false;
+                }
 
-			return false;
-		}
+                return user.Password == HashPassword(password);
+            }
 
-		public async Task UpdateUserFailedLogins(User user, int NewValueOfFailedLogIns)
-		{
-			await _userRepository.UpdateUserFailedLoginsCount(user, NewValueOfFailedLogIns);
-		}
+            return false;
+        }
 
-		public static string HashPassword(string password)
-		{
+        public async Task UpdateUserFailedLogins(User user, int NewValueOfFailedLogIns)
+        {
+            await _userRepository.UpdateUserFailedLoginsCount(user, NewValueOfFailedLogIns);
+        }
+
+        public static string HashPassword(string password)
+        {
             using (System.Security.Cryptography.SHA256 sha256 = SHA256.Create())
             {
                 byte[] hashedBytes = sha256.ComputeHash(Encoding.UTF8.GetBytes(password));
@@ -104,50 +100,50 @@ namespace MarketPlace924.Service
             }
         }
 
-		public async Task<User?> GetUserByEmail(string email)
-		{
-			return await _userRepository.GetUserByEmail(email);
-		}
+        public async Task<User?> GetUserByEmail(string email)
+        {
+            return await _userRepository.GetUserByEmail(email);
+        }
 
-		public async Task<int> GetFailedLoginsCountByEmail(string email)
-		{
-			var user = await GetUserByEmail(email);
+        public async Task<int> GetFailedLoginsCountByEmail(string email)
+        {
+            var user = await GetUserByEmail(email);
 
-			if (user is null) throw new ArgumentNullException($"{email} is not a user");
+            if (user is null) throw new ArgumentNullException($"{email} is not a user");
 
-			int userId = user.UserId;
-			return await  _userRepository.GetFailedLoginsCountByUserId(userId);
-		}
+            int userId = user.UserId;
+            return await _userRepository.GetFailedLoginsCountByUserId(userId);
+        }
 
-		public async Task<bool> IsUser(string email)
-		{
-			return await _userRepository.EmailExists(email);
-		}
+        public async Task<bool> IsUser(string email)
+        {
+            return await _userRepository.EmailExists(email);
+        }
 
-		public async Task<bool> IsSuspended(string email)
-		{
-			var user = await GetUserByEmail(email);
+        public async Task<bool> IsSuspended(string email)
+        {
+            var user = await GetUserByEmail(email);
 
-			if (user is null) throw new ArgumentNullException($"{email} is not a user");
+            if (user is null) throw new ArgumentNullException($"{email} is not a user");
 
-			if (user.BannedUntil.HasValue && user.BannedUntil > DateTime.Now)
-			{
-				return true;
-			}
+            if (user.BannedUntil.HasValue && user.BannedUntil > DateTime.Now)
+            {
+                return true;
+            }
 
-			return false;
-		}
+            return false;
+        }
 
 
-		public async Task SuspendUserForSeconds(string email, int seconds)
-		{
-			var user = await GetUserByEmail(email);
+        public async Task SuspendUserForSeconds(string email, int seconds)
+        {
+            var user = await GetUserByEmail(email);
 
-			if(user is null) throw new ArgumentNullException($"{email} is not a user");
+            if (user is null) throw new ArgumentNullException($"{email} is not a user");
 
-			user.BannedUntil = DateTime.Now.AddSeconds(seconds);
-			await _userRepository.UpdateUser(user);
-		}
+            user.BannedUntil = DateTime.Now.AddSeconds(seconds);
+            await _userRepository.UpdateUser(user);
+        }
 
         public async Task<string> ValidateLogin(string email, string password, string enteredCaptcha, string generatedCaptcha)
         {
@@ -170,7 +166,7 @@ namespace MarketPlace924.Service
             if (!await CanUserLogin(email, password))
                 return "Login failed";
 
-            return "Success"; 
+            return "Success";
         }
         public async Task HandleFailedLogin(string email)
         {
@@ -178,10 +174,10 @@ namespace MarketPlace924.Service
             if (user == null) return;
 
             int failedAttempts = await GetFailedLoginsCountByEmail(email) + 1;
-			Debug.WriteLine(failedAttempts);
+            Debug.WriteLine(failedAttempts);
             await UpdateUserFailedLogins(user, failedAttempts);
 
-            if (failedAttempts >= 5) 
+            if (failedAttempts >= 5)
             {
                 await SuspendUserForSeconds(email, 5);
             }
@@ -195,14 +191,37 @@ namespace MarketPlace924.Service
             }
         }
 
-		public static bool VerifyCaptcha(string enteredCaptcha, string generatedCaptcha)
-		{
-			return enteredCaptcha == generatedCaptcha;
+        public static bool VerifyCaptcha(string enteredCaptcha, string generatedCaptcha)
+        {
+            return enteredCaptcha == generatedCaptcha;
         }
 
-		public async Task<List<User>> GetAll()
-		{
-			return await _userRepository.GetAll();
-		}
-	}
+
+        public async Task<(bool Success, string Message, User? User)> LoginAsync(string email, string password, string enteredCaptcha, string generatedCaptcha)
+        {
+            if (string.IsNullOrEmpty(email))
+                return (false, "Email cannot be empty!", null);
+
+            if (string.IsNullOrEmpty(password))
+                return (false, "Password cannot be empty!", null);
+
+            if (!CheckEmailInLogIn(email))
+                return (false, "Email does not have the right format!", null);
+
+            if (!VerifyCaptcha(enteredCaptcha, generatedCaptcha))
+                return (false, "Captcha verification failed.", null);
+
+            if (!await IsUser(email))
+                return (false, "Email does not exist.", null);
+
+            var user = await GetUserByEmail(email);
+            if(user == null)
+                return (false, "Email does not exist.", null);
+            if(user.IsBanned)
+                return (false, "User is banned.", null);
+            return (true, "Success", user);
+
+
+        }
+    }
 }

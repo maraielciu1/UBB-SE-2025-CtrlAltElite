@@ -7,7 +7,7 @@ CREATE TABLE Users
     Email        NVARCHAR(255) NOT NULL UNIQUE,
     PhoneNumber  NVARCHAR(20)  NULL,
     Password     NVARCHAR(255) NOT NULL,
-    Role         INT           NOT NULL, -- Example: 1 = Admin, 2 = Seller, 3 = Buyer
+    Role         INT           NOT NULL, -- Example: 1 = Admin, 2 = Buyer, 3 = Seller
     FailedLogins INT DEFAULT 0,
     BannedUntil  DATETIME      NULL,
     IsBanned     BIT DEFAULT 0
@@ -38,7 +38,7 @@ CREATE TABLE Buyers
     TotalSpending     NUMERIC(32, 2) NOT NULL,
     NumberOfPurchases int            not null,
     Discount          NUMERIC(32, 2) NOT NULL,
-    FOREIGN KEY (BillingAddressId) REFERENCES BuyerAddress (Id),
+    FOREIGN KEY (UserId) REFERENCES Users (UserId),
     FOREIGN KEY (BillingAddressId) REFERENCES BuyerAddress (Id),
 );
 
@@ -62,6 +62,48 @@ CREATE TABLE BuyerWishlistItems
     PRIMARY KEY (BuyerId, ProductId),
     FOREIGN KEY (BuyerId) references Buyers (UserId),
 );
+
+
+CREATE Table Sellers(
+	SellerID INT NOT NULL PRIMARY KEY,
+	Username NVARCHAR(100) NOT NULL UNIQUE,
+	StoreName NVARCHAR(100),
+	StoreDescription NVARCHAR(255),
+	StoreAddress NVARCHAR(100),
+	FollowersCount INT,
+	TrustScore FLOAT,
+	FOREIGN KEY(SellerID) REFERENCES Users(UserID),
+);
+
+
+CREATE TABLE Notifications(
+	NotificationID INT IDENTITY(1,1) PRIMARY KEY,
+	SellerID INT,
+	NotificationMessage NVARCHAR(100),
+	NotificationFollowerCount INT,
+	FOREIGN KEY(SellerID) REFERENCES Sellers(SellerID),
+);
+
+
+CREATE TABLE Products(
+	ProductID INT IDENTITY(1,1) PRIMARY KEY,
+	SellerID INT,
+	ProductName NVARCHAR(100),
+	ProductDescription NVARCHAR(100),
+	ProductPrice FLOAT,
+	ProductStock INT,
+	FOREIGN KEY(SellerID) REFERENCES Sellers(SellerID),
+);
+
+
+CREATE TABLE Following (
+    FollowerID INT NOT NULL,
+    FollowedID INT NOT NULL,
+    PRIMARY KEY (FollowerID, FollowedID),
+    FOREIGN KEY (FollowerID) REFERENCES Buyers(UserId),
+    FOREIGN KEY (FollowedID) REFERENCES Sellers(UserId)
+);
+
 
 -- Inserare mai mulți Utilizatori
 INSERT INTO Users (Username, Email, PhoneNumber, Password, Role, FailedLogins, BannedUntil, IsBanned)
