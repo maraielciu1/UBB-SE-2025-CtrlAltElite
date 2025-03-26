@@ -31,7 +31,7 @@ namespace MarketPlace924.Repository
             WHERE u.Username = @Username";
             command.Parameters.Add(new SqlParameter("@Username", sellerUsername));
 
-            using (var reader = await command.ExecuteReaderAsync())
+            using (var reader = command.ExecuteReader())
             {
                 if (!reader.Read())
                 {
@@ -67,6 +67,7 @@ namespace MarketPlace924.Repository
                     IsBanned = isBanned
                 };
 
+                reader.Close();
                 return new Seller(user, storeName, storeDescription, storeAddress, followersCount, trustScore);
             }
         }
@@ -104,7 +105,9 @@ namespace MarketPlace924.Repository
             command.Parameters.Add(new SqlParameter("@Username", username));
             var reader = command.ExecuteReader();
             reader.Read();
-            return reader.GetInt32(0);
+            var read = reader.GetInt32(0);
+            reader.Close();
+            return read;
         }
 
         public async Task<List<string>?> GetNotificationsAsync(int sellerID)
@@ -122,6 +125,7 @@ namespace MarketPlace924.Repository
             }
 
             _connection.closeConnection();
+            reader.Close();
             return notifications;
         }
 
@@ -145,18 +149,21 @@ namespace MarketPlace924.Repository
             var command = _connection.getConnection().CreateCommand();
             command.CommandText = "SELECT * FROM Products WHERE SellerID = @SellerID";
             command.Parameters.Add(new SqlParameter("@SellerID", sellerID));
-            var reader = command.ExecuteReader();
-            var products = new List<Product>();
-            while (reader.Read())
+            using (var reader = command.ExecuteReader())
             {
-                var productID = reader.GetInt32(0);
-                var productName = reader.GetString(2);
-                var productDescription = reader.GetString(3);
-                var productPrice = reader.GetDouble(4);
-                var productStock = reader.GetInt32(5);
-                products.Add(new Product(productID, productName, productDescription, productPrice, productStock, sellerID));
+                var products = new List<Product>();
+                while (reader.Read())
+                {
+                    var productID = reader.GetInt32(0);
+                    var productName = reader.GetString(2);
+                    var productDescription = reader.GetString(3);
+                    var productPrice = reader.GetDouble(4);
+                    var productStock = reader.GetInt32(5);
+                    products.Add(new Product(productID, productName, productDescription, productPrice, productStock, sellerID));
+                }
+                reader.Close();
+                return products;
             }
-            return products;
         }
     }
 }

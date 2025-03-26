@@ -6,7 +6,7 @@ namespace MarketPlace924.DBConnection
 	public class DatabaseConnection
     {
         // here you can replace the connection string with your connection info from the local database
-        private static string dbConnectionString = "Data Source=MELISA-ASUS\\SQLEXPRESS;Initial Catalog=ISS;Integrated Security=True;TrustServerCertificate=True;MultipleActiveResultSets=True;";
+        private static string dbConnectionString = "Data Source=MELISA-ASUS\\SQLEXPRESS;Initial Catalog=ISS;Integrated Security=True;TrustServerCertificate=True;";
         private SqlConnection dbConnection = new SqlConnection(dbConnectionString);
 
         public DatabaseConnection() { }

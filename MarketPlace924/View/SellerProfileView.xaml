@@ -44,10 +44,6 @@
                         <StackPanel MaxWidth="300">
                             <TextBlock x:Name="DisplayName" Text="{Binding StoreName}" FontSize="24" FontWeight="Bold" TextWrapping="Wrap" />
                             <StackPanel Orientation="Horizontal">
-                                <TextBlock Text="Username:" FontWeight="Bold" />
-                                <TextBlock x:Name="Username" Text="{Binding Username}" Margin="5,0,0,0" TextWrapping="Wrap" />
-                            </StackPanel>
-                            <StackPanel Orientation="Horizontal">
                                 <TextBlock Text="Email:" FontWeight="Bold" />
                                 <TextBlock x:Name="Email" Text="{Binding Email}" Margin="5,0,0,0" TextWrapping="Wrap" />
                             </StackPanel>

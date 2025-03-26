@@ -61,7 +61,7 @@ namespace MarketPlace924.Repository
         public async Task UpdateUser(User user)
         {
             // this needs to be awaited
-            _connection.openConnection();
+            await _connection.openConnection();
             using var command = _connection.getConnection().CreateCommand();
 
             command.CommandText = "UPDATE Users SET Username = @Username, Email = @Email, PhoneNumber = @PhoneNumber, Password = @Password, Role = @Role, FailedLogins = @FailedLogins, BannedUntil = @BannedUntil, IsBanned = @IsBanned WHERE UserID = @UserID";
