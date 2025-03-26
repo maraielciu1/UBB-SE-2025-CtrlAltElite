@@ -13,28 +13,12 @@
 
     <Grid>
         <Grid.ColumnDefinitions>
-            <ColumnDefinition Width="Auto" />
             <ColumnDefinition Width="4*" />
-            <ColumnDefinition Width="1.2*" />
+            <ColumnDefinition Width="*" />
         </Grid.ColumnDefinitions>
 
-        <!-- Sidebar -->
-        <StackPanel Width="150" HorizontalAlignment="Stretch" Background="#00502020" VerticalAlignment="Stretch" Padding="10">
-            <Button Content="Home" Height="40" Margin="0,0,0,10" Foreground="#FF001EFF" BorderThickness="0">
-                <Button.Background>
-                    <SolidColorBrush/>
-                </Button.Background>
-            </Button>
-            <Button Content="Profile" Height="40" Margin="0,0,0,10" Foreground="#FF001EFF">
-                <Button.Background>
-                    <SolidColorBrush/>
-                </Button.Background>
-            </Button>
-            <Button Content="MyMarket" Height="40" Background="#FF0046EA" />
-        </StackPanel>
-
         <!-- Main Content -->
-        <Grid Grid.Column="1" Background="#FFF0F0F0" Padding="12">
+        <Grid Grid.Column="0" Background="#FFF0F0F0" Padding="12">
             <Grid.RowDefinitions>
                 <RowDefinition Height="Auto"/>
                 <RowDefinition Height="Auto"/>
@@ -57,14 +41,9 @@
             <Grid Grid.Row="1" Margin="0,10,0,0">
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition Width="*"/>
-                    <ColumnDefinition Width="Auto"/>
                 </Grid.ColumnDefinitions>
 
                 <TextBox PlaceholderText="Search" TextChanged="OnSearchProductTextChanged" Grid.Column="0" Margin="0,0,10,0" Height="40" HorizontalAlignment="Stretch"/>
-                <StackPanel Grid.Column="1" Orientation="Horizontal" HorizontalAlignment="Stretch">
-                    <Button Content="Filter" Margin="5" MinWidth="120" Width="Auto"/>
-                    <Button Content="Sort" Margin="5" MinWidth="120" Width="Auto"/>
-                </StackPanel>
             </Grid>
 
             <!-- Scrollable Area -->
@@ -84,7 +63,7 @@
         </Grid>
 
         <!-- Overlapping Layer: Button + Following List -->
-        <Grid Grid.Column="2" HorizontalAlignment="Center" VerticalAlignment="Top" Margin="0,15,0,0">
+        <Grid Grid.Column="1" HorizontalAlignment="Center" VerticalAlignment="Top" Margin="0,15,0,0">
             <Grid x:Name="FollowingList" Background="#FFF0F0F0" Visibility="{Binding FollowingListVisibility}" VerticalAlignment="Top">
                 <Grid.RowDefinitions>
                     <RowDefinition Height="Auto"/>

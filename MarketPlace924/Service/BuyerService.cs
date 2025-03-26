@@ -23,7 +23,7 @@ namespace MarketPlace924.Service
         }
 
         // Retrieves a Buyer object associated with the given User.
-        public async Task<Buyer> GetBuyerByUser(User user)
+        public Buyer GetBuyerByUser(User user)
         {
             // TODO Handle Buyer Not Found; Exception?
             var buyer = new Buyer();

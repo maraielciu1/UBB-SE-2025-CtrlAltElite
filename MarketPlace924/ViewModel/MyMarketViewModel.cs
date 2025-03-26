@@ -110,7 +110,7 @@ namespace MarketPlace924.ViewModel
         // Loads buyer and market data
         private async Task LoadData()
         {
-            _buyer = await _buyerService.GetBuyerByUser(_user);
+            _buyer = _buyerService.GetBuyerByUser(_user);
             OnPropertyChanged(nameof(Buyer));
 
             await LoadFollowing();

@@ -24,7 +24,7 @@ namespace MarketPlace924.Repository
 
 
         // Loads the buyer's info from the database.
-        public async Task LoadBuyerInfo(Buyer buyer)
+        public void LoadBuyerInfo(Buyer buyer)
         {
             _connection.OpenConnectionSync();
             var conn = _connection.getConnection();
@@ -70,9 +70,9 @@ namespace MarketPlace924.Repository
             command.Parameters.AddWithValue("@FollowerID", buyer.Id);
 
             List<int> sellersIDs = new List<int>();
-            using (reader = await command.ExecuteReaderAsync())
+            using (reader =  command.ExecuteReader())
             {
-                while (await reader.ReadAsync())
+                while (reader.Read())
                 {
                     sellersIDs.Add(Convert.ToInt32(reader["FollowedID"]));
                 }
@@ -410,8 +410,8 @@ namespace MarketPlace924.Repository
             command.CommandText = $"SELECT u.Email, u.PhoneNumber, s.* " +
                                   $"FROM Users u " +
                                   $"INNER JOIN Sellers s " +
-                                  $"ON u.UserID = s.SellerID " +
-                                  $"WHERE SellerID IN ({formattedSellersIds})";
+                                  $"ON u.UserId = s.UserId " +
+                                  $"WHERE s.UserId IN ({formattedSellersIds})";
 
 
             List<Seller> followedSellers = new List<Seller>();
@@ -498,8 +498,8 @@ namespace MarketPlace924.Repository
             await command.ExecuteNonQueryAsync();
 
             command = _connection.getConnection().CreateCommand();
-            command.CommandText = "UPDATE Sellers SET FollowersCount = FollowersCount + 1 WHERE SellerID = @SellerID";
-            command.Parameters.AddWithValue("@SellerID", sellerId);
+            command.CommandText = "UPDATE Sellers SET FollowersCount = FollowersCount + 1 WHERE UserId = @UserId";
+            command.Parameters.AddWithValue("@UserId", sellerId);
             await command.ExecuteNonQueryAsync();
 
             _connection.CloseConnection();
@@ -517,8 +517,8 @@ namespace MarketPlace924.Repository
             await command.ExecuteNonQueryAsync();
 
             command = _connection.getConnection().CreateCommand();
-            command.CommandText = "UPDATE Sellers SET FollowersCount = FollowersCount - 1 WHERE SellerID = @SellerID";
-            command.Parameters.AddWithValue("@SellerID", sellerId);
+            command.CommandText = "UPDATE Sellers SET FollowersCount = FollowersCount - 1 WHERE UserId = @UserId";
+            command.Parameters.AddWithValue("@UserId", sellerId);
             await command.ExecuteNonQueryAsync();
 
             _connection.CloseConnection();

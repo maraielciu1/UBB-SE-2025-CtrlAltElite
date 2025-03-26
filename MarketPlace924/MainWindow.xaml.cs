@@ -64,7 +64,7 @@ namespace MarketPlace924
 
         private void NavigateToMarketplace()
         {
-            NavigateToLogin();
+            Stage.Navigate(typeof(MyMarketView), new MyMarketViewModel(_buyerService, _user));
         }
         private void NavigateToBuyerProfile()
         {

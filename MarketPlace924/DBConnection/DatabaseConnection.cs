@@ -5,7 +5,8 @@ namespace MarketPlace924.DBConnection
 {
     public class DatabaseConnection
     {
-        private SqlConnection _dbConnection = new(Configuration.Instance.Properties["Database:ConnectionString"]);
+        private static string dbConnectionString = "Data Source=LAPTOP-MHT5DVFO\\SQLEXPRESS01;Initial Catalog=MarketPlaceDB;Integrated Security=True;TrustServerCertificate=True";
+        private SqlConnection _dbConnection = new(dbConnectionString);
 
 
         public SqlConnection getConnection()
