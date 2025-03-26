@@ -10,7 +10,7 @@
     Title="MarketPlace924">
     <Grid>
         <Frame x:Name="LoginFrame" Visibility="Visible"/>
-        
+
         <Border x:Name="MenuAndStage" Visibility="Collapsed"
                 Style="{StaticResource PrimaryBorder}">
             <Grid>

@@ -1,10 +1,14 @@
 ﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
 
 namespace MarketPlace924.Domain
 {
     public class Product
     {
-        public int ID { get; set; }
+        public int ProductId { get; set; }
         public string Name { get; set; }
         public string Description { get; set; }
         public double Price { get; set; }
@@ -13,12 +17,12 @@ namespace MarketPlace924.Domain
 
         public Product(int id, string name, string description, double price, int stock, int sellerId)
         {
-            ID = id;
+            ProductId = id;
             Name = name;
             Description = description;
             Price = price;
             SellerId = sellerId;
             Stock = stock;
-        } 
+        }
     }
 }

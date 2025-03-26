@@ -17,57 +17,56 @@ namespace MarketPlace924.Repository
 
 		public async Task AddUser(User user)
 		{
-            await _connection.OpenConnection();
+			await _connection.OpenConnection();
 
-            var connection = _connection.getConnection();
-            var command = connection.CreateCommand();
+			var connection = _connection.getConnection();
+			var command = connection.CreateCommand();
 
-            command.CommandText = @"
+			command.CommandText = @"
 			INSERT INTO Users (Username, Email, PhoneNumber, Password, Role, FailedLogins, BannedUntil, IsBanned)
 			VALUES (@Username, @Email, @PhoneNumber, @Password, @Role, @FailedLogins, @BannedUntil, @IsBanned)";
 
-            command.Parameters.AddWithValue("@Username", user.Username);
-            command.Parameters.AddWithValue("@Email", user.Email);
-            command.Parameters.AddWithValue("@PhoneNumber", user.PhoneNumber);
-            command.Parameters.AddWithValue("@Password", user.Password);
-            command.Parameters.AddWithValue("@Role", (int)user.Role);
-            command.Parameters.AddWithValue("@FailedLogins", user.FailedLogins);
-            command.Parameters.AddWithValue("@BannedUntil", user.BannedUntil ?? (object)DBNull.Value);
-            command.Parameters.AddWithValue("@IsBanned", user.IsBanned);
+			command.Parameters.AddWithValue("@Username", user.Username);
+			command.Parameters.AddWithValue("@Email", user.Email);
+			command.Parameters.AddWithValue("@PhoneNumber", user.PhoneNumber);
+			command.Parameters.AddWithValue("@Password", user.Password);
+			command.Parameters.AddWithValue("@Role", (int)user.Role);
+			command.Parameters.AddWithValue("@FailedLogins", user.FailedLogins);
+			command.Parameters.AddWithValue("@BannedUntil", user.BannedUntil ?? (object)DBNull.Value);
+			command.Parameters.AddWithValue("@IsBanned", user.IsBanned);
 
-            command.ExecuteNonQuery();
+			command.ExecuteNonQuery();
 			_connection.CloseConnection();
-        }
+		}
 
-		public async Task<User?> GetUserByUsername(string username)
-		{
-			
-			await _connection.OpenConnection();
-			using var command = _connection.getConnection().CreateCommand();
+        public async Task<User?> GetUserByUsername(string username)
+        {
+
+            await _connection.OpenConnection();
+            using var command = _connection.getConnection().CreateCommand();
 
             command.CommandText = "SELECT * FROM Users WHERE Username = @Username";
             command.Parameters.Add(new SqlParameter("@Username", username));
 
-			using var reader = await command.ExecuteReaderAsync();
+            using var reader = await command.ExecuteReaderAsync();
             if (!await reader.ReadAsync()) return null;
 
             var userId = reader.GetInt32(0);
-			var email = reader.GetString(2);
-			var phoneNumber = reader.GetString(3);
-			var password = reader.GetString(4);
-			var role = (UserRole)reader.GetInt32(5);
-			var failedLoginsCount = reader.GetInt32(6);
-			var bannedUntil = reader.IsDBNull(7) ? (DateTime?)null : reader.GetDateTime(7);
-			var isBanned = reader.GetBoolean(8);
-			_connection.CloseConnection();
-			return new User(userId, username, email, phoneNumber, password, role, failedLoginsCount, bannedUntil, isBanned);
-
+            var email = reader.GetString(2);
+            var phoneNumber = reader.GetString(3);
+            var password = reader.GetString(4);
+            var role = (UserRole)reader.GetInt32(5);
+            var failedLoginsCount = reader.GetInt32(6);
+            var bannedUntil = reader.IsDBNull(7) ? (DateTime?)null : reader.GetDateTime(7);
+            var isBanned = reader.GetBoolean(8);
+            _connection.CloseConnection();
+            return new User(userId, username, email, phoneNumber, password, role, failedLoginsCount, bannedUntil, isBanned);
 
         }
 
         public async Task UpdateUserFailedLoginsCount(User user, int NewValueOfFailedLogIns)
-        {
-
+		{
+			
 			await _connection.OpenConnection();
 			var command = _connection.getConnection().CreateCommand();
 
@@ -137,6 +136,7 @@ namespace MarketPlace924.Repository
             _connection.CloseConnection();
             return result > 0;
         }
+
         public async Task<bool> UsernameExists(string username)
         {
             await _connection.OpenConnection();
@@ -160,7 +160,9 @@ namespace MarketPlace924.Repository
             _connection.CloseConnection();
             return result;
         }
-        
+		
+
+
         //region: For Buyer
         public void UpdateContactInfo(User user)
         {

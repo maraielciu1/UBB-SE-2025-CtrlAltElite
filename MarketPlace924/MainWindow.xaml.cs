@@ -5,7 +5,6 @@ using MarketPlace924.View;
 using MarketPlace924.DBConnection;
 using MarketPlace924.Domain;
 using MarketPlace924.ViewModel;
-using System;
 
 // To learn more about WinUI, the WinUI project structure,
 // and more about our project templates, see: http://aka.ms/winui-project-info.
@@ -32,17 +31,12 @@ namespace MarketPlace924
             var buyerRepo = new BuyerRepository(dbConnection);
             var sellerRepo = new SellerRepository(dbConnection, userRepo);
 
+            // Initialize Services
             _userService = new UserService(userRepo);
             _buyerService = new BuyerService(buyerRepo, userRepo);
             _sellerService = new SellerService(sellerRepo);
 
             LoginFrame.Navigate(typeof(LoginView), new LoginViewModel(_userService, this));
-            // To Start Logged in as Buyer ucomment bellow
-             //_user = new User(userID: 9, phoneNumber: "074322321", email: "alice.smith@example.com", role: );
-             //MenuAndStage.Visibility = Visibility.Visible;
-            //LoginView.Visibility = Visibility.Collapsed;
-            //NavigateToBuyerProfile();
-
         }
 
         public void OnLoginSuccess(User user)
@@ -71,15 +65,15 @@ namespace MarketPlace924
         {
             Stage.Navigate(typeof(LoginView), new LoginViewModel(_userService, this));
         }
-        
+
         private void NavigateToHome()
         {
             NavigateToLogin();
         }
-        
+
         private void NavigateToMarketplace()
         {
-            NavigateToLogin();
+            Stage.Navigate(typeof(MyMarketView), new MyMarketViewModel(_buyerService, _user));
         }
         private void NavigateToBuyerProfile()
         {

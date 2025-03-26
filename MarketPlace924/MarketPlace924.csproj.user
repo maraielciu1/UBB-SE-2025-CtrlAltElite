@@ -20,6 +20,12 @@
       <SubType>Designer</SubType>
     </Page>
     <Page Update="View\SellerProfileView.xaml">
+		<SubType>Designer</SubType>
+	</Page>
+    <Page Update="View\MyMarketProfileView.xaml">
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Update="View\MyMarketView.xaml">
       <SubType>Designer</SubType>
     </Page>
     <Page Update="View\LoginView.xaml">
