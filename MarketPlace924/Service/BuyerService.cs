@@ -142,6 +142,12 @@ namespace MarketPlace924.Service
             return await _buyerRepo.GetFollowedSellers(followingUsersID);
         }
 
+        // Retrieves the list of all sellers.
+        public async Task<List<Seller>> GetAllSellers()
+        {
+            return await _buyerRepo.GetAllSellers();
+        }
+
         // Retrieves products of the seller that the buyer is currently viewing.
         public async Task<List<Product>> GetProductsForViewProfile(int sellerId)
         {
@@ -150,6 +156,13 @@ namespace MarketPlace924.Service
             allProducts.AddRange(products);
             return allProducts;
         }
+
+        // Checks if buyer exists in the database
+        public async Task<bool> CheckIfBuyerExists(int buyerId)
+        {
+            return await _buyerRepo.CheckIfBuyerExists(buyerId);
+        }
+
 
         // Checks if a buyer is following a specific seller.
         public async Task<bool> IsFollowing(int buyerId, int sellerId)

@@ -23,6 +23,8 @@ namespace MarketPlace924.ViewModel
         private ObservableCollection<Product> _filteredProducts = new ObservableCollection<Product>();
         private ObservableCollection<Seller> _allFollowedSellers = new ObservableCollection<Seller>();
         private ObservableCollection<Seller> _filteredFollowedSellers = new ObservableCollection<Seller>();
+        private ObservableCollection<Seller> _allSellers = new ObservableCollection<Seller>();
+        private ObservableCollection<Seller> _filteredAllSellers = new ObservableCollection<Seller>();
 
         // UI State Management
         private bool _isFollowingListVisible;
@@ -69,6 +71,18 @@ namespace MarketPlace924.ViewModel
             }
         }
 
+        // Filtered all sellers list
+        public ObservableCollection<Seller> AllSellersList
+        {
+            get => _filteredAllSellers;
+            set
+            {
+                _filteredAllSellers = value;
+                OnPropertyChanged(nameof(AllSellersList));
+            }
+        }
+
+
         // Indicates if the following list is visible
         public bool IsFollowingListVisible
         {
@@ -114,6 +128,7 @@ namespace MarketPlace924.ViewModel
             OnPropertyChanged(nameof(Buyer));
 
             await LoadFollowing();
+            await LoadAllSellers();
             await LoadMyMarketData();
         }
 
@@ -157,6 +172,21 @@ namespace MarketPlace924.ViewModel
             OnPropertyChanged(nameof(MyMarketFollowing));
         }
 
+        // Filters all sellers based on search query
+        public void FilterAllSellers(string searchText)
+        {
+            _filteredAllSellers.Clear();
+            var filteredSellers = string.IsNullOrEmpty(searchText)
+                ? _allSellers
+                : _allSellers.Where(s => s.StoreName.Contains(searchText, StringComparison.OrdinalIgnoreCase));
+
+            foreach (var seller in filteredSellers)
+            {
+                _filteredAllSellers.Add(seller);
+            }
+            OnPropertyChanged(nameof(AllSellersList));
+        }
+
         // Loads products from followed sellers
         public async Task LoadMyMarketData()
         {
@@ -196,14 +226,31 @@ namespace MarketPlace924.ViewModel
             }
         }
 
+        // Loads all sellers list
+        public async Task LoadAllSellers()
+        {
+            try
+            {
+                var sellers = await _buyerService.GetAllSellers();
+                _allSellers.Clear();
+                foreach (var seller in sellers)
+                {
+                    _allSellers.Add(seller);
+                }
+                FilterAllSellers(""); // Show all followed sellers initially
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Error loading followed sellers: {ex.Message}");
+            }
+        }
+
         // Refreshes buyer and market data
         public async Task RefreshData()
         {
             try
             {
                 await LoadData();
-                await LoadFollowing();
-                await LoadMyMarketData();
             }
             catch (Exception ex)
             {

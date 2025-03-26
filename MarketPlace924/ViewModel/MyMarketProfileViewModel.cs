@@ -1,5 +1,6 @@
 ﻿using MarketPlace924.Domain;
 using MarketPlace924.Service;
+using Microsoft.UI.Xaml.Controls;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
@@ -110,6 +111,12 @@ namespace MarketPlace924.ViewModel
         // Toggles follow/unfollow state for the seller
         private async Task ToggleFollow()
         {
+            if (!await _buyerService.CheckIfBuyerExists(_buyer.Id))
+            {
+                await ShowDialog("Not allowed", "You need to enter the information in the Buyer section!");
+                return;
+            }
+
             if (IsFollowing)
             {
                 await _buyerService.UnfollowSeller(_buyer.Id, _seller.Id); // Unfollow seller
@@ -120,6 +127,19 @@ namespace MarketPlace924.ViewModel
             }
 
             IsFollowing = !IsFollowing; // Update follow status
+        }
+
+        private async System.Threading.Tasks.Task ShowDialog(string title, string message)
+        {
+            ContentDialog dialog = new ContentDialog
+            {
+                Title = title,
+                Content = message,
+                CloseButtonText = "OK",
+                XamlRoot = App.m_window.Content.XamlRoot
+            };
+
+            await dialog.ShowAsync();
         }
 
         // Loads seller profile details and updates UI

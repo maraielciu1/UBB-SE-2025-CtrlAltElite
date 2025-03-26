@@ -442,6 +442,49 @@ namespace MarketPlace924.Repository
             return followedSellers;
         }
 
+        // Retrieves the list of followed sellers based on a list of followed user IDs.
+        public async Task<List<Seller>> GetAllSellers()
+        {
+            await _connection.OpenConnection();
+
+            var command = _connection.getConnection().CreateCommand();
+
+
+            // Add the followed seller IDs to the parameter (using the list of IDs)
+            command.CommandText = $"SELECT u.Email, u.PhoneNumber, s.* " +
+                                  $"FROM Users u " +
+                                  $"INNER JOIN Sellers s " +
+                                  $"ON u.UserId = s.UserId ";
+
+
+            List<Seller> allSellers = new List<Seller>();
+            using (var reader = await command.ExecuteReaderAsync())
+            {
+                while (await reader.ReadAsync())
+                {
+                    var sellerEmail = reader.GetString(0);
+                    var sellerPhoneNumber = reader.GetString(1);
+                    var sellerID = reader.GetInt32(2);
+                    var username = reader.GetString(3);
+                    var storeName = reader.GetString(4);
+                    var storeDescription = reader.GetString(5);
+                    var storeAddress = reader.GetString(6);
+                    var followersCount = reader.GetInt32(7);
+                    var trustScore = reader.GetDouble(8);
+
+                    Seller seller = new Seller(username, storeName, storeDescription, storeAddress, followersCount, trustScore);
+                    Domain.User user = new Domain.User(userID: sellerID, email: sellerEmail, phoneNumber: sellerPhoneNumber);
+
+                    seller.User = user;
+
+                    allSellers.Add(seller);
+                }
+            }
+
+            _connection.CloseConnection();
+            return allSellers;
+        }
+
         // Retrieves the list of products from a specific seller.
         public async Task<List<Product>> GetProductsFromSeller(int sellerID)
         {
@@ -470,6 +513,22 @@ namespace MarketPlace924.Repository
             return products;
         }
 
+        // Check if the Buyer has introduced his data
+        public async Task<bool> CheckIfBuyerExists(int buyerId)
+        {
+            await _connection.OpenConnection();
+            var command = _connection.getConnection().CreateCommand();
+            command.CommandText = "SELECT COUNT(*) FROM Buyers WHERE UserId = @UserId";
+            command.Parameters.AddWithValue("@UserId", buyerId);
+
+            var result = await command.ExecuteScalarAsync();
+            _connection.CloseConnection();
+
+            // Return true if a record exists (i.e., count > 0)
+            return Convert.ToInt32(result) > 0;
+        }
+
+
         // Check if the Buyer is Following the Seller
         public async Task<bool> IsFollowing(int buyerId, int sellerId)
         {
@@ -485,6 +544,7 @@ namespace MarketPlace924.Repository
             // Return true if a record exists (i.e., count > 0)
             return Convert.ToInt32(result) > 0;
         }
+
 
         // The Buyer Follows the Seller
         public async Task FollowSeller(int buyerId, int sellerId)
