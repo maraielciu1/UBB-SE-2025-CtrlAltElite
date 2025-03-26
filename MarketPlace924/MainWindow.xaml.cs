@@ -1,10 +1,9 @@
 using Microsoft.UI.Xaml;
-using Microsoft.UI.Xaml.Controls;
-using MarketPlace924.Domain;
 using MarketPlace924.Repository;
 using MarketPlace924.Service;
 using MarketPlace924.View;
 using MarketPlace924.DBConnection;
+using MarketPlace924.Domain;
 using MarketPlace924.ViewModel;
 
 // To learn more about WinUI, the WinUI project structure,
@@ -12,28 +11,18 @@ using MarketPlace924.ViewModel;
 
 namespace MarketPlace924
 {
-	/// <summary>
-	/// An empty window that can be used on its own or navigated to within a Frame.
-	/// </summary>
-	public sealed partial class MainWindow : Window
+    /// <summary>
+    /// An empty window that can be used on its own or navigated to within a Frame.
+    /// </summary>
+    public sealed partial class MainWindow : Window, OnLoginSuccessCallback
     {
-		public static MainWindow _instance { get; set; }
         private UserService _userService;
         private BuyerService _buyerService;
         private User? _user;
 
-
-        // Controls the visibility of the menu and content stage.
-        public Visibility MenuAndStageVisibility => _user != null ? Visibility.Visible : Visibility.Collapsed;
-
-        // Controls the visibility of the login section.
-        public Visibility LoginVisibility => _user == null ? Visibility.Visible : Visibility.Collapsed;
-
-
         public MainWindow()
         {
             InitializeComponent();
-			_instance = this;
 
             // Initialize Database Connection and Services
             var dbConnection = new DatabaseConnection(); // Using your DBConnection class
@@ -44,19 +33,42 @@ namespace MarketPlace924
             _userService = new UserService(userRepo);
             _buyerService = new BuyerService(buyerRepo, userRepo);
 
-            // Temporary hardcoded user for testing purposes
-            _user = new User(userID: 10, phoneNumber: "074322321", email: "admin@gmail.com");
-
-            // Ensure menu and content area is visible
-            MenuAndStage.Visibility = Visibility.Visible;
-
-            // Navigate to the Buyer's Profile page
-            NavigateToBuyerProfile();
+            LoginFrame.Navigate(typeof(LoginView), new LoginViewModel(_userService, this));
+            // To Start Logged in as Buyer ucomment bellow
+            // _user = new User(userID: 5, phoneNumber: "074322321", email: "admin@gmail.com");
+            // MenuAndStage.Visibility = Visibility.Visible;
+            // LoginView.Visibility = Visibility.Collapsed;
+            // NavigateToBuyerProfile();
         }
 
+        public void OnLoginSuccess(User user)
+        {
+            LoginFrame.Visibility = Visibility.Collapsed;
+            MenuAndStage.Visibility = Visibility.Visible;
+            _user = user;
+            if (user.Role == UserRole.Buyer)
+            {
+                NavigateToBuyerProfile();
+            }
+        }
+
+        private void NavigateToLogin()
+        {
+            Stage.Navigate(typeof(LoginView), new LoginViewModel(_userService, this));
+        }
+
+        private void NavigateToHome()
+        {
+            NavigateToLogin();
+        }
+
+        private void NavigateToMarketplace()
+        {
+            NavigateToLogin();
+        }
         private void NavigateToBuyerProfile()
         {
-            Stage.Navigate(typeof(MyMarketView), new MyMarketViewModel(_buyerService, _user));
+            Stage.Navigate(typeof(BuyerProfileView), new BuyerProfileViewModel(_buyerService, _user, new BuyerWishlistItemDetailsProvider()));
         }
     }
 }

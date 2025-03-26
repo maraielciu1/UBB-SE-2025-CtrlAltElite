@@ -19,7 +19,7 @@ namespace MarketPlace924.Repository
 		{
 			await _connection.OpenConnection();
 
-			var connection = _connection.GetConnection();
+			var connection = _connection.getConnection();
 			var command = connection.CreateCommand();
 
 			command.CommandText = @"
@@ -43,7 +43,7 @@ namespace MarketPlace924.Repository
         {
 
             await _connection.OpenConnection();
-            using var command = _connection.GetConnection().CreateCommand();
+            using var command = _connection.getConnection().CreateCommand();
 
             command.CommandText = "SELECT * FROM Users WHERE Username = @Username";
             command.Parameters.Add(new SqlParameter("@Username", username));
@@ -68,7 +68,7 @@ namespace MarketPlace924.Repository
 		{
 			
 			await _connection.OpenConnection();
-			var command = _connection.GetConnection().CreateCommand();
+			var command = _connection.getConnection().CreateCommand();
 
 			command.CommandText = "UPDATE Users SET FailedLogins = @FailedLogins WHERE UserID = @UserID";
 			user.FailedLogins = NewValueOfFailedLogIns;
@@ -81,7 +81,7 @@ namespace MarketPlace924.Repository
 		public async Task UpdateUser(User user)
 		{
 			await _connection.OpenConnection();
-			using var command = _connection.GetConnection().CreateCommand();
+			using var command = _connection.getConnection().CreateCommand();
 
 			command.CommandText = "UPDATE Users SET Username = @Username, Email = @Email, PhoneNumber = @PhoneNumber, Password = @Password, Role = @Role, FailedLogins = @FailedLogins, BannedUntil = @BannedUntil, IsBanned = @IsBanned WHERE UserID = @UserID";
 			command.Parameters.Add(new SqlParameter("@Username", user.Username));
@@ -101,7 +101,7 @@ namespace MarketPlace924.Repository
 		public async Task<User?> GetUserByEmail(string email)
 		{
 			await _connection.OpenConnection();
-			var command = _connection.GetConnection().CreateCommand();
+			var command = _connection.getConnection().CreateCommand();
 
 			command.CommandText = "SELECT * FROM Users WHERE Email = @Email";
 			command.Parameters.Add(new SqlParameter("@Email", email));
@@ -128,7 +128,7 @@ namespace MarketPlace924.Repository
         public async Task<bool> EmailExists(string email)
         {
             await _connection.OpenConnection();
-            var command = _connection.GetConnection().CreateCommand();
+            var command = _connection.getConnection().CreateCommand();
 
             command.CommandText = "SELECT count(1) FROM Users WHERE Email = @Email";
             command.Parameters.Add(new SqlParameter("@Email", email));
@@ -140,7 +140,7 @@ namespace MarketPlace924.Repository
         public async Task<bool> UsernameExists(string username)
         {
             await _connection.OpenConnection();
-            var command = _connection.GetConnection().CreateCommand();
+            var command = _connection.getConnection().CreateCommand();
 
             command.CommandText = "SELECT COUNT(1) FROM Users WHERE Username = @Username";
             command.Parameters.Add(new SqlParameter("@Username", username));
@@ -152,7 +152,7 @@ namespace MarketPlace924.Repository
         public async Task<int> GetFailedLoginsCountByUserId(int userID)
         {
             await _connection.OpenConnection();
-            var command = _connection.GetConnection().CreateCommand();
+            var command = _connection.getConnection().CreateCommand();
 
             command.CommandText = "SELECT FailedLogins FROM Users WHERE UserID = @UserID";
             command.Parameters.Add(new SqlParameter("@UserID", userID));
@@ -160,5 +160,38 @@ namespace MarketPlace924.Repository
             _connection.CloseConnection();
             return result;
         }
-    }
+		
+
+
+        //region: For Buyer
+        public void UpdateContactInfo(User user)
+        {
+	        _connection.OpenConnectionSync();
+	        var conn = _connection.getConnection();
+	        var command = conn.CreateCommand();
+	        command.CommandText = "UPDATE Users SET PhoneNumber = @PhoneNumber WHERE UserID = @UserID";
+            
+	        command.Parameters.Add(new SqlParameter("@PhoneNumber", user.PhoneNumber));
+	        command.Parameters.Add(new SqlParameter("@UserID", user.UserId));
+	        command.ExecuteNonQuery();
+        }
+
+        public void LoadUserContactById(User user)
+        {
+	        _connection.OpenConnectionSync();
+	        var conn = _connection.getConnection();
+	        var command = conn.CreateCommand();
+	        command.CommandText = "SELECT PhoneNumber, Email FROM Users WHERE UserID = @UserID";
+	        command.Parameters.Add(new SqlParameter("@UserID", user.UserId));
+	        var reader = command.ExecuteReader();
+	        if (!reader.Read())
+	        {
+		        return;
+	        }
+	        user.PhoneNumber = reader.GetString(reader.GetOrdinal("PhoneNumber"));
+	        user.Email = reader.GetString(reader.GetOrdinal("Email"));
+	        reader.Close();
+        }
+        //endregion
+	}
 }

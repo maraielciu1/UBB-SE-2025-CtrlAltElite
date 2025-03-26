@@ -37,14 +37,14 @@
 
                 <TextBox PlaceholderText="Enter Captcha" Text="{Binding CaptchaEnteredCode, Mode=TwoWay}" Width="Auto" Height="45"/>
 
-                <Button Content="Login" Command="{Binding LoginCommand}" IsEnabled="{Binding IsLoginEnabled}" Width="200" Height="55" Background="#1565C0" Foreground="White"
+                <Button Content="Login" Command="{Binding LoginCommand}" IsEnabled="{Binding IsLoginEnabled}" Width="200" Height="50" Background="#1565C0" Foreground="White"
                         HorizontalAlignment="Center"
                         
                         />
 
                 <StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
-                    <TextBlock Text="Don't have an account? " FontSize="16"/>
-                    <TextBlock x:Name="RegisterButtonTextBlock" Text="Register now" Foreground="#1E88E5" FontSize="16" FontWeight="Bold" PointerPressed="RegisterButtonTextBlock_PointerPressed" />
+                    <TextBlock Text="Don't have an account? " FontSize="14"/>
+                    <TextBlock x:Name="RegisterButtonTextBlock" Text="Register now" Foreground="#1E88E5" FontSize="14" FontWeight="Bold" PointerPressed="RegisterButtonTextBlock_PointerPressed" />
                 </StackPanel>
 
             </StackPanel>

@@ -8,7 +8,7 @@ using System.Threading.Tasks;
 
 namespace MarketPlace924.Service
 {
-	class UserService
+	public class UserService
 	{
 		private UserRepository _userRepository;
 		public UserService(UserRepository userRepository)
@@ -34,6 +34,10 @@ namespace MarketPlace924.Service
             {
                 throw new Exception("The phone number should start with +40 area code followed by 9 digits.");
             }
+            if (role != (int)UserRole.Buyer && role != (int)UserRole.Seller)
+            {
+                throw new Exception("Please select an account type (Buyer or Seller).");
+            }
             if (await _userRepository.UsernameExists(username))
             {
                 throw new Exception("Username already exists.");
@@ -44,15 +48,18 @@ namespace MarketPlace924.Service
             }
 
             string hashedPassword = HashPassword(password);
-            Debug.WriteLine($"Role passed in: {role}");
 
             UserRole userRole = (UserRole)role;
             User newUser = new User(0, username, email, phoneNumber, hashedPassword, userRole, 0, null, false);
-            Debug.WriteLine($"Parsed userRole: {userRole}");
 
             await _userRepository.AddUser(newUser);
 
             return true;
+        }
+
+        public bool CheckEmailInLogIn(string Email)
+        {
+            return UserValidator.ValidateEmail(Email);
         }
 
         public static User GetUser(string username)
@@ -62,11 +69,20 @@ namespace MarketPlace924.Service
 
 		public async Task<bool> CanUserLogin(string email, string password)
 		{
+
 			if (await _userRepository.EmailExists(email))
 			{
 				var user = await GetUserByEmail(email);
-
-				return user?.Password == HashPassword(password);
+				if (user == null)
+				{
+					return false;
+				}
+				// Give possibility to have plain text passwords in DB for testing purposes
+				if (user.Password.StartsWith("plain:"))
+				{
+					return user.Password == "plain:" + password;
+				}
+				return user.Password == HashPassword(password);
 			}
 
 			return false;
@@ -179,7 +195,7 @@ namespace MarketPlace924.Service
 
 		public static bool VerifyCaptcha(string enteredCaptcha, string generatedCaptcha)
 		{
-            return enteredCaptcha == generatedCaptcha;
+			return enteredCaptcha == generatedCaptcha;
         }
 
     }

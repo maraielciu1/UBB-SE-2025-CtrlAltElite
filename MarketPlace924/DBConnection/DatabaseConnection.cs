@@ -3,40 +3,36 @@ using System.Threading.Tasks;
 
 namespace MarketPlace924.DBConnection
 {
-	public class DatabaseConnection
+    public class DatabaseConnection
     {
-        // Connection string to the local SQL Server database and SQL Connection instance
-        private static string dbConnectionString = "Data Source=LAPTOP-MHT5DVFO\\SQLEXPRESS01;Initial Catalog=MarketPlaceDB;Integrated Security=True;TrustServerCertificate=True";
-        private SqlConnection dbConnection = new SqlConnection(dbConnectionString);
+        private SqlConnection _dbConnection = new(Configuration.Instance.Properties["Database:ConnectionString"]);
 
-        public DatabaseConnection() { }
 
-        // Gets the current SQL database connection.
-        public SqlConnection GetConnection()
+        public SqlConnection getConnection()
         {
-			return dbConnection;
+            return _dbConnection;
         }
 
+        public void OpenConnectionSync()
+        {
+            if (_dbConnection.State == System.Data.ConnectionState.Closed)
+                _dbConnection.Open();
+        }
 
-        // Opens the database connection asynchronously if it is closed.
         public async Task OpenConnection()
         {
-            if(dbConnection.State == System.Data.ConnectionState.Closed)
-                await dbConnection.OpenAsync();
-
+            if (_dbConnection.State == System.Data.ConnectionState.Closed)
+                await _dbConnection.OpenAsync();
         }
 
-
-        // Closes the database connection.
         public void CloseConnection()
         {
-            if (dbConnection.State == System.Data.ConnectionState.Open)
-                dbConnection.Close();
+            if (_dbConnection.State == System.Data.ConnectionState.Open)
+                _dbConnection.Close();
         }
 
         public void ExecuteProcedure()
         {
-
         }
     }
 }
