@@ -20,6 +20,7 @@ namespace MarketPlace924.View
                 DataContext = viewModel;
             }
         }
+
         private void SaveButtonClick(object sender, RoutedEventArgs e)
         {
             var viewModel = (SellerProfileViewModel)DataContext;
@@ -28,15 +29,9 @@ namespace MarketPlace924.View
 
         private void BackButtonClick(object sender, RoutedEventArgs e)
         {
-            var frame = Window.Current.Content as Frame;
-            if (frame != null && frame.CanGoBack)
+            if (Frame.CanGoBack)
             {
-                frame.GoBack();
-            }
-            else
-            {
-                // Navigate back to the SellerProfileView if the frame cannot go back
-                frame.Navigate(typeof(SellerProfileView));
+                Frame.GoBack();
             }
         }
     }

@@ -6,6 +6,10 @@ using System.Runtime.CompilerServices;
 using System.Windows.Input;
 using MarketPlace924.Domain;
 using MarketPlace924.Service;
+using Microsoft.UI.Xaml.Controls;
+using Microsoft.UI.Xaml;
+using Windows.Networking.NetworkOperators;
+using System.Threading.Tasks;
 
 namespace MarketPlace924.ViewModel
 {
@@ -13,21 +17,32 @@ namespace MarketPlace924.ViewModel
     {
         private UserService _userService;
         private SellerService _sellerService;
-        private string _username;
+        private User _user;
+        private Seller _seller;
+
+        public Seller Seller => _seller;
 
         private ObservableCollection<Product> _allProducts;
         public ObservableCollection<Product> FilteredProducts { get; set; }
 
-        public SellerProfileViewModel(UserService userService, SellerService sellerService, string username)
+        public SellerProfileViewModel(User user, UserService userService, SellerService sellerService)
         {
             _userService = userService;
             _sellerService = sellerService;
-            _username = username;
+            _user = user;
             _allProducts = new ObservableCollection<Product>();
             FilteredProducts = new ObservableCollection<Product>();
-            LoadSellerProfile();
-            LoadSellerProducts();
             UpdateProfileCommand = new CustomCommand(UpdateProfile);
+            LoadSellerData();
+        }
+
+        private async void LoadSellerData()
+        {
+            _seller = _sellerService.GetSellerByUser(_user);
+            OnPropertyChanged(nameof(Seller));
+
+            LoadSellerProfile();
+            await LoadSellerProducts();
         }
 
         public string DisplayName { get; set; } = string.Empty;
@@ -42,19 +57,18 @@ namespace MarketPlace924.ViewModel
         public ObservableCollection<Product> Products { get; set; } = new ObservableCollection<Product>();
         public ICommand UpdateProfileCommand { get; set; }
 
-        private async void LoadSellerProfile()
+        private void LoadSellerProfile()
         {
-            var currentSeller = await _sellerService.GetSellerAsync(_username);
-            if (currentSeller != null)
+            if (_seller != null)
             {
-                StoreName = currentSeller.StoreName;
-                Username = currentSeller.Username;
-                Email = currentSeller.Email;
-                PhoneNumber = currentSeller.PhoneNumber;
-                Address = currentSeller.StoreAddress;
-                FollowersCount = currentSeller.FollowersCount.ToString();
-                TrustScore = currentSeller.TrustScore;
-                Description = currentSeller.StoreDescription;
+                StoreName = _seller.StoreName;
+                Username = _seller.Username;
+                Email = _seller.Email;
+                PhoneNumber = _seller.PhoneNumber;
+                Address = _seller.StoreAddress;
+                FollowersCount = _seller.FollowersCount.ToString();
+                TrustScore = _seller.TrustScore * 100.0 / 5.0;
+                Description = _seller.StoreDescription;
                 OnPropertyChanged(nameof(DisplayName));
 
                 OnPropertyChanged(nameof(StoreName));
@@ -67,12 +81,11 @@ namespace MarketPlace924.ViewModel
             }
         }
 
-        private async void LoadSellerProducts()
+        private async Task LoadSellerProducts()
         {
-            var currentSeller = await _sellerService.GetSellerAsync(_username);
-            if (currentSeller != null)
+            if (_seller != null)
             {
-                var products = await _sellerService.GetAllProductsAsync(await _sellerService.GetSellerIDByUsernameAsync(_username));
+                var products = await _sellerService.GetAllProductsAsync(_seller.Id);
                 if (products != null)
                 {
                     _allProducts.Clear();
@@ -80,7 +93,7 @@ namespace MarketPlace924.ViewModel
                     {
                         _allProducts.Add(product);
                     }
-                    FilterProducts(string.Empty); // Update FilteredProducts after loading
+                    FilterProducts(string.Empty);
                 }
             }
         }
@@ -101,27 +114,33 @@ namespace MarketPlace924.ViewModel
 
         private async void UpdateProfile()
         {
-            var currentSeller = await _sellerService.GetSellerAsync(_username);
-            if (currentSeller != null)
+            if (_seller != null)
             {
-                currentSeller.StoreName = StoreName;
-                currentSeller.Email = Email;
-                currentSeller.PhoneNumber = PhoneNumber;
-                currentSeller.StoreAddress = Address;
-                currentSeller.StoreDescription = Description;
+                _seller.StoreName = StoreName;
+                //currentSeller.Email = Email;
+                //currentSeller.PhoneNumber = PhoneNumber;
+                _seller.StoreAddress = Address;
+                _seller.StoreDescription = Description;
 
-                // Update the seller information in the database
-                var sellerID = await _sellerService.GetSellerIDByUsernameAsync(_username);
-                if (sellerID > 0)
+                if (_seller.Id > 0)
                 {
-                    await _sellerService.UpdateSellerAsync(currentSeller);
+                    await _sellerService.UpdateSellerAsync(_seller);
+                    // Navigate to the desired page after successful update
+                    //NavigateToProfilePage();
                 }
                 else
                 {
-                    // Handle the case where sellerID is not found
                     System.Diagnostics.Debug.WriteLine("Seller ID not found. Cannot update seller information in the database.");
                 }
             }
+            else
+            {
+                System.Diagnostics.Debug.WriteLine("User property is null. Cannot update seller information.");
+            }
+        }
+
+        private void NavigateToProfilePage()
+        {
         }
 
         public event PropertyChangedEventHandler? PropertyChanged;

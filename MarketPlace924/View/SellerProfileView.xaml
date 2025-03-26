@@ -5,25 +5,12 @@
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
     xmlns:local="using:MarketPlace924.View"
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
-    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" xmlns:viewmodel="using:MarketPlace924.ViewModel" d:DataContext="{d:DesignInstance Type=viewmodel:SellerProfileViewModel}"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
     xmlns:sys="clr-namespace:System;assembly=mscorlib"
     mc:Ignorable="d"
     Background="{ThemeResource ApplicationPageBackgroundThemeBrush}">
 
     <Grid>
-        <Grid.ColumnDefinitions>
-            <ColumnDefinition Width="200"/>
-            <!-- Sidebar -->
-            <ColumnDefinition Width="*"/>
-            <!-- Main Content -->
-        </Grid.ColumnDefinitions>
-
-        <!-- Sidebar -->
-        <StackPanel Grid.Column="0" Background="Black" Width="200" Height="Auto">
-            <Button Content="Home" Width="200"/>
-            <Button Content="Profile" Width="200" Background="Gray"/>
-        </StackPanel>
-
         <!-- Main Content Grid -->
         <Grid Grid.Column="1" Padding="20">
             <Grid.RowDefinitions>
@@ -38,14 +25,14 @@
             <!-- Seller Profile Section -->
             <Border>
                 <StackPanel Orientation="Horizontal">
-                    <StackPanel Orientation="Horizontal">
+                    <StackPanel Orientation="Horizontal" Margin="0,0,20,0">
                         <!--" Profile Picture doesn't show right-->
-                        <PersonPicture x:Name="ProfilePicture" BadgeText="{Binding StoreName}" Margin="0,0,10,0" />
+                        <PersonPicture x:Name="ProfilePicture" DisplayName="{Binding StoreName}" Margin="180,0,40,0" />
                         <StackPanel MaxWidth="300">
-                            <TextBlock x:Name="DisplayName" Text="{Binding StoreName}" FontSize="24" FontWeight="Bold" TextWrapping="Wrap" />
+                            <TextBlock x:Name="DisplayName" Text="{Binding StoreName}" FontSize="36" FontWeight="Bold" TextWrapping="Wrap" Margin="0,20,0,10" />
                             <StackPanel Orientation="Horizontal">
-                                <TextBlock Text="Email:" FontWeight="Bold" />
-                                <TextBlock x:Name="Email" Text="{Binding Email}" Margin="5,0,0,0" TextWrapping="Wrap" />
+                                <TextBlock Text="Email:" FontWeight="Bold" Foreground="Aquamarine"/>
+                                <TextBlock x:Name="Email" Text="{Binding Email}" Margin="5,0,0,0" TextWrapping="Wrap" Foreground="Aquamarine" />
                             </StackPanel>
                             <StackPanel Orientation="Horizontal">
                                 <TextBlock Text="Phone:" FontWeight="Bold" />
@@ -55,8 +42,12 @@
                                 <TextBlock Text="Address:" FontWeight="Bold" />
                                 <TextBlock x:Name="Address" Text="{Binding Address}" Margin="5,0,0,0" TextWrapping="Wrap" />
                             </StackPanel>
+                            <StackPanel Orientation="Horizontal">
+                                <TextBlock Text="Description: " FontWeight="Bold" />
+                                <TextBlock x:Name="Description" Text="{Binding Description}" Margin="5,0,0,0" TextWrapping="Wrap" />
+                            </StackPanel>
                         </StackPanel>
-                        <StackPanel Orientation="Vertical" VerticalAlignment="Center" Margin="20,0,0,0">
+                        <StackPanel Orientation="Vertical" VerticalAlignment="Center" Margin="90,0,0,0">
                             <StackPanel Orientation="Horizontal" Margin="10,0,0,0">
                                 <TextBlock Text="Followers:" FontWeight="Bold" FontSize="18" />
                                 <TextBlock x:Name="Followers" Text="{Binding FollowersCount}" Margin="5,0,0,0" FontSize="18" />
@@ -66,7 +57,7 @@
                                 <ProgressBar x:Name="TrustScore" Value="{Binding TrustScore}" Maximum="100" Width="100" Height="20" Margin="5,0,0,0" />
                             </StackPanel>
                         </StackPanel>
-                        <StackPanel HorizontalAlignment="Right" VerticalAlignment="Bottom" Margin="10">
+                        <StackPanel HorizontalAlignment="Right" VerticalAlignment="Bottom" Margin="50,0,0,0">
                             <Button Content="Update Profile" Click="OnUpdateProfileButtonClick" Width="150" Height="40" Margin="10,0,0,0" />
                         </StackPanel>
                     </StackPanel>

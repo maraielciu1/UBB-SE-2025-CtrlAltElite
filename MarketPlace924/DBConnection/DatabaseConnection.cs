@@ -5,8 +5,7 @@ namespace MarketPlace924.DBConnection
 {
     public class DatabaseConnection
     {
-        private static string dbConnectionString = "Data Source=MELISA-ASUS\\SQLEXPRESS;Initial Catalog=ISS;Integrated Security=True;TrustServerCertificate=True;";
-        private SqlConnection _dbConnection = new SqlConnection(dbConnectionString);
+        private SqlConnection _dbConnection = new("Data Source=MELISA-ASUS\\SQLEXPRESS;Initial Catalog=IssDB;Integrated Security=True;TrustServerCertificate=True;");
 
         public SqlConnection getConnection()
         {

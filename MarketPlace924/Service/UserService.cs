@@ -77,11 +77,7 @@ namespace MarketPlace924.Service
 				{
 					return false;
 				}
-				// Give possibility to have plain text passwords in DB for testing purposes
-				if (user.Password.StartsWith("plain:"))
-				{
-					return user.Password == "plain:" + password;
-				}
+				
 				return user.Password == HashPassword(password);
 			}
 
@@ -95,6 +91,7 @@ namespace MarketPlace924.Service
 
 		public static string HashPassword(string password)
 		{
+            return password;
             using (System.Security.Cryptography.SHA256 sha256 = SHA256.Create())
             {
                 byte[] hashedBytes = sha256.ComputeHash(Encoding.UTF8.GetBytes(password));

@@ -29,7 +29,7 @@
                                 Click="{x:Bind NavigateToHome}"
                                 Style="{StaticResource PrimaryButton}" />
                         <Button Grid.Column="1" Content="Profile"
-                                Click="{x:Bind NavigateToBuyerProfile}"
+                                Click="{x:Bind NavigateToSellerProfile}"
                                 Style="{StaticResource PrimaryButton}" />
                         <Button Grid.Column="2" Content="Marketplace"
                                 Click="{x:Bind NavigateToMarketplace}"
