@@ -1,15 +1,12 @@
-﻿using MarketPlace924.Repository;
+﻿using System.Diagnostics;
+using System.Diagnostics.CodeAnalysis;
 using Microsoft.UI.Xaml;
-using System;
-
-// To learn more about WinUI, the WinUI project structure,
-// and more about our project templates, see: http://aka.ms/winui-project-info.
-
 namespace MarketPlace924
 {
-    /// <summary>
-    /// Provides application-specific behavior to supplement the default Application class.
-    /// </summary>
+	/// <summary>
+	/// Provides application-specific behavior to supplement the default Application class.
+	/// </summary>
+	[SuppressMessage("Interoperability", "CA1416:Validate platform compatibility")]
     public partial class App : Application
     {
         /// <summary>
@@ -21,24 +18,21 @@ namespace MarketPlace924
             InitializeComponent();
         }
 
+
         /// <summary>
         /// Invoked when the application is launched.
         /// </summary>
         /// <param name="args">Details about the launch request and process.</param>
-        protected override void OnLaunched(Microsoft.UI.Xaml.LaunchActivatedEventArgs args)
+        protected override void OnLaunched(LaunchActivatedEventArgs args)
         {
             m_window = new MainWindow();
             m_window.Activate();
+            UnhandledException += (_, e) =>
+            {
+                Debug.WriteLine($"Unhandled UI Exception: {e.Exception.StackTrace}");
+                e.Handled = true; // Prevents app from crashing
+            };
         }
-
-        private Window? m_window;
-
-        //private void TestFunction()
-        //{
-        //    Console.WriteLine("TestFunction has been called.");
-        //    SellerRepository _sellerRepository = new SellerRepository();
-        //    string result = _sellerRepository.GetSeller(1);
-        //    Console.WriteLine(result);
-        //}
+        public static Window? m_window { get; private set; }
     }
 }

@@ -3,29 +3,36 @@ using System.Threading.Tasks;
 
 namespace MarketPlace924.DBConnection
 {
-	public class DatabaseConnection
+    public class DatabaseConnection
     {
-        // here you can replace the connection string with your connection info from the local database
         private static string dbConnectionString = "Data Source=MELISA-ASUS\\SQLEXPRESS;Initial Catalog=ISS;Integrated Security=True;TrustServerCertificate=True;";
-        private SqlConnection dbConnection = new SqlConnection(dbConnectionString);
+        private SqlConnection _dbConnection = new SqlConnection(dbConnectionString);
 
-        public DatabaseConnection() { }
         public SqlConnection getConnection()
         {
-            return dbConnection;
+            return _dbConnection;
         }
-        public async Task openConnection()
-        {
-            if (dbConnection.State == System.Data.ConnectionState.Closed)
-                await dbConnection.OpenAsync();
-        }
-        public void closeConnection()
-        {
-            dbConnection.Close();
-        }
-        public void executeProcedure()
-        {
 
+        public void OpenConnectionSync()
+        {
+            if (_dbConnection.State == System.Data.ConnectionState.Closed)
+                _dbConnection.Open();
+        }
+
+        public async Task OpenConnection()
+        {
+            if (_dbConnection.State == System.Data.ConnectionState.Closed)
+                await _dbConnection.OpenAsync();
+        }
+
+        public void CloseConnection()
+        {
+            if (_dbConnection.State == System.Data.ConnectionState.Open)
+                _dbConnection.Close();
+        }
+
+        public void ExecuteProcedure()
+        {
         }
     }
 }

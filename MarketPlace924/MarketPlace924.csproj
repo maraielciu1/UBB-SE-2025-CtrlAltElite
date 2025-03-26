@@ -39,21 +39,10 @@
     <ProjectCapability Include="Msix" />
   </ItemGroup>
   <ItemGroup>
-    <PackageReference Include="CSharpMarkup.WinUI.LiveChartsCore.SkiaSharpView" Version="2.4.18" />
     <PackageReference Include="Microsoft.Data.SqlClient" Version="6.0.1" />
     <PackageReference Include="Microsoft.Windows.SDK.BuildTools" Version="10.0.26100.1742" />
     <PackageReference Include="Microsoft.WindowsAppSDK" Version="1.6.250228001" />
     <PackageReference Include="System.Data.SqlClient" Version="4.9.0" />
-  </ItemGroup>
-  <ItemGroup>
-    <Page Update="View\UpdateProfileView.xaml">
-      <Generator>MSBuild:Compile</Generator>
-    </Page>
-  </ItemGroup>
-  <ItemGroup>
-    <Page Update="View\SellerProfileView.xaml">
-      <Generator>MSBuild:Compile</Generator>
-    </Page>
   </ItemGroup>
   <ItemGroup>
     <Page Update="View\LoginView.xaml">
@@ -61,7 +50,7 @@
     </Page>
   </ItemGroup>
   <ItemGroup>
-    <Folder Include="Converters\" />
+    <Folder Include="Assets\Products\" />
   </ItemGroup>
 
   <!--

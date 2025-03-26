@@ -1,14 +1,45 @@
 <?xml version="1.0" encoding="utf-8"?>
+
 <Window
     x:Class="MarketPlace924.MainWindow"
     xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-    xmlns:local="using:MarketPlace924"
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     mc:Ignorable="d"
     Title="MarketPlace924">
-
-	<StackPanel Orientation="Horizontal" HorizontalAlignment="Center" VerticalAlignment="Center">
-	</StackPanel>
+    <Grid>
+        <Frame x:Name="LoginFrame" Visibility="Visible"/>
+        
+        <Border x:Name="MenuAndStage" Visibility="Collapsed"
+                Style="{StaticResource PrimaryBorder}">
+            <Grid>
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="60" />
+                    <RowDefinition Height="*" />
+                </Grid.RowDefinitions>
+                <StackPanel Grid.Row="0">
+                    <Grid>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*" />
+                            <ColumnDefinition Width="*" />
+                            <ColumnDefinition Width="*" />
+                        </Grid.ColumnDefinitions>
+                        <Button Grid.Column="0" Content="Home"
+                                Click="{x:Bind NavigateToHome}"
+                                Style="{StaticResource PrimaryButton}" />
+                        <Button Grid.Column="1" Content="Profile"
+                                Click="{x:Bind NavigateToBuyerProfile}"
+                                Style="{StaticResource PrimaryButton}" />
+                        <Button Grid.Column="2" Content="Marketplace"
+                                Click="{x:Bind NavigateToMarketplace}"
+                                Style="{StaticResource PrimaryButton}" />
+                    </Grid>
+                </StackPanel>
+                <ScrollView Grid.Row="1" Padding="20">
+                    <Frame x:Name="Stage" Background="#FFFFFF"></Frame>
+                </ScrollView>
+            </Grid>
+        </Border>
+    </Grid>
 </Window>
