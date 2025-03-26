@@ -4,8 +4,9 @@ using System.Collections.ObjectModel;
 using MarketPlace924.Domain;
 using Microsoft.UI.Xaml.Navigation;
 using MarketPlace924.ViewModel;
+using MarketPlace924.ViewModel.Admin;
 
-namespace MarketPlace924.View
+namespace MarketPlace924.View.Admin
 {
 	public sealed partial class AdminView : Page
 	{
@@ -16,8 +17,6 @@ namespace MarketPlace924.View
 			this.InitializeComponent();
 
 			Users = new ObservableCollection<User>();
-
-			UsersListView.ItemsSource = ViewModel.Users;
 		}
 
 
@@ -33,8 +32,9 @@ namespace MarketPlace924.View
 			if (e.Parameter is AdminViewModel viewModel)
 			{
 				ViewModel = viewModel;
-			}
 
+				UsersListView.ItemsSource = ViewModel.Users;
+			}
 		}
 	}
 }

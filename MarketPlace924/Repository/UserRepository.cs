@@ -198,11 +198,7 @@ namespace MarketPlace924.Repository
 
 			command.CommandText = "SELECT * FROM Users";
 
-			var reader = await command.ExecuteReaderAsync();
-			if (!await reader.ReadAsync())
-			{
-				return null;
-			}
+			var reader = command.ExecuteReader();
 
 			var result = new List<User>();
 

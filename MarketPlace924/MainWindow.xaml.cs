@@ -5,6 +5,8 @@ using MarketPlace924.View;
 using MarketPlace924.DBConnection;
 using MarketPlace924.Domain;
 using MarketPlace924.ViewModel;
+using MarketPlace924.View.Admin;
+using MarketPlace924.ViewModel.Admin;
 // To learn more about WinUI, the WinUI project structure,
 // and more about our project templates, see: http://aka.ms/winui-project-info.
 
