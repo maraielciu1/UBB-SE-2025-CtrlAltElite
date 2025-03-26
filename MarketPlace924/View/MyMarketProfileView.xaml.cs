@@ -8,8 +8,8 @@ namespace MarketPlace924.View
 {
     public sealed partial class MyMarketProfileView : Page
     {
-        private Seller _selectedSeller;
-        private MyMarketProfileViewModel _viewModel;
+        private MyMarketProfileViewModel? _viewModel;
+        public MyMarketProfileViewModel ViewModel => _viewModel;
 
         public MyMarketProfileView()
         {
@@ -20,12 +20,12 @@ namespace MarketPlace924.View
         {
             base.OnNavigatedTo(e);
 
-            // Retrieve the seller from the navigation parameter
-            _selectedSeller = e.Parameter as Seller;
-
-            // Initialize the ViewModel with the selected seller
-            _viewModel = new MyMarketProfileViewModel(_selectedSeller);
-            this.DataContext = _viewModel;
+            // If the navigation parameter contains a MyMarketProfileViewModel, assign it to _viewModel
+            if (e.Parameter is MyMarketProfileViewModel viewModel)
+            {
+                _viewModel = viewModel;
+                DataContext = _viewModel;
+            }
         }
 
         private void GoBackToMyMarket(object sender, RoutedEventArgs e)
@@ -34,6 +34,16 @@ namespace MarketPlace924.View
             if (Frame.CanGoBack)
             {
                 Frame.GoBack();
+            }
+        }
+
+        // Handles the text change event in the product search text box.
+        private void OnSearchProductTextChanged(object sender, TextChangedEventArgs e)
+        {
+            var textBox = sender as TextBox;
+            if (_viewModel != null && textBox != null)
+            {
+                _viewModel.FilterProducts(textBox.Text); // Pass the search text to the ViewModel
             }
         }
     }

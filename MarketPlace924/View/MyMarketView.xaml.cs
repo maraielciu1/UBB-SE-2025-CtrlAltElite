@@ -46,6 +46,12 @@ namespace MarketPlace924.View
 
                 _viewModel = viewModel;
                 DataContext = _viewModel;
+
+                if (_viewModel != null)
+                {
+                    // Call the RefreshData method when navigating to the MyMarket page
+                    _viewModel.RefreshData();
+                }
             }
 
         }
@@ -78,8 +84,10 @@ namespace MarketPlace924.View
 
             if (tappedSeller != null)
             {
+                var profileViewModel = new MyMarketProfileViewModel(_viewModel.BuyerService, _viewModel.Buyer, tappedSeller);
+
                 // Navigate to the Seller's profile page and pass the seller data
-                Frame.Navigate(typeof(MyMarketProfileView), tappedSeller);
+                Frame.Navigate(typeof(MyMarketProfileView), profileViewModel);
             }
         }
     }

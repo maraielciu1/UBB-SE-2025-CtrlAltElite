@@ -1,11 +1,14 @@
 ﻿using MarketPlace924.DBConnection;
 using MarketPlace924.Domain;
 using Microsoft.Data.SqlClient;
+using Microsoft.UI.Xaml.Controls.Primitives;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Windows.System;
+using Windows.UI.Notifications;
 using Windows.UI.Popups;
 
 namespace MarketPlace924.Repository
@@ -37,10 +40,9 @@ namespace MarketPlace924.Repository
                     sellersIDs.Add(Convert.ToInt32(reader["FollowedID"]));
                 }
             }
+            _connection.CloseConnection();
 
             buyer.FollowingUsersIds = sellersIDs;
-
-            _connection.CloseConnection();
         }
 
 
@@ -85,7 +87,11 @@ namespace MarketPlace924.Repository
 
             // Add the followed seller IDs to the parameter (using the list of IDs)
             string formattedSellersIds = string.Join(",", followingUsersIds);
-            command.CommandText = $"SELECT * FROM Sellers WHERE SellerID IN ({formattedSellersIds})";
+            command.CommandText = $"SELECT u.Email, u.PhoneNumber, s.* " +
+                                  $"FROM Users u " +
+                                  $"INNER JOIN Sellers s " +
+                                  $"ON u.UserID = s.SellerID " +
+                                  $"WHERE SellerID IN ({formattedSellersIds})";
 
 
             List<Seller> followedSellers = new List<Seller>();
@@ -93,16 +99,21 @@ namespace MarketPlace924.Repository
             {
                 while (await reader.ReadAsync())
                 {
-                    var sellerID = reader.GetInt32(0);
-                    var username = reader.GetString(1);
-                    var storeName = reader.GetString(2);
-                    var storeDescription = reader.GetString(3);
-                    var storeAddress = reader.GetString(4);
-                    var followersCount = reader.GetInt32(5);
-                    var trustScore = reader.GetDouble(6);
+                    var sellerEmail = reader.GetString(0);
+                    var sellerPhoneNumber = reader.GetString(1);
+                    var sellerID = reader.GetInt32(2);
+                    var username = reader.GetString(3);
+                    var storeName = reader.GetString(4);
+                    var storeDescription = reader.GetString(5);
+                    var storeAddress = reader.GetString(6);
+                    var followersCount = reader.GetInt32(7);
+                    var trustScore = reader.GetDouble(8);
 
-                    Seller seller = new Seller(sellerID, storeName, storeDescription, storeAddress, followersCount, trustScore);
-                    
+                    Seller seller = new Seller(username, storeName, storeDescription, storeAddress, followersCount, trustScore);
+                    Domain.User user = new Domain.User(userID: sellerID, email: sellerEmail, phoneNumber: sellerPhoneNumber);
+
+                    seller.User = user;
+
                     followedSellers.Add(seller);
                 }
             }
@@ -137,6 +148,60 @@ namespace MarketPlace924.Repository
 
             _connection.CloseConnection();
             return products;
+        }
+
+        // Check if the Buyer is Following the Seller
+        public async Task<bool> IsFollowing(int buyerId, int sellerId)
+        {
+            await _connection.OpenConnection();
+            var command = _connection.GetConnection().CreateCommand();
+            command.CommandText = "SELECT COUNT(*) FROM Following WHERE FollowerID = @FollowerID AND FollowedID = @FollowedID";
+            command.Parameters.AddWithValue("@FollowerID", buyerId);
+            command.Parameters.AddWithValue("@FollowedID", sellerId);
+
+            var result = await command.ExecuteScalarAsync();
+            _connection.CloseConnection();
+
+            // Return true if a record exists (i.e., count > 0)
+            return Convert.ToInt32(result) > 0;
+        }
+
+        // The Buyer Follows the Seller
+        public async Task FollowSeller(int buyerId, int sellerId)
+        {
+            await _connection.OpenConnection();
+
+            var command = _connection.GetConnection().CreateCommand();
+            command.CommandText = "INSERT INTO Following (FollowerID, FollowedID) VALUES (@FollowerID, @FollowedID)";
+            command.Parameters.AddWithValue("@FollowerID", buyerId);
+            command.Parameters.AddWithValue("@FollowedID", sellerId);
+            await command.ExecuteNonQueryAsync();
+
+            command = _connection.GetConnection().CreateCommand();
+            command.CommandText = "UPDATE Sellers SET FollowersCount = FollowersCount + 1 WHERE SellerID = @SellerID";
+            command.Parameters.AddWithValue("@SellerID", sellerId);
+            await command.ExecuteNonQueryAsync();
+
+            _connection.CloseConnection();
+        }
+
+        // The Buyer Unfollows the Seller
+        public async Task UnfollowSeller(int buyerId, int sellerId)
+        {
+            await _connection.OpenConnection();
+
+            var command = _connection.GetConnection().CreateCommand();
+            command.CommandText = "DELETE FROM Following WHERE FollowerID = @FollowerID AND FollowedID = @FollowedID";
+            command.Parameters.AddWithValue("@FollowerID", buyerId);
+            command.Parameters.AddWithValue("@FollowedID", sellerId);
+            await command.ExecuteNonQueryAsync();
+
+            command = _connection.GetConnection().CreateCommand();
+            command.CommandText = "UPDATE Sellers SET FollowersCount = FollowersCount - 1 WHERE SellerID = @SellerID";
+            command.Parameters.AddWithValue("@SellerID", sellerId);
+            await command.ExecuteNonQueryAsync();
+
+            _connection.CloseConnection();
         }
     }
 }

@@ -8,7 +8,12 @@ namespace MarketPlace924.Domain
 {
     public class Seller
     {
-        public int SellerID { get; set; }
+        public User User { get; set; }
+        public int Id => User.UserId;
+        public string Email => User.Email;
+        public string PhoneNumber => User.PhoneNumber;
+
+        public string Username { get; set; }
         public int FollowersCount { get; set; }
         public string StoreName { get; set; }
         public string StoreDescription { get; set; }
@@ -16,9 +21,9 @@ namespace MarketPlace924.Domain
         public double TrustScore { get; set; }
 
 
-        public Seller(int sellerID, string storeName, string storeDescription, string storeAddress, int followersCount = 0, double trustScore = 0)
+        public Seller(string username, string storeName, string storeDescription, string storeAddress, int followersCount = 0, double trustScore = 0)
         {
-            SellerID = sellerID;
+            Username = username;
             StoreName = storeName;
             StoreDescription = storeDescription;
             StoreAddress = storeAddress;

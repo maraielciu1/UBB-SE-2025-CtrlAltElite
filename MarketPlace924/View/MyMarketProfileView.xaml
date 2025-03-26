@@ -17,7 +17,7 @@
         </Grid.ColumnDefinitions>
 
         <!-- Main Content Grid (all the profile and product sections are inside this grid) -->
-        <Grid Grid.Column="1">
+        <Grid Grid.Column="0">
             <Grid.RowDefinitions>
                 <RowDefinition Height="Auto"/>
                 <!-- Seller Info (Profile section) -->
@@ -74,9 +74,9 @@
                                 <ProgressBar x:Name="TrustScore" Value="{Binding TrustScore}" Maximum="100" Width="100" Height="20" Margin="5,0,0,0" />
                             </StackPanel>
                         </StackPanel>
-                        <!-- Button to update the seller profile -->
+                        <!-- Button to follow/unfollow the seller profile -->
                         <StackPanel HorizontalAlignment="Right" VerticalAlignment="Bottom" Margin="10">
-                            <Button Content="Update Profile" Width="150" Height="40" Margin="10,0,0,0" />
+                            <Button Content="{Binding FollowButtonText}" Command="{Binding FollowCommand}" Background="{Binding FollowButtonColor}" Width="150" Height="40" Margin="10,0,0,0" />
                         </StackPanel>
                     </StackPanel>
                 </StackPanel>
@@ -92,7 +92,7 @@
                 </Grid.ColumnDefinitions>
 
                 <!-- Search Box for filtering products -->
-                <TextBox PlaceholderText="Search" Grid.Column="0" Margin="0,0,10,0" Height="40" HorizontalAlignment="Stretch"/>
+                <TextBox PlaceholderText="Search" TextChanged="OnSearchProductTextChanged" Grid.Column="0" Margin="0,0,10,0" Height="40" HorizontalAlignment="Stretch"/>
 
                 <!-- Filter and Sort buttons -->
                 <StackPanel Grid.Column="1" Orientation="Horizontal" HorizontalAlignment="Stretch">
@@ -103,7 +103,7 @@
 
             <!-- Product Grid (Displays the products in a scrollable grid) -->
             <ScrollViewer Grid.Row="2" VerticalScrollBarVisibility="Auto">
-                <ItemsControl ItemsSource="{Binding FilteredProducts}">
+                <ItemsControl ItemsSource="{Binding SellerProducts}">
                     <!-- Items Panel for displaying products in a wrapped grid layout -->
                     <ItemsControl.ItemsPanel>
                         <ItemsPanelTemplate>

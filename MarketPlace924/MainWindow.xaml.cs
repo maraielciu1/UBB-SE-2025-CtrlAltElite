@@ -45,7 +45,7 @@ namespace MarketPlace924
             _buyerService = new BuyerService(buyerRepo, userRepo);
 
             // Temporary hardcoded user for testing purposes
-            _user = new User(userID: 3, phoneNumber: "074322321", email: "admin@gmail.com");
+            _user = new User(userID: 10, phoneNumber: "074322321", email: "admin@gmail.com");
 
             // Ensure menu and content area is visible
             MenuAndStage.Visibility = Visibility.Visible;

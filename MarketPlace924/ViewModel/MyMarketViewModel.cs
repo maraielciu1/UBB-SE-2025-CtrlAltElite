@@ -13,25 +13,30 @@ namespace MarketPlace924.ViewModel
 {
     public class MyMarketViewModel : INotifyPropertyChanged
     {
-        // Fields
+        // Services and User Data
         private readonly BuyerService _buyerService;
         private readonly User _user;
         private Buyer _buyer;
 
+        // Collections for Products and Followed Sellers
         private ObservableCollection<Product> _allProducts = new ObservableCollection<Product>();
         private ObservableCollection<Product> _filteredProducts = new ObservableCollection<Product>();
         private ObservableCollection<Seller> _allFollowedSellers = new ObservableCollection<Seller>();
         private ObservableCollection<Seller> _filteredFollowedSellers = new ObservableCollection<Seller>();
 
+        // UI State Management
         private bool _isFollowingListVisible;
-
+        private int _followedSellersCount;
 
         // Properties
 
-        // Gets the buyer associated with the user.
+        // Buyer service accessor
+        public BuyerService BuyerService { get; }
+
+        // Buyer information
         public Buyer Buyer => _buyer;
 
-        // Collection of filtered products displayed in the "My Market" feed.
+        // Filtered products displayed in "My Market" feed
         public ObservableCollection<Product> MyMarketProducts
         {
             get => _filteredProducts;
@@ -42,7 +47,7 @@ namespace MarketPlace924.ViewModel
             }
         }
 
-        // Collection of filtered sellers followed by the buyer.
+        // Filtered followed sellers list
         public ObservableCollection<Seller> MyMarketFollowing
         {
             get => _filteredFollowedSellers;
@@ -53,7 +58,18 @@ namespace MarketPlace924.ViewModel
             }
         }
 
-        // Indicates whether the following list is visible.
+        // Number of followed sellers
+        public int FollowedSellersCount
+        {
+            get => _followedSellersCount;
+            private set
+            {
+                _followedSellersCount = value;
+                OnPropertyChanged(nameof(FollowedSellersCount));
+            }
+        }
+
+        // Indicates if the following list is visible
         public bool IsFollowingListVisible
         {
             get => _isFollowingListVisible;
@@ -69,117 +85,89 @@ namespace MarketPlace924.ViewModel
             }
         }
 
-        // Determines the visibility of the following list.
+        // Visibility for the following list
         public Visibility FollowingListVisibility => IsFollowingListVisible ? Visibility.Visible : Visibility.Collapsed;
 
-        // Determines the visibility of the button to show the following list.
+        // Visibility for the button to show the following list
         public Visibility ShowFollowingVisibility => IsFollowingListVisible ? Visibility.Collapsed : Visibility.Visible;
 
-
-
-        // Commands
-
-        // Command to toggle the visibility of the following list.
+        // Command to toggle following list visibility
         public ICommand ShowFollowingCommand { get; }
 
 
-
-        // Constructor
         public MyMarketViewModel(BuyerService buyerService, User user)
         {
             _buyerService = buyerService;
             _user = user;
 
+            BuyerService = _buyerService;
             ShowFollowingCommand = new RelayCommand(ShowFollowingList);
             IsFollowingListVisible = false;
 
             LoadData();
         }
 
-
-        // Methods
-
-        // Loads the buyer information and market data.
-        private async void LoadData()
+        // Loads buyer and market data
+        private async Task LoadData()
         {
             _buyer = await _buyerService.GetBuyerByUser(_user);
             OnPropertyChanged(nameof(Buyer));
 
+            await LoadFollowing();
             await LoadMyMarketData();
         }
 
-        // Toggles the visibility of the following list.
+        // Toggles following list visibility and reloads data if shown
         private async void ShowFollowingList(object parameter)
         {
             IsFollowingListVisible = !IsFollowingListVisible;
-
             if (IsFollowingListVisible)
             {
                 await LoadFollowing();
             }
         }
 
-        // Filters products based on the search query.
+        // Filters products based on search query
         public void FilterProducts(string searchText)
         {
             _filteredProducts.Clear();
+            var filteredProducts = string.IsNullOrEmpty(searchText)
+                ? _allProducts
+                : _allProducts.Where(p => p.Name.Contains(searchText, StringComparison.OrdinalIgnoreCase));
 
-            if (string.IsNullOrEmpty(searchText))
+            foreach (var product in filteredProducts)
             {
-                foreach (var product in _allProducts)
-                {
-                    _filteredProducts.Add(product);
-                }
+                _filteredProducts.Add(product);
             }
-            else
-            {
-                var filteredProducts = _allProducts.Where(p => p.Name.Contains(searchText, StringComparison.OrdinalIgnoreCase)).ToList();
-                foreach (var product in filteredProducts)
-                {
-                    _filteredProducts.Add(product);
-                }
-            }
-
             OnPropertyChanged(nameof(MyMarketProducts));
         }
 
-        // Filters the followed sellers based on the search query.
+        // Filters followed sellers based on search query
         public void FilterFollowing(string searchText)
         {
             _filteredFollowedSellers.Clear();
+            var filteredSellers = string.IsNullOrEmpty(searchText)
+                ? _allFollowedSellers
+                : _allFollowedSellers.Where(s => s.StoreName.Contains(searchText, StringComparison.OrdinalIgnoreCase));
 
-            if (string.IsNullOrEmpty(searchText))
+            foreach (var seller in filteredSellers)
             {
-                foreach (var seller in _allFollowedSellers)
-                {
-                    _filteredFollowedSellers.Add(seller);
-                }
+                _filteredFollowedSellers.Add(seller);
             }
-            else
-            {
-                var filteredSellers = _allFollowedSellers.Where(p => p.StoreName.Contains(searchText, StringComparison.OrdinalIgnoreCase)).ToList();
-                foreach (var seller in filteredSellers)
-                {
-                    _filteredFollowedSellers.Add(seller);
-                }
-            }
-
             OnPropertyChanged(nameof(MyMarketFollowing));
         }
 
-        // Loads the products from the followed sellers.
+        // Loads products from followed sellers
         public async Task LoadMyMarketData()
         {
             try
             {
                 var products = await _buyerService.GetProductsFromFollowedSellers(_buyer.FollowingUsersIds);
-
                 _allProducts.Clear();
                 foreach (var product in products)
                 {
                     _allProducts.Add(product);
                 }
-
                 FilterProducts(""); // Show all products initially
             }
             catch (Exception ex)
@@ -188,19 +176,18 @@ namespace MarketPlace924.ViewModel
             }
         }
 
-        // Loads the followed sellers.
+        // Loads the followed sellers list
         public async Task LoadFollowing()
         {
             try
             {
                 var sellers = await _buyerService.GetFollowedSellers(_buyer.FollowingUsersIds);
-
                 _allFollowedSellers.Clear();
                 foreach (var seller in sellers)
                 {
                     _allFollowedSellers.Add(seller);
                 }
-
+                FollowedSellersCount = _allFollowedSellers.Count;
                 FilterFollowing(""); // Show all followed sellers initially
             }
             catch (Exception ex)
@@ -209,7 +196,22 @@ namespace MarketPlace924.ViewModel
             }
         }
 
+        // Refreshes buyer and market data
+        public async Task RefreshData()
+        {
+            try
+            {
+                await LoadData();
+                await LoadFollowing();
+                await LoadMyMarketData();
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Error refreshing data: {ex.Message}");
+            }
+        }
 
+        // PropertyChanged event for UI updates
         public event PropertyChangedEventHandler PropertyChanged;
 
         protected void OnPropertyChanged(string propertyName)

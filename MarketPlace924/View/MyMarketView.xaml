@@ -97,8 +97,10 @@
                     <ListView ItemsSource="{Binding MyMarketFollowing}">
                         <ListView.ItemContainerStyle>
                             <Style TargetType="ListViewItem">
-                                <Setter Property="MinHeight" Value="70"/>
+                                <!-- Fix the height of each ListViewItem for consistent appearance -->
+                                <Setter Property="MinHeight" Value="60"/>
                                 <Setter Property="Padding" Value="10"/>
+                                <Setter Property="Margin" Value="5"/>
                             </Style>
                         </ListView.ItemContainerStyle>
 
@@ -108,15 +110,12 @@
                                     <Grid.ColumnDefinitions>
                                         <ColumnDefinition Width="*"/>
                                         <ColumnDefinition Width="2*"/>
-                                        <ColumnDefinition Width="*"/>
                                     </Grid.ColumnDefinitions>
 
                                     <!-- PersonPicture -->
                                     <PersonPicture x:Name="ProfilePicture" DisplayName="{Binding StoreName}" Tapped="OnPersonPictureTapped" Width="40" Height="40" Margin="0,0,10,0" Grid.Column="0" VerticalAlignment="Center"/>
                                     <!-- Seller Name -->
                                     <TextBlock Text="{Binding StoreName}" FontSize="15" FontWeight="SemiBold" HorizontalAlignment="Left" VerticalAlignment="Center" Margin="10,0,0,0" Grid.Column="1" TextTrimming="CharacterEllipsis"/>
-                                    <!-- Unfollow Button -->
-                                    <Button Content="Unfollow" FontSize="12" Height="35" VerticalAlignment="Center" Grid.Column="2"/>
                                 </Grid>
                             </DataTemplate>
                         </ListView.ItemTemplate>
@@ -131,7 +130,7 @@
                         <RowDefinition Height="2*" />
                         <RowDefinition />
                     </Grid.RowDefinitions>
-                    <TextBlock Text="723" FontSize="22" HorizontalAlignment="Center" VerticalAlignment="Center" />
+                    <TextBlock Text="{Binding FollowedSellersCount}"  FontSize="22" HorizontalAlignment="Center" VerticalAlignment="Center" />
                     <TextBlock Text="Following" FontSize="14" HorizontalAlignment="Center" VerticalAlignment="Center" Grid.Row="1" FontWeight="Bold" />
                 </Grid>
             </Button>
