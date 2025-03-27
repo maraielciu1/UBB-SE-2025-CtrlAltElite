@@ -49,5 +49,9 @@ namespace MarketPlace924.Service
         //    return reviews.Average(r => r.Score);
         //}
 
+        public async Task<List<string>> GetNotifications(int sellerId, int currentFollowerCount)
+        {
+            return await _sellerRepository.GetNotifications(sellerId, currentFollowerCount);
+        }
     }
 }

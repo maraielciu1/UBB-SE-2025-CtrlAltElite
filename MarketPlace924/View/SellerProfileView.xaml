@@ -115,22 +115,19 @@
 
         <StackPanel  Grid.Column="1" Width="Auto" Height="Auto" HorizontalAlignment="Right" VerticalAlignment="Top" Margin="10,30,30,30" Padding="10">
             <Expander
-                 IsExpanded="False"
+                 IsExpanded="{Binding IsExpanderExpanded, Mode=TwoWay}"
                  ExpandDirection="Down"
                  VerticalAlignment="Top"
-                 Header="Notifications"
-                 Background="#0D47A1"
-                 Width="350"
-                 MaxHeight="200">
-                <Expander.Content>
-                    <ListView>
-                        <ListViewItem>• You have 4 new followers</ListViewItem>
-                        <ListViewItem>• You gained 12 followers in 24 hrs</ListViewItem>
-                        <ListViewItem>• Congratulations! You reached 50 followers</ListViewItem>
-                        <ListViewItem>• You have 23 new followers</ListViewItem>
-                        <ListViewItem>• You gained 12 followers in 24 hrs</ListViewItem>
-                    </ListView>
-                </Expander.Content>
+                 Header="🔔 Notifications"
+                 Width="300"
+                 MaxHeight="200">       
+                <ListBox ItemsSource="{Binding Notifications}">
+                    <ListBox.ItemTemplate>
+                        <DataTemplate>
+                            <TextBlock Text="{Binding}" />
+                        </DataTemplate>
+                    </ListBox.ItemTemplate>
+                </ListBox>
             </Expander>
         </StackPanel>
     </Grid>

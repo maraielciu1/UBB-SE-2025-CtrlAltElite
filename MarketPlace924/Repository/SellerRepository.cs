@@ -146,5 +146,91 @@ namespace MarketPlace924.Repository
         //    _connection.CloseConnection();
         //    return reviews;
         //}
+
+        public async Task<List<string>> GetNotifications(int sellerId, int currentFollowerCount)
+        {
+            List<string> notificationSeller = new List<string>();
+            await _connection.OpenConnection();
+
+            int lastFollowerCount = 0;
+
+            // Get the last follower count from the latest notification
+            var command = _connection.getConnection().CreateCommand();
+            command.CommandText = "SELECT TOP 1 NotificationFollowerCount FROM Notifications WHERE SellerID = @SellerId ORDER BY NotificationID DESC";
+            command.Parameters.AddWithValue("@SellerId", sellerId);
+            object? result = await command.ExecuteScalarAsync();
+
+            if (result != null)
+            {
+                lastFollowerCount = Convert.ToInt32(result);
+            }
+
+            // Generate a new notification message
+            string message = "";
+            if (currentFollowerCount != lastFollowerCount)
+            {
+                // If followers increased or decreased, generate a message
+                if (currentFollowerCount > lastFollowerCount)
+                {
+                    // Check for milestone notifications (e.g., 10, 50, 100 followers)
+                    if (currentFollowerCount >= 100 && currentFollowerCount % 100 == 0)
+                    {
+                        message = $"Congratulations! You've reached {currentFollowerCount} followers!";
+                    }
+                    else if (currentFollowerCount >= 50 && currentFollowerCount % 50 == 0)
+                    {
+                        message = $"Amazing! You've reached {currentFollowerCount} followers!";
+                    }
+                    else if (currentFollowerCount >= 10 && currentFollowerCount % 10 == 0)
+                    {
+                        message = $"Incredible! You've reached {currentFollowerCount} followers!";
+                    }
+                    else
+                    {
+                        message = $"You have gained {currentFollowerCount - lastFollowerCount} new ";
+                        if (currentFollowerCount - lastFollowerCount == 1)
+                            message += "follower!";
+                        else
+                            message += "followers!";
+                    }
+                }
+                else if (currentFollowerCount < lastFollowerCount)
+                {
+                    message = $"You have lost {lastFollowerCount - currentFollowerCount} ";
+                    if (lastFollowerCount - currentFollowerCount == 1)
+                        message += "follower!";
+                    else
+                        message += "followers!";
+                }
+
+
+
+                // Insert the new notification
+                command = _connection.getConnection().CreateCommand();
+                command.CommandText = "INSERT INTO Notifications (SellerID, NotificationMessage, NotificationFollowerCount) VALUES (@SellerID, @NotificationMessage, @NotificationFollowerCount)";
+                command.Parameters.AddWithValue("@SellerId", sellerId);
+                command.Parameters.AddWithValue("@NotificationMessage", message);
+                command.Parameters.AddWithValue("@NotificationFollowerCount", currentFollowerCount);
+                await command.ExecuteNonQueryAsync();
+            }
+
+            // Now get the latest 6 notifications for this seller
+            command = _connection.getConnection().CreateCommand();
+            command.CommandText = "SELECT TOP 6 NotificationMessage FROM Notifications WHERE SellerID = @SellerId ORDER BY NotificationID DESC";
+            command.Parameters.AddWithValue("@SellerId", sellerId);
+
+            using (var reader = await command.ExecuteReaderAsync())
+            {
+                while (await reader.ReadAsync())
+                {
+                    var notificationMessage = reader.GetString(0);
+                    notificationSeller.Add(notificationMessage);
+                }
+            }
+
+            _connection.CloseConnection();
+
+            return notificationSeller;
+        }
     }
 }
