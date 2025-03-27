@@ -4,6 +4,7 @@
     xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
     xmlns:local="using:MarketPlace924.View"
+    xmlns:models="using:MarketPlace924.Domain"
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     mc:Ignorable="d"
@@ -72,25 +73,31 @@
             </Grid>
 
             <!-- Product Grid -->
-            <ScrollViewer Grid.Row="2" VerticalScrollBarVisibility="Auto">
-                <ItemsControl ItemsSource="{Binding SellerProducts}">
-                    <ItemsControl.ItemsPanel>
+            <ScrollViewer Grid.Row="2" VerticalScrollBarVisibility="Auto" Margin="0,10,0,0">
+                <ListView ItemsSource="{Binding SellerProducts}" SelectionMode="None"
+                      ScrollViewer.VerticalScrollMode="Enabled"
+                      ScrollViewer.HorizontalScrollMode="Disabled"
+                      ScrollViewer.VerticalScrollBarVisibility="Auto"
+                      ScrollViewer.HorizontalScrollBarVisibility="Disabled"> 
+                    <!-- Grid layout for horizontal alignment but vertical scrolling -->
+                    <ListView.ItemsPanel>
                         <ItemsPanelTemplate>
-                            <WrapGrid ItemWidth="300" />
+                            <ItemsWrapGrid Orientation="Horizontal" MaximumRowsOrColumns="10" />
                         </ItemsPanelTemplate>
-                    </ItemsControl.ItemsPanel>
-                    <ItemsControl.ItemTemplate>
-                        <DataTemplate>
-                            <Border Style="{StaticResource PrimaryBorder}">
+                    </ListView.ItemsPanel>
+
+                    <ListView.ItemTemplate>
+                        <DataTemplate x:DataType="models:Product">
+                            <Border Style="{StaticResource ProductBorder}">
                                 <StackPanel>
                                     <TextBlock Text="{Binding Name}" Style="{StaticResource PrimaryLabel}" />
-                                    <TextBlock Text="{Binding Price}" Foreground="Green" />
                                     <TextBlock Text="{Binding Description}" />
+                                    <TextBlock Text="{Binding Price}" Foreground="Green" />
                                 </StackPanel>
                             </Border>
                         </DataTemplate>
-                    </ItemsControl.ItemTemplate>
-                </ItemsControl>
+                    </ListView.ItemTemplate>
+                </ListView>
             </ScrollViewer>
         </Grid>
     </Grid>

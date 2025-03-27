@@ -76,7 +76,7 @@
                 <TextBlock Style="{StaticResource PrimaryLabel}" Text="My Market" FontSize="40" FontWeight="Bold" VerticalAlignment="Center" HorizontalAlignment="Center" Grid.Column="1"/>
             </Grid>
 
-            <!-- Search + Buttons -->
+            <!-- Search -->
             <Grid Grid.Row="1" Margin="0,10,0,0">
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition Width="*"/>
@@ -85,16 +85,28 @@
                 <TextBox Style="{StaticResource PrimaryTextBox}" PlaceholderText="Search" TextChanged="OnSearchProductTextChanged" Grid.Column="0" Margin="0,0,10,0" Height="45" HorizontalAlignment="Stretch"/>
             </Grid>
 
-            <!-- Scrollable Area -->
             <ScrollViewer Grid.Row="2" VerticalScrollBarVisibility="Auto" Margin="0,10,0,0">
-                <ListView ItemsSource="{Binding MyMarketProducts}" SelectionMode="None">
+                <ListView ItemsSource="{Binding MyMarketProducts}" SelectionMode="None"
+                  ScrollViewer.VerticalScrollMode="Enabled"
+                  ScrollViewer.HorizontalScrollMode="Disabled"
+                  ScrollViewer.VerticalScrollBarVisibility="Auto"
+                  ScrollViewer.HorizontalScrollBarVisibility="Disabled">
+                    <!-- Grid layout for horizontal alignment but vertical scrolling -->
+                    <ListView.ItemsPanel>
+                        <ItemsPanelTemplate>
+                            <ItemsWrapGrid Orientation="Horizontal" MaximumRowsOrColumns="10" />
+                        </ItemsPanelTemplate>
+                    </ListView.ItemsPanel>
+
                     <ListView.ItemTemplate>
                         <DataTemplate x:DataType="models:Product">
-                            <StackPanel>
-                                <TextBlock Style="{StaticResource PrimaryLabel}" Text="{Binding Name}" FontSize="18" FontWeight="Bold"/>
-                                <TextBlock Text="{Binding Description}" FontSize="14"/>
-                                <TextBlock Text="{Binding Price}" FontSize="16" Foreground="Green"/>
-                            </StackPanel>
+                            <Border Style="{StaticResource ProductBorder}">
+                                <StackPanel>
+                                    <TextBlock Text="{Binding Name}" Style="{StaticResource PrimaryLabel}" />
+                                    <TextBlock Text="{Binding Description}" FontSize="14"/>
+                                    <TextBlock Text="{Binding Price}" FontSize="16" Foreground="Green"/>
+                                </StackPanel>
+                            </Border>
                         </DataTemplate>
                     </ListView.ItemTemplate>
                 </ListView>

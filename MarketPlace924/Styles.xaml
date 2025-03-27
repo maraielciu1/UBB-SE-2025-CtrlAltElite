@@ -86,4 +86,15 @@
         <Setter Property="Margin" Value="10,0,0,0"/>
         <Setter Property="TextTrimming" Value="CharacterEllipsis"/>
     </Style>
+
+    <Style x:Key="ProductBorder" TargetType="Border">
+        <Setter Property="Padding" Value="10"></Setter>
+        <Setter Property="Margin" Value="10"></Setter>
+        <Setter Property="CornerRadius" Value="10"></Setter>
+        <Setter Property="Background" Value="White"></Setter>
+        <Setter Property="BorderBrush" Value="#0D47A1"></Setter>
+        <Setter Property="BorderThickness" Value="2"></Setter>
+        <Setter Property="Width" Value="200"></Setter>
+        <Setter Property="Height" Value="150"></Setter>
+    </Style>
 </ResourceDictionary>
