@@ -20,6 +20,7 @@ namespace MarketPlace924
     {
         private UserService _userService;
         private BuyerService _buyerService;
+        private SellerService _sellerService;
         private User? _user;
 		private AdminService _adminService;
 		private AnalyticsService _analyticsService;
@@ -32,19 +33,18 @@ namespace MarketPlace924
             var dbConnection = new DatabaseConnection(); // Using your DBConnection class
             var userRepo = new UserRepository(dbConnection);
             var buyerRepo = new BuyerRepository(dbConnection);
+            var sellerRepo = new SellerRepository(dbConnection, userRepo);
 
             // Initialize Services
             _userService = new UserService(userRepo);
             _buyerService = new BuyerService(buyerRepo, userRepo);
+
 			_adminService = new AdminService(userRepo);
 			_analyticsService = new AnalyticsService(userRepo, buyerRepo);
 
+            _sellerService = new SellerService(sellerRepo);
+
             LoginFrame.Navigate(typeof(LoginView), new LoginViewModel(_userService, this));
-            // To Start Logged in as Buyer ucomment bellow
-            // _user = new User(userID: 5, phoneNumber: "074322321", email: "admin@gmail.com");
-            // MenuAndStage.Visibility = Visibility.Visible;
-            // LoginView.Visibility = Visibility.Collapsed;
-            // NavigateToBuyerProfile();
         }
 
         public void OnLoginSuccess(User user)
@@ -67,9 +67,17 @@ namespace MarketPlace924
 				case UserRole.Admin:
 					NavigateToAdminProfile();
 					break;
+                case UserRole.Seller:
+                    NavigateToSellerProfile();
+                    break;
 
 			}
-		}
+        }
+
+        private void NavigateToSellerProfile()
+        {
+            Stage.Navigate(typeof(SellerProfileView), new SellerProfileViewModel(_user, _userService, _sellerService));
+        }
 
         private void NavigateToLogin()
         {
@@ -81,7 +89,7 @@ namespace MarketPlace924
             NavigateToLogin();
         }
 
-        private void NavigateToMarketplace()
+        private void NavigateToMyMarket()
         {
             Stage.Navigate(typeof(MyMarketView), new MyMarketViewModel(_buyerService, _user));
         }

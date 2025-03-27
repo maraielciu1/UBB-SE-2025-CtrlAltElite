@@ -1,5 +1,4 @@
-﻿
-using System.Diagnostics;
+﻿using System.Diagnostics;
 using System.Diagnostics.CodeAnalysis;
 using Microsoft.UI.Xaml;
 namespace MarketPlace924
@@ -34,7 +33,6 @@ namespace MarketPlace924
                 e.Handled = true; // Prevents app from crashing
             };
         }
-
         public static Window? m_window { get; private set; }
     }
 }

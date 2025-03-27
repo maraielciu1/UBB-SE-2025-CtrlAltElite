@@ -72,16 +72,16 @@ namespace MarketPlace924.Service
         public async Task<bool> CanUserLogin(string email, string password)
         {
 
-            if (await _userRepository.EmailExists(email))
-            {
-                var user = await GetUserByEmail(email);
-                if (user == null)
-                {
-                    return false;
-                }
-
-                return user.Password == HashPassword(password);
-            }
+			if (await _userRepository.EmailExists(email))
+			{
+				var user = await GetUserByEmail(email);
+				if (user == null)
+				{
+					return false;
+				}
+				
+				return user.Password == HashPassword(password);
+			}
 
             return false;
         }
