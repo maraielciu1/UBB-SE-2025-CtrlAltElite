@@ -25,6 +25,41 @@ namespace MarketPlace924.ViewModel
         private ObservableCollection<Product> _allProducts;
         public ObservableCollection<Product> FilteredProducts { get; set; }
 
+        private ObservableCollection<string> _notifications = new ObservableCollection<string>();
+
+        public ObservableCollection<string> Notifications
+        {
+            get => _notifications;
+            set
+            {
+                _notifications = value;
+                OnPropertyChanged(nameof(Notifications));
+            }
+        }
+
+        private bool _isExpanderExpanded = false;
+        private bool _isNotificationsLoaded = false;
+
+        public bool IsExpanderExpanded
+        {
+            get => _isExpanderExpanded;
+            set
+            {
+                if (_isExpanderExpanded != value)
+                {
+                    _isExpanderExpanded = value;
+                    OnPropertyChanged();
+                    if (_isExpanderExpanded && !_isNotificationsLoaded)
+                    {
+                        // Load notifications only once when expander is expanded
+                        LoadNotifications();
+                        _isNotificationsLoaded = true;
+                    }
+                }
+            }
+        }
+
+
         public SellerProfileViewModel(User user, UserService userService, SellerService sellerService)
         {
             _userService = userService;
@@ -142,6 +177,18 @@ namespace MarketPlace924.ViewModel
         private void NavigateToProfilePage()
         {
         }
+
+        public async Task LoadNotifications()
+        {
+            var notifications = await _sellerService.GetNotifications(_seller.Id, _seller.FollowersCount);
+            _notifications.Clear();
+            foreach (var notification in notifications)
+            {
+                _notifications.Add(notification);
+            }
+            OnPropertyChanged(nameof(Notifications));
+        }
+
 
         public event PropertyChangedEventHandler? PropertyChanged;
         protected void OnPropertyChanged([CallerMemberName] string propertyName = null)

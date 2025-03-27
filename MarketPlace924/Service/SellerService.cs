@@ -32,5 +32,10 @@ namespace MarketPlace924.Service
         {
             await _sellerRepository.UpdateSellerAsync(seller);
         }
+
+        public async Task<List<string>> GetNotifications(int sellerId, int currentFollowerCount)
+        {
+            return await _sellerRepository.GetNotifications(sellerId, currentFollowerCount);
+        }
     }
 }
