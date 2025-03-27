@@ -31,7 +31,7 @@
                         <Button Grid.Column="1" Content="Profile"
                                 Click="{x:Bind NavigateToBuyerProfile}"
                                 Style="{StaticResource MainMenuButton}"/>
-                        <Button Grid.Column="2" Content="My Market"
+                        <Button Grid.Column="2" x:Name="MyMarketButton" Content="My Market"
                                 Click="{x:Bind NavigateToMarketplace}"
                                 Style="{StaticResource MainMenuButton}"/>
                     </Grid>

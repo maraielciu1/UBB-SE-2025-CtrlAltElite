@@ -7,6 +7,7 @@ using MarketPlace924.Domain;
 using MarketPlace924.ViewModel;
 using MarketPlace924.View.Admin;
 using MarketPlace924.ViewModel.Admin;
+using Microsoft.UI.Xaml.Controls;
 // To learn more about WinUI, the WinUI project structure,
 // and more about our project templates, see: http://aka.ms/winui-project-info.
 
@@ -51,7 +52,14 @@ namespace MarketPlace924
             LoginFrame.Visibility = Visibility.Collapsed;
             MenuAndStage.Visibility = Visibility.Visible;
             _user = user;
-			switch (user.Role)
+
+            var myMarketButton = (Button)MenuAndStage.FindName("MyMarketButton");
+            if (myMarketButton != null)
+            {
+                myMarketButton.IsEnabled = user.Role == UserRole.Buyer;
+            }
+
+            switch (user.Role)
 			{
 				case UserRole.Buyer:
 					NavigateToBuyerProfile();
