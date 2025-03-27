@@ -429,10 +429,16 @@ namespace MarketPlace924.Repository
                     var followersCount = reader.GetInt32(7);
                     var trustScore = reader.GetDouble(8);
 
-                    Seller seller = new Seller(username, storeName, storeDescription, storeAddress, followersCount, trustScore);
-                    Domain.User user = new Domain.User(userID: sellerID, email: sellerEmail, phoneNumber: sellerPhoneNumber);
+                    Seller seller = new Seller();
 
+                    Domain.User user = new Domain.User(userID: sellerID, username: username, email: sellerEmail, phoneNumber: sellerPhoneNumber);
                     seller.User = user;
+
+                    seller.StoreName = storeName;
+                    seller.StoreDescription = storeDescription;
+                    seller.StoreAddress = storeAddress;
+                    seller.FollowersCount = followersCount;
+                    seller.TrustScore = trustScore;
 
                     followedSellers.Add(seller);
                 }
@@ -472,10 +478,16 @@ namespace MarketPlace924.Repository
                     var followersCount = reader.GetInt32(7);
                     var trustScore = reader.GetDouble(8);
 
-                    Seller seller = new Seller(username, storeName, storeDescription, storeAddress, followersCount, trustScore);
-                    Domain.User user = new Domain.User(userID: sellerID, email: sellerEmail, phoneNumber: sellerPhoneNumber);
-
+                    Seller seller = new Seller();
+                    
+                    Domain.User user = new Domain.User(userID: sellerID, username: username, email: sellerEmail, phoneNumber: sellerPhoneNumber);
                     seller.User = user;
+
+                    seller.StoreName = storeName;
+                    seller.StoreDescription = storeDescription;
+                    seller.StoreAddress = storeAddress;
+                    seller.FollowersCount = followersCount;
+                    seller.TrustScore = trustScore;
 
                     allSellers.Add(seller);
                 }

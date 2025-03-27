@@ -18,7 +18,7 @@
                     <RowDefinition Height="60" />
                     <RowDefinition Height="*" />
                 </Grid.RowDefinitions>
-                <StackPanel Grid.Row="0">
+                <StackPanel Grid.Row="0" Margin="0, -5, 0, 0">
                     <Grid>
                         <Grid.ColumnDefinitions>
                             <ColumnDefinition Width="*" />
@@ -27,15 +27,18 @@
                         </Grid.ColumnDefinitions>
                         <Button Grid.Column="0" Content="Home"
                                 Click="{x:Bind NavigateToHome}"
-                                Style="{StaticResource PrimaryButton}" />
+                                Style="{StaticResource MainMenuButton}"/>
                         <Button Grid.Column="1" Content="Profile"
                                 Click="{x:Bind NavigateToBuyerProfile}"
-                                Style="{StaticResource PrimaryButton}" />
-                        <Button Grid.Column="2" Content="Marketplace"
+                                Style="{StaticResource MainMenuButton}"/>
+                        <Button Grid.Column="2" Content="My Market"
                                 Click="{x:Bind NavigateToMarketplace}"
-                                Style="{StaticResource PrimaryButton}" />
+                                Style="{StaticResource MainMenuButton}"/>
                     </Grid>
                 </StackPanel>
+
+                <Border Grid.Row="1" BorderBrush="#1976D2" BorderThickness="0,2,0,0" Margin="0,6,0,0"/>
+
                 <ScrollView Grid.Row="1" Padding="20">
                     <Frame x:Name="Stage" Background="#FFFFFF"></Frame>
                 </ScrollView>
