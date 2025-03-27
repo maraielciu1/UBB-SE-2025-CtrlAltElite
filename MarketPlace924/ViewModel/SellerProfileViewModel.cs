@@ -10,6 +10,7 @@ using Microsoft.UI.Xaml.Controls;
 using Microsoft.UI.Xaml;
 using Windows.Networking.NetworkOperators;
 using System.Threading.Tasks;
+using System.Collections.Generic;
 
 namespace MarketPlace924.ViewModel
 {
@@ -144,7 +145,6 @@ namespace MarketPlace924.ViewModel
                 if (_seller.Id > 0)
                 {
                     await _sellerService.UpdateSellerAsync(_seller);
-                    //write successful update message
                     await ShowDialog("Success", "Your seller has been updated successfully!");
                 }
                 else
@@ -177,6 +177,75 @@ namespace MarketPlace924.ViewModel
             var sortedProducts = _allProducts.OrderBy(p => p.Price).ToList();
             FilteredProducts = new ObservableCollection<Product>(sortedProducts);
             OnPropertyChanged(nameof(FilteredProducts));
+        }
+
+        public string StoreNameError { get; set; }
+        public string EmailError { get; set; }
+        public string PhoneNumberError { get; set; }
+        public string AddressError { get; set; }
+        public string DescriptionError { get; set; }
+
+        public List<string> ValidateFields()
+        {
+            List<string> errorMessages = new List<string>();
+
+            if (string.IsNullOrWhiteSpace(StoreName))
+            {
+                StoreNameError = "Store name is required.";
+                errorMessages.Add(StoreNameError);
+            }
+            else
+            {
+                StoreNameError = string.Empty;
+            }
+
+            if (string.IsNullOrWhiteSpace(Email) || !Email.Contains("@"))
+            {
+                EmailError = "Valid email is required.";
+                errorMessages.Add(EmailError);
+            }
+            else
+            {
+                EmailError = string.Empty;
+            }
+
+            if (string.IsNullOrWhiteSpace(PhoneNumber))
+            {
+                PhoneNumberError = "Phone number is required.";
+                errorMessages.Add(PhoneNumberError);
+            }
+            else
+            {
+                PhoneNumberError = string.Empty;
+            }
+
+            if (string.IsNullOrWhiteSpace(Address))
+            {
+                AddressError = "Address is required.";
+                errorMessages.Add(AddressError);
+            }
+            else
+            {
+                AddressError = string.Empty;
+            }
+
+            if (string.IsNullOrWhiteSpace(Description))
+            {
+                DescriptionError = "Description is required.";
+                errorMessages.Add(DescriptionError);
+            }
+            else
+            {
+                DescriptionError = string.Empty;
+            }
+
+            OnPropertyChanged(nameof(StoreNameError));
+            OnPropertyChanged(nameof(EmailError));
+            OnPropertyChanged(nameof(PhoneNumberError));
+            OnPropertyChanged(nameof(AddressError));
+            OnPropertyChanged(nameof(DescriptionError));
+
+            return errorMessages;
         }
 
 
