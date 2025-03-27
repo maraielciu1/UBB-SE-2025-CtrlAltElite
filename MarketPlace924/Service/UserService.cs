@@ -1,6 +1,8 @@
 ﻿using MarketPlace924.Domain;
 using MarketPlace924.Repository;
 using System;
+using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.Diagnostics;
 using System.Security.Cryptography;
 using System.Text;
@@ -218,8 +220,10 @@ namespace MarketPlace924.Service
             if(user.IsBanned)
                 return (false, "User is banned.", null);
             return (true, "Success", user);
-
-
         }
-    }
+		public async Task<List<User>> GetAll()
+		{
+			return await _userRepository.GetAll();
+		}
+	}
 }

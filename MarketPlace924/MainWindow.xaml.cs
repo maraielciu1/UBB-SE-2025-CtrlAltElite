@@ -5,7 +5,8 @@ using MarketPlace924.View;
 using MarketPlace924.DBConnection;
 using MarketPlace924.Domain;
 using MarketPlace924.ViewModel;
-
+using MarketPlace924.View.Admin;
+using MarketPlace924.ViewModel.Admin;
 // To learn more about WinUI, the WinUI project structure,
 // and more about our project templates, see: http://aka.ms/winui-project-info.
 
@@ -19,6 +20,8 @@ namespace MarketPlace924
         private UserService _userService;
         private BuyerService _buyerService;
         private User? _user;
+		private AdminService _adminService;
+		private AnalyticsService _analyticsService;
 
         public MainWindow()
         {
@@ -32,6 +35,8 @@ namespace MarketPlace924
             // Initialize Services
             _userService = new UserService(userRepo);
             _buyerService = new BuyerService(buyerRepo, userRepo);
+			_adminService = new AdminService(userRepo);
+			_analyticsService = new AnalyticsService(userRepo, buyerRepo);
 
             LoginFrame.Navigate(typeof(LoginView), new LoginViewModel(_userService, this));
             // To Start Logged in as Buyer ucomment bellow
@@ -46,11 +51,17 @@ namespace MarketPlace924
             LoginFrame.Visibility = Visibility.Collapsed;
             MenuAndStage.Visibility = Visibility.Visible;
             _user = user;
-            if (user.Role == UserRole.Buyer)
-            {
-                NavigateToBuyerProfile();
-            }
-        }
+			switch (user.Role)
+			{
+				case UserRole.Buyer:
+					NavigateToBuyerProfile();
+					break;
+				case UserRole.Admin:
+					NavigateToAdminProfile();
+					break;
+
+			}
+		}
 
         private void NavigateToLogin()
         {
@@ -70,5 +81,10 @@ namespace MarketPlace924
         {
             Stage.Navigate(typeof(BuyerProfileView), new BuyerProfileViewModel(_buyerService, _user, new BuyerWishlistItemDetailsProvider()));
         }
+
+		private void NavigateToAdminProfile()
+		{
+			Stage.Navigate(typeof(AdminView), new AdminViewModel(_adminService, _analyticsService, _userService));
+		}
     }
 }

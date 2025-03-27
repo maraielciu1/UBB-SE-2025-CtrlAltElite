@@ -595,6 +595,19 @@ namespace MarketPlace924.Repository
 
             _connection.CloseConnection();
         }
-    }
+
+		public async Task<int> GetTotalCount()
+		{
+			await _connection.OpenConnection();
+			var command = _connection.getConnection().CreateCommand();
+
+			command.CommandText = "SELECT Count(*) FROM Buyers";
+
+			var result = (int)command.ExecuteScalar();
+
+			_connection.CloseConnection();
+			return result;
+		}
+	}
 }
 
