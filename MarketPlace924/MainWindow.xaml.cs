@@ -1,3 +1,6 @@
+using System.Collections.Generic;
+using System.ComponentModel;
+using System.Runtime.CompilerServices;
 using System.Threading.Tasks;
 using MarketPlace924.DBConnection;
 using MarketPlace924.Domain;
@@ -8,7 +11,6 @@ using MarketPlace924.View.Admin;
 using MarketPlace924.ViewModel;
 using MarketPlace924.ViewModel.Admin;
 using Microsoft.UI.Xaml;
-using Microsoft.UI.Xaml.Controls;
 
 // To learn more about WinUI, the WinUI project structure,
 // and more about our project templates, see: http://aka.ms/winui-project-info.
@@ -18,7 +20,7 @@ namespace MarketPlace924
     /// <summary>
     /// An empty window that can be used on its own or navigated to within a Frame.
     /// </summary>
-    public sealed partial class MainWindow : Window, IOnLoginSuccessCallback
+    public sealed partial class MainWindow : Window,INotifyPropertyChanged, IOnLoginSuccessCallback
     {
         private UserService _userService;
         private BuyerService _buyerService;
@@ -49,23 +51,29 @@ namespace MarketPlace924
             LoginFrame.Navigate(typeof(LoginView), new LoginViewModel(_userService, this));
         }
 
+
+        public bool IsUserLogedIn => _user != null;
+        public bool IsMarketPlaceButtonVisible => IsUserLogedIn && _user!.Role == UserRole.Buyer;
+
+        public bool IsProfileButtonVisibile =>
+            IsUserLogedIn && (_user!.Role == UserRole.Buyer || _user.Role == UserRole.Seller);
+
+        public Visibility SceneVibility => IsUserLogedIn ? Visibility.Visible : Visibility.Collapsed;
+        public Visibility LoginVisibility => IsUserLogedIn ? Visibility.Collapsed : Visibility.Visible;
+
+        public Visibility MarketPlaceButtonVisibility =>
+            IsMarketPlaceButtonVisible ? Visibility.Visible : Visibility.Collapsed;
+
+        public Visibility ProfileButtonVisibility =>
+            IsProfileButtonVisibile ? Visibility.Visible : Visibility.Collapsed;
+        
         public async Task OnLoginSuccess(User user)
         {
-            LoginFrame.Visibility = Visibility.Collapsed;
-            MenuAndStage.Visibility = Visibility.Visible;
             _user = user;
-
-            var myMarketButton = (Button)MenuAndStage.FindName("MyMarketButton");
-            if (myMarketButton != null)
-            {
-                myMarketButton.IsEnabled = user.Role == UserRole.Buyer;
-            }
-
-
             switch (user.Role)
             {
                 case UserRole.Buyer:
-                    await NavigateToBuyerProfile();break;
+                    await NavigateToBuyerProfile(); break;
                 case UserRole.Seller:
                     NavigateToSellerProfile();
                     break;
@@ -73,8 +81,11 @@ namespace MarketPlace924
                     NavigateToAdminProfile();
                     break;
             }
-
-            }
+            OnPropertyChanged(nameof(LoginVisibility));
+            OnPropertyChanged(nameof(SceneVibility));
+            OnPropertyChanged(nameof(ProfileButtonVisibility));
+            OnPropertyChanged(nameof(MarketPlaceButtonVisibility));
+        }
 
 
         private void NavigateToLogin()
@@ -94,7 +105,7 @@ namespace MarketPlace924
 
 private void NavigateToSellerProfile()
         {
-            Stage.Navigate(typeof(SellerProfileView), new SellerProfileViewModel(_user, _userService, _sellerService));
+            Stage.Navigate(typeof(SellerProfileView), new SellerProfileViewModel(_user!, _userService, _sellerService));
         }
 
         private async Task NavigateToBuyerProfile()
@@ -138,5 +149,13 @@ private void NavigateToSellerProfile()
                     break;
             }
         }
+
+        public event PropertyChangedEventHandler? PropertyChanged;
+
+        private void OnPropertyChanged([CallerMemberName] string? propertyName = null)
+        {
+            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
+        }
+        
     }
 }

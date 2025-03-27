@@ -8,11 +8,12 @@
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     mc:Ignorable="d"
     Title="MarketPlace924">
+  
     <Grid>
-        <Frame x:Name="LoginFrame" Visibility="Visible"/>
+        <Frame x:Name="LoginFrame" Visibility="{x:Bind LoginVisibility, Mode=OneWay}" />
 
-        <Border x:Name="MenuAndStage" Visibility="Collapsed"
-                Style="{StaticResource PrimaryBorder}">
+        <Border Visibility="{x:Bind SceneVibility, Mode=OneWay}"
+                Style="{StaticResource PrimaryBorder}" >
             <Grid>
                 <Grid.RowDefinitions>
                     <RowDefinition Height="60" />
@@ -30,10 +31,12 @@
                                 Style="{StaticResource MainMenuButton}"/>
                         <Button Grid.Column="1" Content="Profile"
                                 Click="{x:Bind NavigateToProfile}"
-                                Style="{StaticResource MainMenuButton}"/>
+                                Style="{StaticResource MainMenuButton}"
+                                Visibility="{x:Bind ProfileButtonVisibility, Mode=OneWay}"/>
                         <Button Grid.Column="2" Content="My Market"
                                 Click="{x:Bind NavigateToMyMarket}"
-                                Style="{StaticResource MainMenuButton}" />
+                                Style="{StaticResource MainMenuButton}"
+                                Visibility="{x:Bind MarketPlaceButtonVisibility, Mode=OneWay}"/>
                     </Grid>
                 </StackPanel>
 
