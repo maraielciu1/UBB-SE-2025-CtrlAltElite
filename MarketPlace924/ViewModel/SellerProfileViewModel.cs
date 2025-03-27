@@ -172,6 +172,14 @@ namespace MarketPlace924.ViewModel
             await dialog.ShowAsync();
         }
 
+        public void SortProducts()
+        {
+            var sortedProducts = _allProducts.OrderBy(p => p.Price).ToList();
+            FilteredProducts = new ObservableCollection<Product>(sortedProducts);
+            OnPropertyChanged(nameof(FilteredProducts));
+        }
+
+
         public event PropertyChangedEventHandler? PropertyChanged;
         protected void OnPropertyChanged([CallerMemberName] string propertyName = null)
         {

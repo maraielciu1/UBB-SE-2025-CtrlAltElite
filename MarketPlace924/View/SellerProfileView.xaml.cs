@@ -14,7 +14,6 @@ public sealed partial class SellerProfileView : Page
     public SellerProfileView()
     {
         InitializeComponent();
-
     }
 
     protected override void OnNavigatedTo(NavigationEventArgs e)
@@ -44,6 +43,15 @@ public sealed partial class SellerProfileView : Page
         if (viewModel != null)
         {
             Frame.Navigate(typeof(UpdateProfileView), viewModel);
+        }
+    }
+
+    private void OnSortButtonClick(object sender, RoutedEventArgs e)
+    {
+        var viewModel = DataContext as SellerProfileViewModel;
+        if (viewModel != null)
+        {
+            viewModel.SortProducts();
         }
     }
 }
