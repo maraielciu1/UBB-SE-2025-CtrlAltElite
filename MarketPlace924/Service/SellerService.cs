@@ -32,5 +32,11 @@ namespace MarketPlace924.Service
         {
             await _sellerRepository.UpdateSellerAsync(seller);
         }
+
+        public async Task CreateSeller(Seller seller)
+        {
+            await _sellerRepository.CreateSeller(seller);
+        }
+
     }
 }

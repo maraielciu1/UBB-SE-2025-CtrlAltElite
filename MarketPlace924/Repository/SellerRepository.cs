@@ -68,6 +68,7 @@ namespace MarketPlace924.Repository
         {
             await _connection.OpenConnection();
             var command = _connection.getConnection().CreateCommand();
+
             command.CommandText = @"
                     UPDATE Sellers 
                     SET StoreName = @StoreName, StoreDescription = @StoreDescription, StoreAddress = @StoreAddress, FollowersCount = @FollowersCount, TrustScore = @TrustScore 
@@ -105,6 +106,22 @@ namespace MarketPlace924.Repository
             _connection.CloseConnection();
             return products;
 
+        }
+
+        public async Task CreateSeller(Seller seller)
+        {
+            await _connection.OpenConnection();
+            var command = _connection.getConnection().CreateCommand();
+            command.CommandText = @"INSERT INTO Sellers (UserId, Username, StoreName, StoreDescription, StoreAddress, FollowersCount, TrustScore)
+                        VALUES 
+                                (@UserId, @Username, @StoreName, @StoreDescription, @StoreAddress, 0, 0)";
+            command.Parameters.AddWithValue("@UserId", seller.Id);
+            command.Parameters.AddWithValue("@Username", seller.Username);
+            command.Parameters.AddWithValue("@StoreName", "");
+            command.Parameters.AddWithValue("@StoreDescription", "");
+            command.Parameters.AddWithValue("@StoreAddress", "");
+            await command.ExecuteNonQueryAsync();
+            _connection.CloseConnection();
         }
     }
 }

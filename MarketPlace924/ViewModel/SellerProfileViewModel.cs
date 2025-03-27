@@ -57,8 +57,12 @@ namespace MarketPlace924.ViewModel
         public ObservableCollection<Product> Products { get; set; } = new ObservableCollection<Product>();
         public ICommand UpdateProfileCommand { get; set; }
 
+        public bool CreationMode { get; set; }
+
         private void LoadSellerProfile()
         {
+            CreationMode = _seller.StoreName == null;
+
             if (_seller != null)
             {
                 StoreName = _seller.StoreName;
@@ -79,6 +83,11 @@ namespace MarketPlace924.ViewModel
                 OnPropertyChanged(nameof(FollowersCount));
                 OnPropertyChanged(nameof(TrustScore));
             }
+            //if (CreationMode)
+            //{
+            //    //Navigate to the updateProfile page
+            //    UpdateProfile();
+            //}
         }
 
         private async Task LoadSellerProducts()
@@ -114,23 +123,34 @@ namespace MarketPlace924.ViewModel
 
         private async void UpdateProfile()
         {
+            if (CreationMode)
+            {
+                await _sellerService.CreateSeller(_seller);
+
+            }
+            else
+            {
+                await _sellerService.UpdateSellerAsync(_seller);
+            }
+
             if (_seller != null)
             {
                 _seller.StoreName = StoreName;
-                //currentSeller.Email = Email;
-                //currentSeller.PhoneNumber = PhoneNumber;
+                //_seller.Email = Email;
+                //_seller.PhoneNumber = PhoneNumber;
                 _seller.StoreAddress = Address;
                 _seller.StoreDescription = Description;
 
                 if (_seller.Id > 0)
                 {
                     await _sellerService.UpdateSellerAsync(_seller);
-                    // Navigate to the desired page after successful update
-                    //NavigateToProfilePage();
+                    //write successful update message
+                    await ShowDialog("Success", "Your seller has been updated successfully!");
                 }
                 else
                 {
                     System.Diagnostics.Debug.WriteLine("Seller ID not found. Cannot update seller information in the database.");
+                    await ShowDialog("Error", "Seller ID not found. Cannot update seller information in the database.");
                 }
             }
             else
@@ -139,8 +159,17 @@ namespace MarketPlace924.ViewModel
             }
         }
 
-        private void NavigateToProfilePage()
+        private async System.Threading.Tasks.Task ShowDialog(string title, string message)
         {
+            ContentDialog dialog = new ContentDialog
+            {
+                Title = title,
+                Content = message,
+                CloseButtonText = "OK",
+                XamlRoot = App.m_window.Content.XamlRoot
+            };
+
+            await dialog.ShowAsync();
         }
 
         public event PropertyChangedEventHandler? PropertyChanged;

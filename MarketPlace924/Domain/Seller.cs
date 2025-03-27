@@ -23,6 +23,15 @@ namespace MarketPlace924.Domain
         public Seller()
         {
         }
+        public Seller(User user, string storeName, string storeDescription, string storeAddress, int followersCount = 0, double trustScore = 0)
+        {
+            User = user;
+            StoreName = storeName;
+            StoreDescription = storeDescription;
+            StoreAddress = storeAddress;
+            FollowersCount = followersCount;
+            TrustScore = trustScore;
+        }
 
         public Seller(string username, string storeName, string storeDescription, string storeAddress, int followersCount = 0, double trustScore = 0)
         {

@@ -9,23 +9,10 @@
    xmlns:viewmodel="using:MarketPlace924.ViewModel"  
    mc:Ignorable="d"  
    d:DataContext="{d:DesignInstance Type=viewmodel:SellerProfileViewModel}"  
-   Background="{ThemeResource ApplicationPageBackgroundThemeBrush}">  
- 
-   <Grid>  
-       <Grid.ColumnDefinitions>  
-           <ColumnDefinition Width="200"/>  
-           <!-- Sidebar -->  
-           <ColumnDefinition Width="*"/>  
-           <!-- Main Content -->  
-       </Grid.ColumnDefinitions>  
- 
-       <!-- Sidebar -->  
-       <StackPanel Grid.Column="0" Background="Black" Width="200" Height="Auto">  
-           <Button Content="Home" Width="200"/>  
-           <Button Content="Profile" Width="200" Background="Gray"/>  
-       </StackPanel>  
- 
-       <!-- Main Content Grid -->  
+   Background="{ThemeResource ApplicationPageBackgroundThemeBrush}">
+
+    <Grid>
+        <!-- Main Content Grid -->  
        <Grid Grid.Column="1" Padding="20" HorizontalAlignment="Center" VerticalAlignment="Center">  
            <StackPanel Width="500">  
                <TextBlock Text="Update Profile" FontSize="24" FontWeight="Bold" Margin="0,0,0,20"/>  
