@@ -5,7 +5,7 @@ namespace MarketPlace924.DBConnection
 {
     public class DatabaseConnection
     {
-        private SqlConnection _dbConnection = new("Data Source=localhost;Initial Catalog=IssDb;Integrated Security=True;TrustServerCertificate=True");
+        private SqlConnection _dbConnection = new("Data Source=LAPTOP-MHT5DVFO\\SQLEXPRESS01;Initial Catalog=MarketPlaceDB;Integrated Security=True;TrustServerCertificate=True;");
 
 
         public SqlConnection getConnection()

@@ -193,8 +193,11 @@ namespace MarketPlace924.ViewModel
             try
             {
                 var products = await _buyerService.GetProductsFromFollowedSellers(_buyer.FollowingUsersIds);
+
+                var sortedProducts = products.OrderByDescending(p => p.ProductId).ToList();
+
                 _allProducts.Clear();
-                foreach (var product in products)
+                foreach (var product in sortedProducts)
                 {
                     _allProducts.Add(product);
                 }

@@ -7,14 +7,14 @@ using System.Collections.Generic;
 
 namespace MarketPlace924.Repository
 {
-	public class UserRepository
-	{
-		private DatabaseConnection _connection;
+    public class UserRepository
+    {
+        private DatabaseConnection _connection;
 
-		public UserRepository(DatabaseConnection connection)
-		{
-			_connection = connection;
-		}
+        public UserRepository(DatabaseConnection connection)
+        {
+            _connection = connection;
+        }
 
 		public async Task AddUser(User user)
 		{
@@ -107,23 +107,23 @@ namespace MarketPlace924.Repository
 			await _connection.OpenConnection();
 			var command = _connection.getConnection().CreateCommand();
 
-			command.CommandText = "SELECT * FROM Users WHERE Email = @Email";
-			command.Parameters.Add(new SqlParameter("@Email", email));
+            command.CommandText = "SELECT * FROM Users WHERE Email = @Email";
+            command.Parameters.Add(new SqlParameter("@Email", email));
 
-			var reader = await command.ExecuteReaderAsync();
-			if (!await reader.ReadAsync())
-			{
-				return null;
-			}
+            var reader = await command.ExecuteReaderAsync();
+            if (!await reader.ReadAsync())
+            {
+                return null;
+            }
 
-			var userId = reader.GetInt32(0);
-			var username = reader.GetString(1);
-			var phoneNumber = reader.GetString(3);
-			var password = reader.GetString(4);
-			var role = (UserRole)reader.GetInt32(5);
-			var failedLoginsCount = reader.GetInt32(6);
-			var bannedUntil = reader.IsDBNull(7) ? (DateTime?)null : reader.GetDateTime(7);
-			var isBanned = reader.GetBoolean(8);
+            var userId = reader.GetInt32(0);
+            var username = reader.GetString(1);
+            var phoneNumber = reader.GetString(3);
+            var password = reader.GetString(4);
+            var role = (UserRole)reader.GetInt32(5);
+            var failedLoginsCount = reader.GetInt32(6);
+            var bannedUntil = reader.IsDBNull(7) ? (DateTime?)null : reader.GetDateTime(7);
+            var isBanned = reader.GetBoolean(8);
 
 			await reader.CloseAsync();
 			_connection.CloseConnection();

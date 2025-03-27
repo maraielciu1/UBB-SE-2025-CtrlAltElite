@@ -157,14 +157,14 @@ namespace MarketPlace924.ViewModel
                 Description = _seller.StoreDescription;
 
                 // Notify the UI of property changes
-                OnPropertyChanged(nameof(DisplayName));
                 OnPropertyChanged(nameof(StoreName));
+                OnPropertyChanged(nameof(Username));
                 OnPropertyChanged(nameof(Email));
                 OnPropertyChanged(nameof(PhoneNumber));
                 OnPropertyChanged(nameof(Address));
-                OnPropertyChanged(nameof(Description));
                 OnPropertyChanged(nameof(FollowersCount));
                 OnPropertyChanged(nameof(TrustScore));
+                OnPropertyChanged(nameof(Description));
             }
         }
 

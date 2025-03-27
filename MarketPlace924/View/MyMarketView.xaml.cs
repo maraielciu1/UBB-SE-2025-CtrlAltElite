@@ -66,13 +66,23 @@ namespace MarketPlace924.View
             }
         }
 
-        // Handles the text change event in the seller search text box.
-        private void OnSearchSellerTextChanged(object sender, TextChangedEventArgs e)
+        // Handles the text change event in the followed seller search text box.
+        private void OnSearchFollowedSellerTextChanged(object sender, TextChangedEventArgs e)
         {
             var textBox = sender as TextBox;
             if (_viewModel != null && textBox != null)
             {
                 _viewModel.FilterFollowing(textBox.Text); // Pass the search text to the ViewModel
+            }
+        }
+
+        // Handles the text change event in the all seller search text box.
+        private void OnSearchAnySellerTextChanged(object sender, TextChangedEventArgs e)
+        {
+            var textBox = sender as TextBox;
+            if (_viewModel != null && textBox != null)
+            {
+                _viewModel.FilterAllSellers(textBox.Text); // Pass the search text to the ViewModel
             }
         }
 

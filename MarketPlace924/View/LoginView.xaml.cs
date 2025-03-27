@@ -39,6 +39,4 @@ namespace MarketPlace924.View
             
         }
     }
-
-
 }
