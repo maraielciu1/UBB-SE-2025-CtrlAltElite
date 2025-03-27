@@ -10,19 +10,18 @@ using System.Collections.ObjectModel;
 using System.Linq;
 using System.Threading.Tasks;
 using System.Windows.Input;
+using System.Runtime.CompilerServices;
 
 namespace MarketPlace924.ViewModel.Admin
 {
 	public class AdminViewModel
 	{
-		private List<User> users = new()
-			{
-				new User { Username = "john_doe", Role = UserRole.Seller },
-				new User { Username = "jane_smith", Role = UserRole.Buyer }
-			};
 
 		private ObservableCollection<UserRowViewModel> _items;
 
+		public static AdminViewModel _instance;
+
+		private List<User> users = new();
 		public ObservableCollection<UserRowViewModel> Users
 		{
 			get
@@ -30,7 +29,7 @@ namespace MarketPlace924.ViewModel.Admin
 				users = _userService.GetAll().Result;
 
 				if (_items == null)
-					_items = new ObservableCollection<UserRowViewModel>(users.Select(user => new UserRowViewModel(user)));
+					_items = new ObservableCollection<UserRowViewModel>(users.Select(user => new UserRowViewModel(user, _adminService)));
 
 				return _items;
 			}
@@ -42,34 +41,40 @@ namespace MarketPlace924.ViewModel.Admin
 
 		private readonly UserService _userService;
 
-		private readonly BuyerService _buyerService;
+		private readonly AnalyticsService _analyticsService;
 
+		public int TotalUsersCount = 0;
 		public List<ISeries> PieSeries { get; set; }
 
-		public AdminViewModel(AdminService adminService, UserService userService)
+		public AdminViewModel(AdminService adminService, AnalyticsService analyticsService, UserService userService)
 		{
-			_userService = userService;
-
+			_instance = this;
 			BanCommand = new RelayCommand(async (user) => await BanUser(user as User));
 			_adminService = adminService;
+			_analyticsService = analyticsService;
+
 			SetupPieChart();
+			_userService = userService;
 		}
 
 		private void SetupPieChart()
 		{
+			TotalUsersCount = _analyticsService.GetTotalUsersCount().Result;
+			var buyersCount = _analyticsService.GetTotalBuyersCount().Result;
+
 			PieSeries = new List<ISeries>
 			{
 				new PieSeries<double>
 				{
-					Values = new List<double> { 60 },
+					Values = new List<double> { buyersCount },
 					Name = "Buyers",
-					Fill = new SolidColorPaint(SKColors.LightGreen)
+					Fill = new SolidColorPaint(SKColors.LightYellow)
 				},
 				new PieSeries<double>
 				{
-					Values = new List<double> { 40 }, // Second slice (40%)
+					Values = new List<double> { TotalUsersCount - buyersCount },
 					Name = "Sellers",
-					Fill = new SolidColorPaint(SKColors.LightCoral)
+					Fill = new SolidColorPaint(SKColors.LightGreen)
 				}
 			};
 		}
@@ -92,6 +97,16 @@ namespace MarketPlace924.ViewModel.Admin
 				CloseButtonText = "OK"
 			};
 			dialog.ShowAsync();
+		}
+
+		public async Task RefreshUsers()
+		{
+			users = await _userService.GetAll();
+			_items.Clear();
+			foreach(var user in users)
+			{
+				_items.Add(new UserRowViewModel(user, _adminService));
+			}
 		}
 	}
 }

@@ -31,8 +31,11 @@
 		<TextBlock Text="{Binding ViewModel.BannedUntil, Mode=OneWay}" VerticalAlignment="Center"/>
 		<TextBlock Text="{Binding ViewModel.IsBanned, Mode=OneWay}" VerticalAlignment="Center"/>
 		<Button Content="Ban" 
-			Command="{Binding ViewModel.BanCommand}" 
-			CommandParameter="{Binding}" 
+			Command="{Binding BanUserCommand}" 
+			Grid.Column="2" VerticalAlignment="Center"/>
+
+		<Button Content="Ban" 
+			Command="{Binding SetAdminCommand}" 
 			Grid.Column="2" VerticalAlignment="Center"/>
 
 	</Grid>

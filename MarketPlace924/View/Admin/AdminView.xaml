@@ -23,9 +23,9 @@
 				<ColumnDefinition Width="200"/>
 				<ColumnDefinition Width="150"/>
 				<ColumnDefinition Width="150"/>
-				<ColumnDefinition Width="50"/>
+				<ColumnDefinition Width="100"/>
 				<ColumnDefinition Width="150"/>
-				<ColumnDefinition Width="50"/>
+				<ColumnDefinition Width="150" />
 				<ColumnDefinition Width="150"/>
 			</Grid.ColumnDefinitions>
 			<TextBlock Text="User ID" VerticalAlignment="Center" HorizontalAlignment="Center" Foreground="White" Padding="10"/>
@@ -57,23 +57,41 @@
 								<TextBlock Text="{Binding Email, Mode=OneWay}" VerticalAlignment="Center" Width="200"/>
 								<TextBlock Text="{Binding Password, Mode=OneWay}" VerticalAlignment="Center" Width="150"/>
 								<TextBlock Text="{Binding PhoneNumber, Mode=OneWay}" VerticalAlignment="Center" Width="150"/>
-								<TextBlock Text="{Binding FailedLogins, Mode=OneWay}" VerticalAlignment="Center" Width="50"/>
+								<TextBlock Text="{Binding FailedLogins, Mode=OneWay}" VerticalAlignment="Center" Width="100"/>
 								<TextBlock Text="{Binding BannedUntil, Mode=OneWay}" VerticalAlignment="Center" Width="150"/>
 								<TextBlock Text="{Binding IsBanned, Mode=OneWay}" VerticalAlignment="Center" Width="50"/>
 
-								<!-- Button with a proper Content property -->
-								<Button Command="{Binding BanCommand}" 
+								<StackPanel Orientation="Horizontal">
+									<!-- Button with a proper Content property -->
+									<Button Command="{Binding BanUserCommand}" 
                                     CommandParameter="{Binding}" 
                                     Content="Ban" VerticalAlignment="Center"/>
+									<!-- Button with a proper Content property -->
+									<Button Command="{Binding SetAdminCommand}" 
+                                    CommandParameter="{Binding}" 
+                                    Content="Set Admin" VerticalAlignment="Center"
+											Margin="10"/>
+								</StackPanel>
 							</StackPanel>
 						</DataTemplate>
 					</ListView.ItemTemplate>
 				</ListView>
 			</Grid>
 		</ScrollViewer>
+		<Grid Grid.Row="3">
+			<Grid.ColumnDefinitions>
+				<ColumnDefinition Width="400"/>
+				<ColumnDefinition Width="*"/>
+			</Grid.ColumnDefinitions>
+			<StackPanel Grid.Column="1" Orientation="Horizontal">
 
-		<Grid Grid.Row="3" Background="Black">
-			<lvc:PieChart Series="{Binding PieSeries}" Width="300" Height="300"/>
+				<TextBlock Text="Total Users" VerticalAlignment="Center"/>
+				<TextBlock Text="{Binding ViewModel.TotalUsersCount}" VerticalAlignment="Center"/>
+			</StackPanel>
+
+			<Grid Grid.Column="2">
+				<lvc:PieChart Series="{Binding PieSeries}" Width="300" Height="300"/>
+			</Grid>
 		</Grid>
 	</Grid>
 </Page>

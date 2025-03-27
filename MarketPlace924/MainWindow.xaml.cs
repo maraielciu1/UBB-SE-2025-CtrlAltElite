@@ -21,6 +21,7 @@ namespace MarketPlace924
         private BuyerService _buyerService;
         private User? _user;
 		private AdminService _adminService;
+		private AnalyticsService _analyticsService;
 
         public MainWindow()
         {
@@ -35,6 +36,7 @@ namespace MarketPlace924
             _userService = new UserService(userRepo);
             _buyerService = new BuyerService(buyerRepo, userRepo);
 			_adminService = new AdminService(userRepo);
+			_analyticsService = new AnalyticsService(userRepo, buyerRepo);
 
             LoginFrame.Navigate(typeof(LoginView), new LoginViewModel(_userService, this));
             // To Start Logged in as Buyer ucomment bellow
@@ -82,7 +84,7 @@ namespace MarketPlace924
 
 		private void NavigateToAdminProfile()
 		{
-			Stage.Navigate(typeof(AdminView), new AdminViewModel(_adminService, _userService));
+			Stage.Navigate(typeof(AdminView), new AdminViewModel(_adminService, _analyticsService, _userService));
 		}
     }
 }

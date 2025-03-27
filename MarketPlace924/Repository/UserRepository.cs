@@ -91,7 +91,10 @@ namespace MarketPlace924.Repository
 			command.Parameters.Add(new SqlParameter("@Password", user.Password));
 			command.Parameters.Add(new SqlParameter("@Role", user.Role));
 			command.Parameters.Add(new SqlParameter("@FailedLogins", user.FailedLogins));
-			command.Parameters.Add(new SqlParameter("@BannedUntil", user.BannedUntil));
+			if(user.BannedUntil == null)
+				command.Parameters.Add(new SqlParameter("@BannedUntil", DBNull.Value));
+			else
+				command.Parameters.Add(new SqlParameter("@BannedUntil", user.BannedUntil));
 			command.Parameters.Add(new SqlParameter("@IsBanned", user.IsBanned));
 			command.Parameters.Add(new SqlParameter("@UserID", user.UserId));
 			command.ExecuteNonQuery();
@@ -221,6 +224,19 @@ namespace MarketPlace924.Repository
 			}
 
 			await reader.CloseAsync();
+			_connection.CloseConnection();
+			return result;
+		}
+
+		public async Task<int> GetTotalCount()
+		{
+			await _connection.OpenConnection();
+			var command = _connection.getConnection().CreateCommand();
+
+			command.CommandText = "SELECT Count(*) FROM Users";
+
+			var result = (int)command.ExecuteScalar();
+
 			_connection.CloseConnection();
 			return result;
 		}
