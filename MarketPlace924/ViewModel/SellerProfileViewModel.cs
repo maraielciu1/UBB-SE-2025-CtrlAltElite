@@ -73,6 +73,7 @@ namespace MarketPlace924.ViewModel
                 Address = _seller.StoreAddress;
                 FollowersCount = _seller.FollowersCount.ToString();
                 TrustScore = _seller.TrustScore * 100.0 / 5.0;
+                //TrustScore = _sellerService.CalculateAverageReviewScore(_seller.Id) * 100.0 / 5.0;
                 Description = _seller.StoreDescription;
                 OnPropertyChanged(nameof(DisplayName));
 

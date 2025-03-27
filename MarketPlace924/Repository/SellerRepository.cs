@@ -4,6 +4,7 @@ using MarketPlace924.DBConnection;
 using Microsoft.Data.SqlClient;
 using MarketPlace924.Domain;
 using System.Collections.Generic;
+using Microsoft.UI.Xaml.Controls;
 
 
 namespace MarketPlace924.Repository
@@ -123,5 +124,27 @@ namespace MarketPlace924.Repository
             await command.ExecuteNonQueryAsync();
             _connection.CloseConnection();
         }
+
+        //public async Task<List<Review>?> GetReviewsBySellerId(int sellerId)
+        //{
+        //    var reviews = new List<Review>();
+        //    await _connection.OpenConnection();
+        //    var command = _connection.getConnection().CreateCommand();
+        //    command.CommandText = "SELECT * FROM Reviews WHERE SellerID = @SellerID";
+        //    command.Parameters.Add(new SqlParameter("@SellerID", sellerId));
+
+        //    using (var reader = await command.ExecuteReaderAsync())
+        //    {
+        //        while (await reader.ReadAsync())
+        //        {
+        //            var reviewId = reader.GetInt32(0);
+        //            var score = reader.GetDouble(2);
+        //            var review = new Review(reviewId, sellerId, score);
+        //            reviews.Add(review);
+        //        }
+        //    }
+        //    _connection.CloseConnection();
+        //    return reviews;
+        //}
     }
 }
