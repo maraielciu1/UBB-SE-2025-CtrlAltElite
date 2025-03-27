@@ -25,7 +25,7 @@ namespace MarketPlace924.Service
                 return false;
             }
             string emailPattern = @"^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$";
-            if (!Regex.IsMatch(email, emailPattern))
+            if (Regex.IsMatch(email, emailPattern))
             {
                 return false;
             }

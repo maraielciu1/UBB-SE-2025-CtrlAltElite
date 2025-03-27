@@ -3,6 +3,7 @@ using Microsoft.Data.SqlClient;
 using System;
 using MarketPlace924.DBConnection;
 using System.Threading.Tasks;
+using System.Collections.Generic;
 
 namespace MarketPlace924.Repository
 {
@@ -90,7 +91,10 @@ namespace MarketPlace924.Repository
 			command.Parameters.Add(new SqlParameter("@Password", user.Password));
 			command.Parameters.Add(new SqlParameter("@Role", user.Role));
 			command.Parameters.Add(new SqlParameter("@FailedLogins", user.FailedLogins));
-			command.Parameters.Add(new SqlParameter("@BannedUntil", user.BannedUntil));
+			if(user.BannedUntil == null)
+				command.Parameters.Add(new SqlParameter("@BannedUntil", DBNull.Value));
+			else
+				command.Parameters.Add(new SqlParameter("@BannedUntil", user.BannedUntil));
 			command.Parameters.Add(new SqlParameter("@IsBanned", user.IsBanned));
 			command.Parameters.Add(new SqlParameter("@UserID", user.UserId));
 			command.ExecuteNonQuery();
@@ -192,6 +196,50 @@ namespace MarketPlace924.Repository
 	        user.Email = reader.GetString(reader.GetOrdinal("Email"));
 	        reader.Close();
         }
-        //endregion
+
+		public async Task<List<User>> GetAll()
+		{
+			await _connection.OpenConnection();
+			var command = _connection.getConnection().CreateCommand();
+
+			command.CommandText = "SELECT * FROM Users";
+
+			var reader = command.ExecuteReader();
+
+			var result = new List<User>();
+
+			while (await reader.ReadAsync())
+			{
+				var userId = reader.GetInt32(0);
+				var username = reader.GetString(1);
+				var email = reader.GetString(2);
+				var phoneNumber = reader.GetString(3);
+				var password = reader.GetString(4);
+				var role = (UserRole)reader.GetInt32(5);
+				var failedLoginsCount = reader.GetInt32(6);
+				var bannedUntil = reader.IsDBNull(7) ? (DateTime?)null : reader.GetDateTime(7);
+				var isBanned = reader.GetBoolean(8);
+
+				result.Add(new User(userId, username, email, phoneNumber, password, role, failedLoginsCount, bannedUntil, isBanned));
+			}
+
+			await reader.CloseAsync();
+			_connection.CloseConnection();
+			return result;
+		}
+
+		public async Task<int> GetTotalCount()
+		{
+			await _connection.OpenConnection();
+			var command = _connection.getConnection().CreateCommand();
+
+			command.CommandText = "SELECT Count(*) FROM Users";
+
+			var result = (int)command.ExecuteScalar();
+
+			_connection.CloseConnection();
+			return result;
+		}
+		//endregion
 	}
 }

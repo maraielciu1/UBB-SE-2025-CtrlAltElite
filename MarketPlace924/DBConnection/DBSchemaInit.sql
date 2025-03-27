@@ -113,7 +113,8 @@ VALUES ('ion_popescu', 'ion.popescu@example.com', '0722-123-456', 'plain:parola1
        ('elena_georgescu', 'elena.georgescu@example.com', '0733-222-333', 'plain:pisicamea123', 2, 0, NULL, 0),
        ('daniel_mocanu', 'daniel.mocanu@example.com', '0755-444-555', 'plain:contabil2024', 2, 0, NULL, 0),
        ('cristina_matei', 'cristina.matei@example.com', '0788-666-777', 'plain:proiecteIT', 2, 0, null, 0),
-       ('lipsa', 'lipsa@example.com', '0788-666-777', 'plain:lipsa', 2, 0, null, 0)
+       ('lipsa', 'lipsa@example.com', '0788-666-777', 'plain:lipsa', 2, 0, null, 0),
+	   ('admin', 'admin@example.com', '1111-111-111', 'jGl25bVBBBW96Qi9Te4V37Fnqchz/Eu4qB9vKrRIqRg=', 1, 0, NULL, 0);
        ;
 
 -- Inserare mai multe Adrese ale Cumpărătorilor
