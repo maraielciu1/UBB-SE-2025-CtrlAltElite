@@ -38,16 +38,11 @@ namespace MarketPlace924.Service
         {
             await _sellerRepository.CreateSeller(seller);
         }
-        //public async Task<double> CalculateAverageReviewScore(int sellerId)
-        //{
-        //    var reviews = await _sellerRepository.GetReviewsBySellerId(sellerId);
-        //    if (reviews == null || !reviews.Any())
-        //    {
-        //        return 0;
-        //    }
 
-        //    return reviews.Average(r => r.Score);
-        //}
+        public async Task<double> CalculateAverageReviewScore(int sellerId)
+        {
+            return await _sellerRepository.GetTrustScoreBySellerId(sellerId);
+        }
 
         public async Task<List<string>> GetNotifications(int sellerId, int currentFollowerCount)
         {
