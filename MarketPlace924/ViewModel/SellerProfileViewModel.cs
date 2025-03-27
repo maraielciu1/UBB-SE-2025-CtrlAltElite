@@ -77,7 +77,7 @@ namespace MarketPlace924.ViewModel
             _seller = _sellerService.GetSellerByUser(_user);
             OnPropertyChanged(nameof(Seller));
 
-            LoadSellerProfile();
+            await LoadSellerProfile();
             await LoadSellerProducts();
         }
 
@@ -95,7 +95,7 @@ namespace MarketPlace924.ViewModel
 
         public bool CreationMode { get; set; }
 
-        private void LoadSellerProfile()
+        private async Task LoadSellerProfile()
         {
             CreationMode = _seller.StoreName == null;
 
@@ -107,8 +107,7 @@ namespace MarketPlace924.ViewModel
                 PhoneNumber = _seller.PhoneNumber;
                 Address = _seller.StoreAddress;
                 FollowersCount = _seller.FollowersCount.ToString();
-                TrustScore = _seller.TrustScore * 100.0 / 5.0;
-                //TrustScore = _sellerService.CalculateAverageReviewScore(_seller.Id) * 100.0 / 5.0;
+                TrustScore = await _sellerService.CalculateAverageReviewScore(_seller.Id) * 100.0 / 5.0;
                 Description = _seller.StoreDescription;
                 OnPropertyChanged(nameof(DisplayName));
 

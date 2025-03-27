@@ -5,6 +5,7 @@ using Microsoft.Data.SqlClient;
 using MarketPlace924.Domain;
 using System.Collections.Generic;
 using Microsoft.UI.Xaml.Controls;
+using System.Linq;
 
 
 namespace MarketPlace924.Repository
@@ -125,27 +126,36 @@ namespace MarketPlace924.Repository
             _connection.CloseConnection();
         }
 
-        //public async Task<List<Review>?> GetReviewsBySellerId(int sellerId)
-        //{
-        //    var reviews = new List<Review>();
-        //    await _connection.OpenConnection();
-        //    var command = _connection.getConnection().CreateCommand();
-        //    command.CommandText = "SELECT * FROM Reviews WHERE SellerID = @SellerID";
-        //    command.Parameters.Add(new SqlParameter("@SellerID", sellerId));
+        public async Task<double> GetTrustScoreBySellerId(int sellerId)
+        {
+            var reviews = new List<Review>();
+            await _connection.OpenConnection();
+            var command = _connection.getConnection().CreateCommand();
+            command.CommandText = "SELECT * FROM Reviews WHERE SellerID = @SellerID";
+            command.Parameters.Add(new SqlParameter("@SellerID", sellerId));
 
-        //    using (var reader = await command.ExecuteReaderAsync())
-        //    {
-        //        while (await reader.ReadAsync())
-        //        {
-        //            var reviewId = reader.GetInt32(0);
-        //            var score = reader.GetDouble(2);
-        //            var review = new Review(reviewId, sellerId, score);
-        //            reviews.Add(review);
-        //        }
-        //    }
-        //    _connection.CloseConnection();
-        //    return reviews;
-        //}
+            using (var reader = await command.ExecuteReaderAsync())
+            {
+                while (await reader.ReadAsync())
+                {
+                    var reviewId = reader.GetInt32(0);
+                    var score = reader.GetDouble(2);
+                    var review = new Review(reviewId, sellerId, score);
+                    reviews.Add(review);
+                }
+            }
+
+            var trustScore = reviews.Average(r => r.Score);
+
+            command = _connection.getConnection().CreateCommand();
+            command.CommandText = "UPDATE Sellers Set TrustScore=@TrustScore WHERE UserId=@UserId";
+            command.Parameters.Add(new SqlParameter("@TrustScore", trustScore));
+            command.Parameters.Add(new SqlParameter("@UserId", sellerId));
+            await command.ExecuteNonQueryAsync();
+
+            _connection.CloseConnection();
+            return trustScore;
+        }
 
         public async Task<List<string>> GetNotifications(int sellerId, int currentFollowerCount)
         {
