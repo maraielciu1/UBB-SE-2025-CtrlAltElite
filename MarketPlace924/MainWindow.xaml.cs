@@ -92,7 +92,7 @@ namespace MarketPlace924
             Stage.Navigate(typeof(MyMarketView), new MyMarketViewModel(_buyerService, _user!));
         }
 
-private void NavigateToSellerProfile()
+        private void NavigateToSellerProfile()
         {
             Stage.Navigate(typeof(SellerProfileView), new SellerProfileViewModel(_user, _userService, _sellerService));
         }

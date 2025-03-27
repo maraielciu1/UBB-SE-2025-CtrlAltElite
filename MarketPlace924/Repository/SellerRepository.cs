@@ -6,6 +6,7 @@ using MarketPlace924.Domain;
 using System.Collections.Generic;
 using Microsoft.UI.Xaml.Controls;
 using System.Linq;
+using Microsoft.IdentityModel.Tokens;
 
 
 namespace MarketPlace924.Repository
@@ -145,7 +146,12 @@ namespace MarketPlace924.Repository
                 }
             }
 
-            var trustScore = reviews.Average(r => r.Score);
+            double trustScore = 0;
+            if (reviews.Count != 0)
+            {
+                trustScore = reviews.Average(r => r.Score);
+            }
+
 
             command = _connection.getConnection().CreateCommand();
             command.CommandText = "UPDATE Sellers Set TrustScore=@TrustScore WHERE UserId=@UserId";
