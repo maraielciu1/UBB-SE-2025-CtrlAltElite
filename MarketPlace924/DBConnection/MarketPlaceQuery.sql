@@ -1,5 +1,8 @@
-﻿
+﻿USE MarketPlaceDB
+GO
+
 -- Drop tables in reverse order of dependencies
+DROP TABLE IF EXISTS Reviews;
 DROP TABLE IF EXISTS Notifications;
 DROP TABLE IF EXISTS Following;
 DROP TABLE IF EXISTS BuyerWishlistItems;
@@ -110,53 +113,53 @@ CREATE TABLE Following (
     FOREIGN KEY (FollowedID) REFERENCES Sellers(UserId)
 );
 
+CREATE INDEX idx_users_email ON Users (Email);
 
--- Inserare mai mulți Utilizatori
+
+-- Inserare mai mulți Utilizatori (Atât Cumpărători, cât și Vânzători)
 INSERT INTO Users (Username, Email, PhoneNumber, Password, Role, FailedLogins, BannedUntil, IsBanned)
-VALUES
-       -- Buyers
-       ('ion_popescu', 'ion.popescu@example.com', '+40722123451', 'plain:parola123', 2, 0, NULL, 0),
-       ('maria_ionescu', 'maria.ionescu@example.com', '+40722123452', 'plain:florilemeledragi', 2, 0, NULL, 0),
-       ('vasile_mihai', 'vasile.mihai@example.com', '+40722123453', 'plain:sarmale123', 2, 1, '2025-06-01', 1),
-       ('elena_georgescu', 'elena.georgescu@example.com', '+40722123454', 'plain:pisicamea123', 2, 0, NULL, 0),
-       ('daniel_mocanu', 'daniel.mocanu@example.com', '+40722123455', 'plain:contabil2024', 2, 0, NULL, 0),
-       ('cristina_matei', 'cristina.matei@example.com', '+40722123456', 'plain:proiecteIT', 2, 0, null, 0),
-       ('lipsa', 'lipsa@example.com', '+40722123457', 'plain:lipsa', 2, 0, null, 0),
-       -- Sellers
-       ('andrei_vasile', 'andrei.vasile@example.com', '0711-222-333', 'plain:techshop', 3, 0, NULL, 0),
-       ('florentina_petre', 'florentina.petre@example.com', '0723-456-789', 'plain:florarie', 3, 0, NULL, 0),
-       ('mihai_dumitru', 'mihai.dumitru@example.com', '0734-567-890', 'plain:gadgets', 3, 0, NULL, 0),
-       ('ana_marinescu', 'ana.marinescu@example.com', '0745-678-901', 'plain:fashionista', 3, 0, NULL, 0),
-       ('bogdan_radu', 'bogdan.radu@example.com', '0756-789-012', 'plain:softdev', 3, 0, NULL, 0),
-       ('camelia_stan', 'camelia.stan@example.com', '0767-890-123', 'plain:homedeco', 3, 0, NULL, 0),
+VALUES 
+    -- Buyers
+    ('ion_popescu', 'ion.popescu@example.com', '+40722123456', 'Ctcwb4sLby/TWhvYGiwtX0g0ZmnyhzE6ZitdwvBasfs=', 2, 0, NULL, 0), -- Parola123!
+    ('maria_ionescu', 'maria.ionescu@example.com', '+40744987654', 'lKI5kNt7dmvv5ce2y2SOlxNwKwmfnWvPxt3vsuI0Tc8=', 2, 0, NULL, 0), --Flori123!
+    ('vasile_mihai', 'vasile.mihai@example.com', '+40766654321', 'C/OvJ2LdQTiJKVRqXG6mHaAYpgrMkxJHq7X4QE/oJL8=', 2, 1, '2025-06-01', 1), --Sarmale123!
+    ('elena_georgescu', 'elena.georgescu@example.com', '+40733222333', 'fyfsnf1pkujB1uCjIjWI3G5UrqtuQJNwDgEyQafC5zE=', 2, 0, NULL, 0), --Pisica123!
+    ('daniel_mocanu', 'daniel.mocanu@example.com', '+40755444555', 'pC4o/0wFC4CYGV/xDmJ2SVnYm0ghfMr2WTnMKK9eW1M=', 2, 0, NULL, 0), --Conta123!
+    ('cristina_matei', 'cristina.matei@example.com', '+40788666777', 'Tty5SkN1j7eweWRQpp9l42MHOm6pwUUoT5oWq/KY64M=', 2, 0, NULL, 0), --Proiect123!
 
-       -- Admins
-       ('admin romania', 'admin@example.ro', '+40123456789', 'plain:admin', 1, 0, NULL, 0),
-       ('admin america', 'admin@example.com', '+40987654321', 'plain:admine', 1, 0, NULL, 0);
+    -- Sellers
+    ('andrei_vasile', 'andrei.vasile@example.com', '+40711222333', 'CQNo0x06klJSW9cFSwQtHU2bFcPo8tOCTBNUtb4eomk=', 3, 0, NULL, 0), --Tech123!
+    ('florentina_petre', 'florentina.petre@example.com', '+40723456789', 'lKI5kNt7dmvv5ce2y2SOlxNwKwmfnWvPxt3vsuI0Tc8=', 3, 0, NULL, 0), --Flori123!
+    ('mihai_dumitru', 'mihai.dumitru@example.com', '+40734567890', '5lWQKR5CXo6H8TGc2LK9G+zT6ytV255Tk2LLjqcPOIk=', 3, 0, NULL, 0), --Gadgets123!
+    ('ana_marinescu', 'ana.marinescu@example.com', '+40745678901', 'LqGI41pLxLBJ0iAaFDsqp3IkIVAZ7fySZNonV3Py1Oc=', 3, 0, NULL, 0), --Fashion123!
+    ('bogdan_radu', 'bogdan.radu@example.com', '+40756789012', 'NDfzi9sxFOG82y2Vfxw5CyI4+8gADb1zi5nkbI8Kq/E=', 3, 0, NULL, 0), --Soft123!
+    ('camelia_stan', 'camelia.stan@example.com', '+40767890123', '5g7+q9D7pRlGEN2qEeb3C8ZVWk44pqX5eO7pJgNcBGY=', 3, 0, NULL, 0), --Home123!
+
+	-- Admins
+	('admin romania', 'admin@example.ro', '+40123456789', 'UriPdLj2JbgULItEJ8HrHxBJ41j0WTrnUfTrbFBT/Uk=', 1, 0, NULL, 0), --Admin1!a
+	('admin america', 'admin@example.com', '+40987654321', 'FDYYrYTEKQ1DBu88XcBJ+wdUEqXPPSLoG8REcoHwyQg=', 1, 0, NULL, 0); -- AdminUS123!
 
 
 
 -- Inserare mai multe Adrese pentru Cumpărători
 INSERT INTO BuyerAddress (StreetLine, City, Country, PostalCode)
-VALUES ('N/A', 'N/A', 'N/A', 'N/A'),
-       ('Strada Mihai Eminescu 24', 'București', 'România', '010001'),
-       ('Strada Avram Iancu 35', 'Cluj-Napoca', 'România', '400012'),
-       ('Strada Avram Iancu 35', 'Cluj-Napoca', 'România', '400012'),
-       ('Strada Avram Iancu 35', 'Cluj-Napoca', 'România', '400012'),
-       ('Bulevardul Unirii 15', 'Timișoara', 'România', '300123'),
-       ('Strada Mărășești 48', 'Iași', 'România', '700456'),
-       ('Strada Horea 22', 'Brașov', 'România', '500007');
+VALUES 
+    ('N/A', 'N/A', 'N/A', 'N/A'),
+    ('Strada Mihai Eminescu 24', 'București', 'România', '010001'),
+    ('Strada Avram Iancu 35', 'Cluj-Napoca', 'România', '400012'),
+    ('Bulevardul Unirii 15', 'Timișoara', 'România', '300123'),
+    ('Strada Mărășești 48', 'Iași', 'România', '700456'),
+    ('Strada Horea 22', 'Brașov', 'România', '500007');
 
 -- Inserare Cumpărători în Buyers
-INSERT INTO Buyers (UserId, FirstName, LastName, BillingAddressId, ShippingAddressId, UseSameAddress, Badge,
-                    TotalSpending, NumberOfPurchases, Discount)
+INSERT INTO Buyers (UserId, FirstName, LastName, BillingAddressId, ShippingAddressId, UseSameAddress, Badge, TotalSpending, NumberOfPurchases, Discount)
 VALUES 
-       (1, 'Ion', 'Popescu', 1, 2, 1, 'Bronze', 1700.00, 40, 6.00),
-       (2, 'Maria', 'Ionescu', 4, 4, 1, 'Gold', 2800.00, 60, 9.00),
-       (3, 'Vasile', 'Mihai', 3, 5, 1, 'Silver', 900.00, 22, 3.00),
-       (4, 'Elena', 'Georgescu', 7, 7, 1, 'Silver', 7000.00, 120, 18.00),
-       (5, 'Daniel', 'Mocanu', 6, 6, 1, 'Bronze', 2500.00, 50, 7.00),
-       (6, 'Cris', 'Matei', 0, 0, 1, 'Bronze', 50.00, 1, 0.00);
+    (1, 'Ion', 'Popescu', 1, 2, 1, 'Bronze', 1700.00, 40, 6.00),
+    (2, 'Maria', 'Ionescu', 2, 2, 1, 'Gold', 2800.00, 60, 9.00),
+    (3, 'Vasile', 'Mihai', 3, 2, 1, 'Silver', 900.00, 22, 3.00),
+    (4, 'Elena', 'Georgescu', 2, 3, 1, 'Silver', 7000.00, 120, 18.00),
+    (5, 'Daniel', 'Mocanu', 1, 1, 1, 'Bronze', 2500.00, 50, 7.00),
+    (6, 'Cris', 'Matei', 0, 0, 1, 'Bronze', 50.00, 1, 0.00);
 
 -- Inserare mai multe Conexiuni între Cumpărători
 INSERT INTO BuyerLinkage (RequestingBuyerId, ReceivingBuyerId, IsApproved)
@@ -197,7 +200,7 @@ VALUES (1, 6),
 
 -- Inserare Vânzători în Sellers
 INSERT INTO Sellers (UserId, Username, StoreName, StoreDescription, StoreAddress, FollowersCount, TrustScore)
-VALUES
+VALUES 
     (7, 'andrei_vasile', 'Tech Shop', 'Gadget-uri de ultimă generație.', 'Strada IT 45, București', 300, 4.9),
     (8, 'florentina_petre', 'Florăria Petre', 'Flori proaspete zilnic.', 'Strada Rozelor 22, Cluj-Napoca', 120, 4.7),
     (9, 'mihai_dumitru', 'Gadget Market', 'Telefoane și accesorii moderne.', 'Bulevardul Tehnologiei 10, Timișoara', 180, 4.6),
@@ -207,7 +210,7 @@ VALUES
 
 -- Inserare Produse
 INSERT INTO Products (SellerID, ProductName, ProductDescription, ProductPrice, ProductStock)
-VALUES
+VALUES 
     (7, 'Laptop ASUS', 'Laptop performant pentru birou.', 3500.00, 10),
     (7, 'Mouse Wireless', 'Mouse ergonomic pentru utilizare zilnică.', 150.00, 30),
     (8, 'Buchet de trandafiri', 'Buchet elegant cu 15 trandafiri roșii.', 120.00, 20),
@@ -233,12 +236,14 @@ VALUES
     (5, 12), -- Daniel Mocanu -> Home Deco
     (6, 8);  -- Cristina Matei -> Florăria Petre
 
-INSERT INTO Notifications (SellerID, NotificationMessage, NotificationFollowerCount)
-VALUES
-    (7, 'You gained 17 followers!', 292),
-    (7, 'You have reached 300 followers!', 300),
+-- ultima notificare sa aiba nr de followers ca userul
 
-    (8, 'You gained 3 followers!', 105),
+INSERT INTO Notifications (SellerID, NotificationMessage, NotificationFollowerCount)
+VALUES 
+	(7, 'You gained 17 followers!', 292),
+	(7, 'You have reached 300 followers!', 300),
+
+	(8, 'You gained 3 followers!', 105),
     (8, 'You gained 10 followers!', 115),
     (8, 'You gained 4 followers!', 119),
     (8, 'You have reached 120 followers!', 120),
@@ -246,11 +251,30 @@ VALUES
     (9, 'You gained 5 followers! Total followers: 185', 185),
     (9, 'You have reached 180 followers!', 180),
 
-    (10, 'You gained 30 followers!', 240),
+	(10, 'You gained 30 followers!', 240),
     (10, 'You have reached 250 followers!', 250),
 
-    (11, 'You gained 23 followers!', 145),
+	(11, 'You gained 23 followers!', 145),
     (11, 'You have reached 150 followers!', 150),
 
     (12, 'You gained 8 followers!', 94),
     (12, 'You have reached 100 followers!', 100);
+
+
+CREATE TABLE Reviews 
+(
+	ReviewId	INT IDENTITY (1,1) PRIMARY KEY, 
+	SellerId	INT NOT NULL, 
+	Score		FLOAT ,
+	Foreign key (SellerId) REFERENCES Sellers(UserId)
+)
+
+-- Mock data for Reviews table
+INSERT INTO Reviews (SellerId, Score) VALUES 
+(7, 4.9), (7, 5.0), (7, 4.8), (7, 4.7), (7, 4.9), (7, 5.0), -- Avg ~4.9
+(8, 4.8), (8, 4.7), (8, 4.6), (8, 4.7), (8, 4.8), (8, 4.9), -- Avg ~4.7
+(9, 4.5), (9, 4.6), (9, 4.7), (9, 4.5), (9, 4.7), (9, 4.6), -- Avg ~4.6
+(10, 4.9), (10, 4.8), (10, 4.7), (10, 4.8), (10, 4.9), (10, 4.9), -- Avg ~4.8
+(11, 4.4), (11, 4.5), (11, 4.6), (11, 4.5), (11, 4.4), (11, 4.5), -- Avg ~4.5
+(12, 4.3), (12, 4.4), (12, 4.5), (12, 4.2), (12, 4.3), (12, 4.4); -- Avg ~4.4
+
