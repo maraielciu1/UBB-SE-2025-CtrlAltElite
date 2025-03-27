@@ -8,6 +8,8 @@ using MarketPlace924.ViewModel;
 using MarketPlace924.View.Admin;
 using MarketPlace924.ViewModel.Admin;
 using Microsoft.UI.Xaml.Controls;
+using System.Windows.Input;
+using System.ComponentModel;
 // To learn more about WinUI, the WinUI project structure,
 // and more about our project templates, see: http://aka.ms/winui-project-info.
 
@@ -59,25 +61,22 @@ namespace MarketPlace924
                 myMarketButton.IsEnabled = user.Role == UserRole.Buyer;
             }
 
+
             switch (user.Role)
-			{
-				case UserRole.Buyer:
-					NavigateToBuyerProfile();
-					break;
-				case UserRole.Admin:
-					NavigateToAdminProfile();
-					break;
+            {
+                case UserRole.Buyer:
+                    NavigateToBuyerProfile();
+                    break;
                 case UserRole.Seller:
                     NavigateToSellerProfile();
                     break;
+                case UserRole.Admin:
+                    NavigateToAdminProfile();
+                    break;
+            }
 
-			}
         }
 
-        private void NavigateToSellerProfile()
-        {
-            Stage.Navigate(typeof(SellerProfileView), new SellerProfileViewModel(_user, _userService, _sellerService));
-        }
 
         private void NavigateToLogin()
         {
@@ -93,14 +92,38 @@ namespace MarketPlace924
         {
             Stage.Navigate(typeof(MyMarketView), new MyMarketViewModel(_buyerService, _user));
         }
+
+        private void NavigateToSellerProfile()
+        {
+            Stage.Navigate(typeof(SellerProfileView), new SellerProfileViewModel(_user, _userService, _sellerService));
+        }
+
         private void NavigateToBuyerProfile()
         {
             Stage.Navigate(typeof(BuyerProfileView), new BuyerProfileViewModel(_buyerService, _user, new BuyerWishlistItemDetailsProvider()));
         }
 
 		private void NavigateToAdminProfile()
-		{
+        {
 			Stage.Navigate(typeof(AdminView), new AdminViewModel(_adminService, _analyticsService, _userService));
 		}
+
+        private void NavigateToProfile(object sender, RoutedEventArgs e)
+        {
+            if (_user == null) return;
+
+            switch (_user.Role)
+            {
+                case UserRole.Buyer:
+                    Stage.Navigate(typeof(BuyerProfileView), new BuyerProfileViewModel(_buyerService, _user, new BuyerWishlistItemDetailsProvider()));
+                    break;
+                case UserRole.Seller:
+                    Stage.Navigate(typeof(SellerProfileView), new SellerProfileViewModel(_user, _userService, _sellerService));
+                    break;
+                case UserRole.Admin:
+                    Stage.Navigate(typeof(AdminView), new AdminViewModel(_adminService, _analyticsService, _userService));
+                    break;
+            }
+        }
     }
 }
