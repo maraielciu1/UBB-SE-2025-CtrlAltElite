@@ -1,21 +1,16 @@
-﻿using MarketPlace924.DBConnection;
-using MarketPlace924.Domain;
-using Microsoft.Data.SqlClient;
-using Microsoft.UI.Xaml.Controls.Primitives;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
-using Windows.System;
-using Windows.UI.Notifications;
-using Windows.UI.Popups;
+using MarketPlace924.DBConnection;
+using MarketPlace924.Domain;
+using Microsoft.Data.SqlClient;
 
 namespace MarketPlace924.Repository
 {
     public class BuyerRepository
     {
-        private DBConnection.DatabaseConnection _connection;
+        private DatabaseConnection _connection;
 
         public BuyerRepository(DatabaseConnection connection)
         {
@@ -24,9 +19,9 @@ namespace MarketPlace924.Repository
 
 
         // Loads the buyer's info from the database.
-        public void LoadBuyerInfo(Buyer buyer)
+        public async Task LoadBuyerInfo(Buyer buyer)
         {
-            _connection.OpenConnectionSync();
+            await _connection.OpenConnection();
             var conn = _connection.getConnection();
             var cmd = conn.CreateCommand();
             cmd.CommandText = @"select 
@@ -35,10 +30,10 @@ namespace MarketPlace924.Repository
                     ShippingAddressId, BillingAddressId, UseSameAddress
                 from Buyers where UserID = @userID";
             cmd.Parameters.AddWithValue("@userID", buyer.Id);
-            var reader = cmd.ExecuteReader();
-            if (!reader.Read())
+            var reader = await cmd.ExecuteReaderAsync();
+            if (!await reader.ReadAsync())
             {
-                reader.Close();
+                await reader.CloseAsync();
                 return;
             }
 
@@ -54,13 +49,13 @@ namespace MarketPlace924.Repository
             buyer.Discount = reader.GetDecimal(reader.GetOrdinal("Discount"));
             buyer.UseSameAddress = useSameAddress;
 
-            reader.Close();
+            await reader.CloseAsync();
 
-            var billingAddress = LoadAddress(billingAddressId, conn)!;
+            var billingAddress = (await LoadAddress(billingAddressId, conn))!;
             buyer.BillingAddress = billingAddress;
             buyer.ShippingAddress = useSameAddress
                 ? billingAddress
-                : LoadAddress(shippingAddressId, conn)!;
+                : (await LoadAddress(shippingAddressId, conn))!;
 
 
             // FollowingUsersIds For My Market
@@ -70,28 +65,30 @@ namespace MarketPlace924.Repository
             command.Parameters.AddWithValue("@FollowerID", buyer.Id);
 
             List<int> sellersIDs = new List<int>();
-            using (reader =  command.ExecuteReader())
+            using (reader = command.ExecuteReader())
             {
                 while (reader.Read())
                 {
                     sellersIDs.Add(Convert.ToInt32(reader["FollowedID"]));
                 }
             }
+
             buyer.FollowingUsersIds = sellersIDs;
 
             _connection.CloseConnection();
         }
 
-        private Address? LoadAddress(int addressId, SqlConnection conn)
+        private async Task<Address?> LoadAddress(int addressId, SqlConnection conn)
         {
             var cmd = conn.CreateCommand();
             cmd.CommandText = @"select StreetLine, City, Country, PostalCode
                             from BuyerAddress where Id = @addressId";
             cmd.Parameters.AddWithValue("@addressId", addressId);
 
-            var reader = cmd.ExecuteReader();
-            if (!reader.Read())
+            var reader = await cmd.ExecuteReaderAsync();
+            if (!await reader.ReadAsync())
             {
+                await reader.CloseAsync();
                 return null;
             }
 
@@ -103,7 +100,7 @@ namespace MarketPlace924.Repository
                 Country = reader.GetString(reader.GetOrdinal("Country")),
                 PostalCode = reader.GetString(reader.GetOrdinal("PostalCode")),
             };
-            reader.Close();
+            await reader.CloseAsync();
             return address;
         }
 
@@ -113,15 +110,15 @@ namespace MarketPlace924.Repository
         }
 
 
-        public void SaveInfo(Buyer buyer)
+        public async Task SaveInfo(Buyer buyer)
         {
-            _connection.OpenConnectionSync();
+            await _connection.OpenConnection();
             var conn = _connection.getConnection();
             var command = conn.CreateCommand();
-            PersistAddress(buyer.BillingAddress, conn);
+            await PersistAddress(buyer.BillingAddress, conn);
             if (!buyer.UseSameAddress)
             {
-                PersistAddress(buyer.ShippingAddress, conn);
+                await PersistAddress(buyer.ShippingAddress, conn);
             }
 
             command.CommandText = @"UPDATE Buyers 
@@ -140,50 +137,50 @@ namespace MarketPlace924.Repository
             command.Parameters.AddWithValue("@UseSameAddress", buyer.UseSameAddress);
             command.Parameters.AddWithValue("@ShippingAddressId", buyer.ShippingAddress.Id);
             command.Parameters.Add(new SqlParameter("@UserID", buyer.User.UserId));
-            command.ExecuteNonQuery();
+            await command.ExecuteNonQueryAsync();
         }
 
-        public BuyerWishlist GetWishlist(int userId)
+        public async Task<BuyerWishlist> GetWishlist(int userId)
         {
-            _connection.OpenConnectionSync();
+            await _connection.OpenConnection();
             var conn = _connection.getConnection();
             var command = conn.CreateCommand();
             command.CommandText = @"SELECT ProductId from BuyerWishlistItems WHERE BuyerId = @userId";
             command.Parameters.AddWithValue("@userId", userId);
-            var reader = command.ExecuteReader();
+            var reader = await command.ExecuteReaderAsync();
             var wishlist = new BuyerWishlist();
-            while (reader.Read())
+            while (await reader.ReadAsync())
             {
                 wishlist.Items.Add(new BuyerWishlistItem(reader.GetInt32(reader.GetOrdinal("ProductId"))));
             }
 
-            reader.Close();
+            await reader.CloseAsync();
             return wishlist;
         }
 
-        public List<BuyerLinkage> GetBuyerLinkages(int userId)
+        public async Task<List<BuyerLinkage>> GetBuyerLinkages(int userId)
         {
-            _connection.OpenConnectionSync();
+            await _connection.OpenConnection();
             var conn = _connection.getConnection();
             var command = conn.CreateCommand();
             command.CommandText = @"SELECT RequestingBuyerId, ReceivingBuyerId, IsApproved
                                 FROM BuyerLinkage 
                                 WHERE RequestingBuyerId = @userId OR  ReceivingBuyerId =@userId";
             command.Parameters.AddWithValue("@userId", userId);
-            var reader = command.ExecuteReader();
+            var reader = await command.ExecuteReaderAsync();
             var buyerLinkages = new List<BuyerLinkage>();
-            while (reader.Read())
+            while (await reader.ReadAsync())
             {
                 buyerLinkages.Add(ReadBuyerLinkage(reader, userId));
             }
 
-            reader.Close();
+            await reader.CloseAsync();
             return buyerLinkages;
         }
 
-        public void CreateLinkageRequest(int requestingBuyerId, int receivingBuyerId)
+        public async Task CreateLinkageRequest(int requestingBuyerId, int receivingBuyerId)
         {
-            _connection.OpenConnectionSync();
+            await _connection.OpenConnection();
             var command = _connection.getConnection().CreateCommand();
             command.CommandText = @"INSERT INTO BuyerLinkage(RequestingBuyerId, ReceivingBuyerId, IsApproved)
                                 VALUES (@RequestingBuyerId, @ReceivingBuyerId, @IsApproved);";
@@ -191,11 +188,12 @@ namespace MarketPlace924.Repository
             command.Parameters.AddWithValue("@ReceivingBuyerId", receivingBuyerId);
             command.Parameters.AddWithValue("@IsApproved", false);
 
-            command.ExecuteNonQuery();
+            await command.ExecuteNonQueryAsync();
         }
-        public void UpdateLinkageRequest(int requestingBuyerId, int receivingBuyerId)
+
+        public async Task UpdateLinkageRequest(int requestingBuyerId, int receivingBuyerId)
         {
-            _connection.OpenConnectionSync();
+            await _connection.OpenConnection();
             var command = _connection.getConnection().CreateCommand();
             command.CommandText = @"UPDATE BuyerLinkage 
                                 SET IsApproved=@IsApproved
@@ -205,12 +203,12 @@ namespace MarketPlace924.Repository
             command.Parameters.AddWithValue("@ReceivingBuyerId", receivingBuyerId);
             command.Parameters.AddWithValue("@IsApproved", true);
 
-            command.ExecuteNonQuery();
+            await command.ExecuteNonQueryAsync();
         }
 
-        public bool DeleteLinkageRequest(int requestingBuyerId, int receivingBuyerId)
+        public async Task<bool> DeleteLinkageRequest(int requestingBuyerId, int receivingBuyerId)
         {
-            _connection.OpenConnectionSync();
+            await _connection.OpenConnection();
             var command = _connection.getConnection().CreateCommand();
             command.CommandText = @"DELETE FROM BuyerLinkage 
                                 WHERE RequestingBuyerId=@RequestingBuyerId
@@ -218,7 +216,7 @@ namespace MarketPlace924.Repository
             command.Parameters.AddWithValue("@RequestingBuyerId", requestingBuyerId);
             command.Parameters.AddWithValue("@ReceivingBuyerId", receivingBuyerId);
 
-            return command.ExecuteNonQuery() > 0;
+            return await command.ExecuteNonQueryAsync() > 0;
         }
 
         private BuyerLinkage ReadBuyerLinkage(SqlDataReader reader, int userId)
@@ -249,7 +247,7 @@ namespace MarketPlace924.Repository
             {
                 Buyer = new Buyer
                 {
-                    User = new Domain.User
+                    User = new User
                     {
                         UserId = linkedBuyerId
                     }
@@ -260,19 +258,19 @@ namespace MarketPlace924.Repository
         }
 
 
-        private void PersistAddress(Address address, SqlConnection conn)
+        private async Task PersistAddress(Address address, SqlConnection conn)
         {
             if (address.Id == 0)
             {
-                InsertAddress(address, conn);
+                await InsertAddress(address, conn);
             }
             else
             {
-                UpdateAddress(address, conn);
+                await UpdateAddress(address, conn);
             }
         }
 
-        private void UpdateAddress(Address address, SqlConnection conn)
+        private async Task UpdateAddress(Address address, SqlConnection conn)
         {
             var cmd = conn.CreateCommand();
             cmd.CommandText = @"UPDATE BuyerAddress
@@ -288,10 +286,10 @@ namespace MarketPlace924.Repository
             cmd.Parameters.AddWithValue("@Country", address.Country);
             cmd.Parameters.AddWithValue("@PostalCode", address.PostalCode);
             cmd.Parameters.AddWithValue("@ID", address.Id);
-            cmd.ExecuteNonQuery();
+            await cmd.ExecuteNonQueryAsync();
         }
 
-        private void InsertAddress(Address address, SqlConnection conn)
+        private async Task InsertAddress(Address address, SqlConnection conn)
         {
             var cmd = conn.CreateCommand();
             cmd.CommandText = @"INSERT INTO BuyerAddress(StreetLine,City,Country,PostalCode)
@@ -300,12 +298,12 @@ namespace MarketPlace924.Repository
             cmd.Parameters.AddWithValue("@City", address.City);
             cmd.Parameters.AddWithValue("@Country", address.Country);
             cmd.Parameters.AddWithValue("@PostalCode", address.PostalCode);
-            address.Id = Convert.ToInt32(cmd.ExecuteScalar());
+            address.Id = Convert.ToInt32(await cmd.ExecuteScalarAsync());
         }
 
-        public List<Buyer> FindBuyersWithShippingAddress(Address shippingAddress)
+        public async Task<List<Buyer>> FindBuyersWithShippingAddress(Address shippingAddress)
         {
-            _connection.OpenConnectionSync();
+            await _connection.OpenConnection();
             var command = _connection.getConnection().CreateCommand();
             command.CommandText = @"
                 SELECT b.UserId FROM Buyers b
@@ -319,35 +317,36 @@ namespace MarketPlace924.Repository
             command.Parameters.AddWithValue("@City", shippingAddress.City);
             command.Parameters.AddWithValue("@Country", shippingAddress.Country);
             command.Parameters.AddWithValue("@PostalCode", shippingAddress.PostalCode);
-            var reader = command.ExecuteReader();
+            var reader = await command.ExecuteReaderAsync();
             var buyerIds = new List<int>();
-            while (reader.Read())
+            while (await reader.ReadAsync())
             {
                 buyerIds.Add(reader.GetInt32(reader.GetOrdinal("UserId")));
             }
 
-            reader.Close();
+            await reader.CloseAsync();
             return buyerIds.Select(buyerId => new Buyer
             {
-                User = new Domain.User
+                User = new User
                 {
                     UserId = buyerId
                 }
             }).ToList();
         }
 
-        public void CreateBuyer(Buyer buyer)
+        public async Task CreateBuyer(Buyer buyer)
         {
-            _connection.OpenConnectionSync();
+            await _connection.OpenConnection();
             var conn = _connection.getConnection();
             var command = conn.CreateCommand();
-            PersistAddress(buyer.BillingAddress, conn);
+            await PersistAddress(buyer.BillingAddress, conn);
             if (!buyer.UseSameAddress)
             {
-                PersistAddress(buyer.ShippingAddress, conn);
+                await PersistAddress(buyer.ShippingAddress, conn);
             }
 
-            command.CommandText = @"INSERT INTO Buyers (UserId, FirstName, LastName, BillingAddressId, ShippingAddressId, UseSameAddress, Badge,
+            command.CommandText =
+                @"INSERT INTO Buyers (UserId, FirstName, LastName, BillingAddressId, ShippingAddressId, UseSameAddress, Badge,
                     TotalSpending, NumberOfPurchases, Discount)
                                 VALUES (@UserID, @FirstName, @LastName,  @BillingAddressId, @ShippingAddressId, @UseSameAddress, @Badge, 0, 0,0) ";
 
@@ -358,16 +357,15 @@ namespace MarketPlace924.Repository
             command.Parameters.AddWithValue("@UseSameAddress", buyer.UseSameAddress);
             command.Parameters.AddWithValue("@ShippingAddressId", buyer.ShippingAddress.Id);
             command.Parameters.AddWithValue("@Badge", BuyerBadge.BRONZE.ToString());
-            command.ExecuteNonQuery();
+            await command.ExecuteNonQueryAsync();
         }
 
 
-        
         // My Market Functionalities
 
 
         // Retrieves the list of followed sellers' IDs for a specific buyer.
-        public async Task<List<int>> GetFollowingUsersIds(int buyerID)
+        public async Task<List<int>> GetFollowingUsersIds(int buyerId)
         {
             List<int> followingUsersIDs = new List<int>();
 
@@ -375,15 +373,15 @@ namespace MarketPlace924.Repository
 
             var command = _connection.getConnection().CreateCommand();
             command.CommandText = "SELECT FollowedID FROM Following WHERE FollowerID = @FollowerID";
-            command.Parameters.AddWithValue("@FollowerID", buyerID);
+            command.Parameters.AddWithValue("@FollowerID", buyerId);
 
-            using(var reader = await command.ExecuteReaderAsync())
+            using (var reader = await command.ExecuteReaderAsync())
             {
                 while (await reader.ReadAsync())
                 {
                     followingUsersIDs.Add(Convert.ToInt32(reader["FollowedID"]));
                 }
-            }            
+            }
 
             _connection.CloseConnection();
 
@@ -392,7 +390,7 @@ namespace MarketPlace924.Repository
 
 
         // Retrieves the list of followed sellers based on a list of followed user IDs.
-        public async Task<List<Seller>> GetFollowedSellers(List<int> followingUsersIds)
+        public async Task<List<Seller>> GetFollowedSellers(List<int>? followingUsersIds)
         {
             if (followingUsersIds == null || followingUsersIds.Count == 0)
             {
@@ -421,7 +419,7 @@ namespace MarketPlace924.Repository
                 {
                     var sellerEmail = reader.GetString(0);
                     var sellerPhoneNumber = reader.GetString(1);
-                    var sellerID = reader.GetInt32(2);
+                    var sellerId = reader.GetInt32(2);
                     var username = reader.GetString(3);
                     var storeName = reader.GetString(4);
                     var storeDescription = reader.GetString(5);
@@ -431,7 +429,7 @@ namespace MarketPlace924.Repository
 
                     Seller seller = new Seller();
 
-                    Domain.User user = new Domain.User(userID: sellerID, username: username, email: sellerEmail, phoneNumber: sellerPhoneNumber);
+                    var user = new User(userID: sellerId, username: username, email: sellerEmail, phoneNumber: sellerPhoneNumber);
                     seller.User = user;
 
                     seller.StoreName = storeName;
@@ -470,7 +468,7 @@ namespace MarketPlace924.Repository
                 {
                     var sellerEmail = reader.GetString(0);
                     var sellerPhoneNumber = reader.GetString(1);
-                    var sellerID = reader.GetInt32(2);
+                    var sellerId = reader.GetInt32(2);
                     var username = reader.GetString(3);
                     var storeName = reader.GetString(4);
                     var storeDescription = reader.GetString(5);
@@ -480,7 +478,7 @@ namespace MarketPlace924.Repository
 
                     Seller seller = new Seller();
                     
-                    Domain.User user = new Domain.User(userID: sellerID, username: username, email: sellerEmail, phoneNumber: sellerPhoneNumber);
+                    var user = new User(userID: sellerId, username: username, email: sellerEmail, phoneNumber: sellerPhoneNumber);
                     seller.User = user;
 
                     seller.StoreName = storeName;
@@ -498,26 +496,26 @@ namespace MarketPlace924.Repository
         }
 
         // Retrieves the list of products from a specific seller.
-        public async Task<List<Product>> GetProductsFromSeller(int sellerID)
+        public async Task<List<Product>> GetProductsFromSeller(int sellerId)
         {
             await _connection.OpenConnection();
 
             var command = _connection.getConnection().CreateCommand();
             command.CommandText = "SELECT * FROM Products WHERE SellerID = @SellerID";
-            command.Parameters.AddWithValue("@SellerID", sellerID);
+            command.Parameters.AddWithValue("@SellerID", sellerId);
 
             List<Product> products = new List<Product>();
 
-            using(var reader = await command.ExecuteReaderAsync())
+            using (var reader = await command.ExecuteReaderAsync())
             {
                 while (await reader.ReadAsync())
                 {
-                    var productID = reader.GetInt32(0);
+                    var productId = reader.GetInt32(0);
                     var productName = reader.GetString(2);
                     var productDescription = reader.GetString(3);
                     var productPrice = reader.GetDouble(4);
 
-                    products.Add(new Product(productID, productName, productDescription, productPrice, 0, sellerID));
+                    products.Add(new Product(productId, productName, productDescription, productPrice, 0, sellerId));
                 }
             }
 
@@ -546,7 +544,8 @@ namespace MarketPlace924.Repository
         {
             await _connection.OpenConnection();
             var command = _connection.getConnection().CreateCommand();
-            command.CommandText = "SELECT COUNT(*) FROM Following WHERE FollowerID = @FollowerID AND FollowedID = @FollowedID";
+            command.CommandText =
+                "SELECT COUNT(*) FROM Following WHERE FollowerID = @FollowerID AND FollowedID = @FollowedID";
             command.Parameters.AddWithValue("@FollowerID", buyerId);
             command.Parameters.AddWithValue("@FollowedID", sellerId);
 
@@ -596,18 +595,52 @@ namespace MarketPlace924.Repository
             _connection.CloseConnection();
         }
 
-		public async Task<int> GetTotalCount()
-		{
-			await _connection.OpenConnection();
-			var command = _connection.getConnection().CreateCommand();
+        public async Task<int> GetTotalCount()
+        {
+            await _connection.OpenConnection();
+            var command = _connection.getConnection().CreateCommand();
 
-			command.CommandText = "SELECT Count(*) FROM Buyers";
+            command.CommandText = "SELECT Count(*) FROM Buyers";
 
-			var result = (int)command.ExecuteScalar();
+            var result = (int)command.ExecuteScalar();
 
-			_connection.CloseConnection();
-			return result;
-		}
-	}
+            _connection.CloseConnection();
+            return result;
+        }
+
+
+        public async Task UpdateAfterPurchase(Buyer buyer)
+        {
+            await _connection.OpenConnection();
+            var conn = _connection.getConnection();
+            var cmd = conn.CreateCommand();
+            cmd.CommandText = @"UPDATE Buyers
+                            SET 
+                                TotalSpending=@TotalSpending,
+                                NumberOfPurchases=@NumberOfPurchases,
+                                Badge=@Badge,
+                                Discount=@Discount
+                            WHERE
+                                UserId=@UserId;";
+            cmd.Parameters.AddWithValue("@TotalSpending", buyer.TotalSpending);
+            cmd.Parameters.AddWithValue("@NumberOfPurchases", buyer.NumberOfPurchases);
+            cmd.Parameters.AddWithValue("@Badge", buyer.Badge.ToString());
+            cmd.Parameters.AddWithValue("@Discount", buyer.Discount);
+            cmd.Parameters.AddWithValue("@UserId", buyer.Id);
+            await cmd.ExecuteNonQueryAsync();
+        }
+
+        public async Task RemoveWishilistItem(int buyerId, int productId)
+        {
+            await _connection.OpenConnection();
+            var conn = _connection.getConnection();
+            var cmd = conn.CreateCommand();
+            cmd.CommandText = @"DELETE FROM BuyerWishlistItems
+                              WHERE
+                                BuyerId=@BuyerId and ProductId=@ProductId";
+            cmd.Parameters.AddWithValue("@BuyerId", buyerId);
+            cmd.Parameters.AddWithValue("@ProductId", productId);
+            await cmd.ExecuteNonQueryAsync();
+        }
+    }
 }
-

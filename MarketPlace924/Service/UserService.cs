@@ -49,19 +49,19 @@ namespace MarketPlace924.Service
                 throw new Exception("Email is already in use.");
             }
 
-            string hashedPassword = HashPassword(password);
+            var hashedPassword = HashPassword(password);
 
-            UserRole userRole = (UserRole)role;
-            User newUser = new User(0, username, email, phoneNumber, hashedPassword, userRole, 0, null, false);
+            var userRole = (UserRole)role;
+            var newUser = new User(0, username, email, phoneNumber, hashedPassword, userRole, 0, null, false);
 
             await _userRepository.AddUser(newUser);
 
             return true;
         }
 
-        public bool CheckEmailInLogIn(string Email)
+        public bool CheckEmailInLogIn(string email)
         {
-            return UserValidator.ValidateEmail(Email);
+            return UserValidator.ValidateEmail(email);
         }
 
         public static User GetUser(string username)
@@ -80,22 +80,26 @@ namespace MarketPlace924.Service
 					return false;
 				}
 				
+                if (user.Password.StartsWith("plain:"))
+                {
+                    return user.Password == "plain:" + password;
+                }
 				return user.Password == HashPassword(password);
 			}
 
             return false;
         }
 
-        public async Task UpdateUserFailedLogins(User user, int NewValueOfFailedLogIns)
+        public async Task UpdateUserFailedLogins(User user, int newValueOfFailedLogIns)
         {
-            await _userRepository.UpdateUserFailedLoginsCount(user, NewValueOfFailedLogIns);
+            await _userRepository.UpdateUserFailedLoginsCount(user, newValueOfFailedLogIns);
         }
 
         public static string HashPassword(string password)
         {
-            using (System.Security.Cryptography.SHA256 sha256 = SHA256.Create())
+            using (var sha256 = SHA256.Create())
             {
-                byte[] hashedBytes = sha256.ComputeHash(Encoding.UTF8.GetBytes(password));
+                var hashedBytes = sha256.ComputeHash(Encoding.UTF8.GetBytes(password));
                 return Convert.ToBase64String(hashedBytes);
             }
         }
@@ -159,7 +163,7 @@ namespace MarketPlace924.Service
             if (await IsSuspended(email))
             {
                 var user = await GetUserByEmail(email);
-                TimeSpan remainingTime = (user.BannedUntil ?? DateTime.Now) - DateTime.Now;
+                var remainingTime = (user?.BannedUntil ?? DateTime.Now) - DateTime.Now;
                 return $"Too many failed attempts. Try again in {remainingTime.Seconds}s";
             }
 

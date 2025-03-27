@@ -11,4 +11,10 @@ public class BuyerWishlistItemViewModel
     public string ImageSource { get; set; }
 
     public bool OwnItem { get; set; }
+
+    public IOnBuyerWishlistItemRemoveCallback RemoveCallback { get; set; } = null!;
+    public async void Remove()
+    {
+       await RemoveCallback.OnBuyerWishlistItemRemove(ProductId);
+    }
 }

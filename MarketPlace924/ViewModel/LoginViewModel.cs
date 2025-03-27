@@ -4,13 +4,14 @@ using System.Threading.Tasks;
 using System.Windows.Input;
 using MarketPlace924.Service;
 using MarketPlace924.View;
+using MarketPlace924.ViewModel;
 using Microsoft.UI.Xaml;
 
 public class LoginViewModel : INotifyPropertyChanged
 {
 
     public UserService UserService { get; private set; }
-    private readonly OnLoginSuccessCallback _successCallback;
+    private readonly IOnLoginSuccessCallback _successCallback;
     private readonly CaptchaService _captchaService;
     private string _email;
     private string _password;
@@ -93,7 +94,7 @@ public class LoginViewModel : INotifyPropertyChanged
     public ICommand LoginCommand { get; }
     
 
-    public LoginViewModel(UserService userService, OnLoginSuccessCallback successCallback)
+    public LoginViewModel(UserService userService, IOnLoginSuccessCallback successCallback)
     {
         UserService = userService ?? throw new ArgumentNullException(nameof(userService));
         _successCallback = successCallback ?? throw new ArgumentNullException(nameof(successCallback));
@@ -176,7 +177,7 @@ public class LoginViewModel : INotifyPropertyChanged
             _failedAttempts = 0;
             await UserService.UpdateUserFailedLogins(user, 0);
             IsLoginEnabled = true;
-            _successCallback.OnLoginSuccess(user);
+            await _successCallback.OnLoginSuccess(user);
         }
         OnPropertyChanged(nameof(FailedAttemptsText));
     }

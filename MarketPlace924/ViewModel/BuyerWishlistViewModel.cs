@@ -2,35 +2,37 @@
 using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Linq;
+using System.Threading.Tasks;
 using MarketPlace924.Domain;
+using MarketPlace924.Service;
 
 namespace MarketPlace924.ViewModel;
 
-public class BuyerWishlistViewModel : INotifyPropertyChanged
+public class BuyerWishlistViewModel : INotifyPropertyChanged, IOnBuyerWishlistItemRemoveCallback
 {
     private List<BuyerWishlistItemViewModel>? _allItems;
-    private string _searchText = "";
+    private string _searchText = string.Empty;
     private ObservableCollection<BuyerWishlistItemViewModel>? _items;
-    private Buyer _buyer;
-    private BuyerWishlistItemDetailsProvider _itemDetailsProvider;
+    public Buyer Buyer { get; set; } = null!;
+    public BuyerWishlistItemDetailsProvider ItemDetailsProvider { get; set; } = null!;
     private bool _familySyncActive;
-    private string _selectedSort;
+    private string? _selectedSort;
+    public BuyerService BuyerService { get; set; } = null!;
 
 
-    public BuyerWishlistViewModel(BuyerWishlistViewModel copySource)
+    public BuyerWishlistViewModel Copy()
     {
-        _buyer = copySource._buyer;
-        _itemDetailsProvider = copySource._itemDetailsProvider;
-        _searchText = copySource._searchText;
-        _familySyncActive = copySource._familySyncActive;
-        _selectedSort = copySource._selectedSort;
+        return new BuyerWishlistViewModel
+        {
+            Buyer = Buyer,
+            ItemDetailsProvider = ItemDetailsProvider,
+            BuyerService = BuyerService,
+            _searchText = _searchText,
+            _familySyncActive = _familySyncActive,
+            _selectedSort = _selectedSort
+        };
     }
 
-    public BuyerWishlistViewModel(Buyer buyer, BuyerWishlistItemDetailsProvider itemDetailsProvider)
-    {
-        _buyer = buyer;
-        _itemDetailsProvider = itemDetailsProvider;
-    }
 
     public ObservableCollection<BuyerWishlistItemViewModel> Items
     {
@@ -63,7 +65,7 @@ public class BuyerWishlistViewModel : INotifyPropertyChanged
     };
 
 
-    public string SelectedSort
+    public string? SelectedSort
     {
         get => _selectedSort;
         set
@@ -91,10 +93,17 @@ public class BuyerWishlistViewModel : INotifyPropertyChanged
         PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
     }
 
+    public async Task OnBuyerWishlistItemRemove(int productId)
+    {
+        await BuyerService.RemoveWishilistItem(Buyer, productId);
+        _items = null;
+        OnPropertyChanged(nameof(Items));
+    }
+
     private List<BuyerWishlistItemViewModel> ComputeAllItems()
     {
-        var ownItems = _buyer.Wishlist.Items.Select(x => GetWishlistItemDetails(x, true));
-        var linkedItems = _buyer.Linkages.Where(link => link.Status == BuyerLinkageStatus.Confirmed)
+        var ownItems = Buyer.Wishlist.Items.Select(x => GetWishlistItemDetails(x, true));
+        var linkedItems = Buyer.Linkages.Where(link => link.Status == BuyerLinkageStatus.Confirmed)
             .Select(link => link.Buyer.Wishlist.Items).SelectMany(list => list)
             .Select(wishlistItem => GetWishlistItemDetails(wishlistItem));
         return ownItems.Concat(linkedItems).GroupBy(x => x.ProductId)
@@ -104,9 +113,12 @@ public class BuyerWishlistViewModel : INotifyPropertyChanged
 
     private BuyerWishlistItemViewModel GetWishlistItemDetails(BuyerWishlistItem wishlistItem, bool canDelete = false)
     {
-        var item = _itemDetailsProvider.GetWishlistItemDetails(wishlistItem.ProductId);
-        item.OwnItem = canDelete;
-        item.ProductId = wishlistItem.ProductId;
+        var item = ItemDetailsProvider.LoadWishlistItemDetails(new BuyerWishlistItemViewModel
+        {
+            ProductId = wishlistItem.ProductId,
+            OwnItem = canDelete,
+            RemoveCallback = this
+        });
         return item;
     }
 

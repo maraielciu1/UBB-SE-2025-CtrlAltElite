@@ -1,46 +1,52 @@
-﻿using System.ComponentModel;
+﻿using System;
+using System.ComponentModel;
+using System.Threading.Tasks;
 using MarketPlace924.Domain;
 using MarketPlace924.Service;
+using Microsoft.UI.Xaml.Controls;
 
 namespace MarketPlace924.ViewModel;
 
-public class BuyerProfileViewModel : INotifyPropertyChanged, OnBuyerLinkageUpdatedCallback
+public class BuyerProfileViewModel : INotifyPropertyChanged, IOnBuyerLinkageUpdatedCallback
 {
-    private BuyerService _buyerService;
-    private BuyerWishlistItemDetailsProvider _wishlistItemDetailsProvider;
-    private User _user;
-    private Buyer _buyer;
+    public BuyerService BuyerService { get; set; } = null!;
+    public BuyerWishlistItemDetailsProvider WishlistItemDetailsProvider { get; set; } = null!;
+    public User User { get; set; } = null!;
 
-    public Buyer Buyer => _buyer;
+    public Buyer? Buyer { get; private set; }
 
-    private BuyerWishlistViewModel? _wishlist;
+    public BuyerWishlistViewModel? Wishlist { get; set; }
 
-    private BuyerFamilySyncViewModel? _familySync;
+    public BuyerFamilySyncViewModel? FamilySync { get; set; }
 
-    private BuyerAddressViewModel? _billingAddress;
-    private BuyerAddressViewModel? _shippingAddress;
+    public BuyerAddressViewModel? BillingAddress { get; set; }
+    public BuyerAddressViewModel? ShippingAddress { get; set; }
+    public BuyerBadgeViewModel? BuyerBadge { get; set; }
+
+    public bool CreationMode { get; set; }
+
+
     private Address? _previousAddress;
 
-
-    public bool ShippingAddressEnabled => !_buyer.UseSameAddress;
+    public bool ShippingAddressEnabled => !ShippingAddressDisabled;
 
     public bool ShippingAddressDisabled
     {
-        get => _buyer.UseSameAddress;
+        get => (Buyer?.UseSameAddress ?? true);
         set
         {
             if (value)
             {
-                _previousAddress = _buyer.ShippingAddress;
-                _buyer.ShippingAddress = _buyer.BillingAddress;
+                _previousAddress = Buyer!.ShippingAddress;
+                Buyer.ShippingAddress = Buyer.BillingAddress;
             }
             else
             {
-                _buyer.ShippingAddress = _previousAddress ?? new Address();
+                Buyer!.ShippingAddress = _previousAddress ?? new Address();
             }
 
-            _shippingAddress = new BuyerAddressViewModel(_buyer.ShippingAddress);
-            _buyer.UseSameAddress = value;
+            ShippingAddress = new BuyerAddressViewModel(Buyer.ShippingAddress);
+            Buyer.UseSameAddress = value;
             OnPropertyChanged(nameof(ShippingAddressEnabled));
             OnPropertyChanged(nameof(ShippingAddressDisabled));
             OnPropertyChanged(nameof(ShippingAddress));
@@ -48,111 +54,64 @@ public class BuyerProfileViewModel : INotifyPropertyChanged, OnBuyerLinkageUpdat
     }
 
 
-    public BuyerAddressViewModel BillingAddress
+    public async void SaveInfo()
     {
-        get
+        try
         {
-            if (_billingAddress == null)
+            if (CreationMode)
             {
-                _billingAddress = new BuyerAddressViewModel(_buyer.BillingAddress);
+                await BuyerService.CreateBuyer(Buyer!);
+            }
+            else
+            {
+                await BuyerService.SaveInfo(Buyer!);
             }
 
-            return _billingAddress;
+            await LoadBuyerProfile();
         }
-    }
-
-    public BuyerAddressViewModel ShippingAddress
-    {
-        get
+        catch (Exception ex)
         {
-            if (_shippingAddress == null)
-            {
-                _shippingAddress = new BuyerAddressViewModel(_buyer.ShippingAddress);
-            }
-
-            return _shippingAddress;
+            await ShowDialog("Error", ex.Message);
         }
     }
 
-    public BuyerWishlistViewModel Wishlist
+    private async Task ShowDialog(string title, string message)
     {
-        get
+        var dialog = new ContentDialog
         {
-            if (_wishlist == null)
-            {
-                _wishlist = new BuyerWishlistViewModel(_buyer, _wishlistItemDetailsProvider);
-            }
+            Title = title,
+            Content = message,
+            CloseButtonText = "OK",
+            XamlRoot = App.m_window?.Content.XamlRoot
+        };
 
-            return _wishlist;
-        }
+        await dialog.ShowAsync();
     }
 
-    public BuyerFamilySyncViewModel FamilySync
+
+    public async void ResetInfo()
     {
-        get
+        await LoadBuyerProfile();
+    }
+
+
+    public async Task OnBuyerLinkageUpdated()
+    {
+        await BuyerService.LoadBuyer(Buyer!, BuyerDataSegments.Linkages);
+        Wishlist = Wishlist?.Copy();
+        if (FamilySync != null)
         {
-            if (_familySync == null)
-            {
-                _familySync = new BuyerFamilySyncViewModel(_buyerService, _buyer, this);
-            }
-
-            return _familySync;
+            await FamilySync.LoadLinkages();
         }
-    }
-
-    public bool CreationMode { get; set; }
-
-    public void SaveInfo()
-    {
-        if (CreationMode)
-        {
-            _buyerService.CreateBuyer(_buyer);
-            
-        }
-        else
-        {
-            _buyerService.SaveInfo(_buyer);
-        }
-        LoadBuyerProfile();
-    }
-
-    public void ResetInfo()
-    {
-        LoadBuyerProfile();
-    }
-
-    public BuyerProfileViewModel(BuyerService buyerService, User user,
-        BuyerWishlistItemDetailsProvider wishlistItemDetailsProvider)
-    {
-        _wishlistItemDetailsProvider = wishlistItemDetailsProvider;
-        _buyerService = buyerService;
-        _user = user;
-        _buyer = LoadBuyerProfile();
-    }
-
-    private Buyer LoadBuyerProfile()
-    {
-        _buyer = _buyerService.GetBuyerByUser(_user);
-      
-        CreationMode = _buyer.FirstName == null;
-
-        if (CreationMode)
-        {
-            _buyer.BillingAddress = new Address();
-            _buyer.ShippingAddress = _buyer.BillingAddress;
-            _buyer.UseSameAddress = true;
-        }
-        OnPropertyChanged(nameof(CreationMode));
-        _billingAddress = new BuyerAddressViewModel(_buyer.BillingAddress);
-        _shippingAddress = new BuyerAddressViewModel(_buyer.ShippingAddress);
-        OnPropertyChanged(nameof(Buyer));
-        OnPropertyChanged(nameof(BillingAddress));
-        OnPropertyChanged(nameof(ShippingAddress));
-        OnPropertyChanged(nameof(ShippingAddressDisabled));
-        OnPropertyChanged(nameof(ShippingAddressEnabled));
-        _familySync = null; // will be assigned on next FamilySync get
+        
+        OnPropertyChanged(nameof(Wishlist));
         OnPropertyChanged(nameof(FamilySync));
-        return _buyer;
+    }
+
+    public void AfterPurchase()
+    {
+        BuyerBadge?.Updated();
+        OnPropertyChanged(nameof(BuyerBadge));
     }
 
     public event PropertyChangedEventHandler? PropertyChanged;
@@ -162,10 +121,39 @@ public class BuyerProfileViewModel : INotifyPropertyChanged, OnBuyerLinkageUpdat
         PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
     }
 
-    public void OnBuyerLinkageUpdated()
+    public async Task LoadBuyerProfile()
     {
-        _buyerService.LoadBuyer(_buyer, BuyerDataSegments.Linkages);
-        _wishlist = new BuyerWishlistViewModel(_wishlist!);
+        Buyer = await BuyerService.GetBuyerByUser(User);
+
+        // ReSharper disable once ConditionIsAlwaysTrueOrFalseAccordingToNullableAPIContract
+        CreationMode = Buyer.FirstName == null;
+
+        if (CreationMode)
+        {
+            Buyer.BillingAddress = new Address();
+            Buyer.ShippingAddress = Buyer.BillingAddress;
+            Buyer.UseSameAddress = true;
+        }
+
+        OnPropertyChanged(nameof(CreationMode));
+        BillingAddress = new BuyerAddressViewModel(Buyer.BillingAddress);
+        ShippingAddress = new BuyerAddressViewModel(Buyer.ShippingAddress);
+        FamilySync = new BuyerFamilySyncViewModel(BuyerService, Buyer, this);
+        await FamilySync.LoadLinkages();
+        Wishlist = new BuyerWishlistViewModel
+        {
+            BuyerService = BuyerService,
+            Buyer = Buyer,
+            ItemDetailsProvider = WishlistItemDetailsProvider
+        };
+        BuyerBadge = new BuyerBadgeViewModel { Buyer = Buyer };
+        OnPropertyChanged(nameof(Buyer));
+        OnPropertyChanged(nameof(BillingAddress));
+        OnPropertyChanged(nameof(ShippingAddress));
+        OnPropertyChanged(nameof(ShippingAddressDisabled));
+        OnPropertyChanged(nameof(ShippingAddressEnabled));
         OnPropertyChanged(nameof(Wishlist));
+        OnPropertyChanged(nameof(FamilySync));
+        OnPropertyChanged(nameof(BuyerBadge));
     }
 }
