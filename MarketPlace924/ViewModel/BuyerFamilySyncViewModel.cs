@@ -2,6 +2,8 @@
 using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Linq;
+using System.Runtime.CompilerServices;
+using System.Threading.Tasks;
 using MarketPlace924.Domain;
 using MarketPlace924.Service;
 
@@ -10,37 +12,30 @@ namespace MarketPlace924.ViewModel;
 public class BuyerFamilySyncViewModel : INotifyPropertyChanged
 {
     private List<BuyerLinkageViewModel>? _allItems;
-    private ObservableCollection<BuyerLinkageViewModel>? _items;
+    public ObservableCollection<BuyerLinkageViewModel>? Items { get; set; } = new();
     private Buyer _currentBuyer;
     private BuyerService _service;
 
-    private OnBuyerLinkageUpdatedCallback _linkageUpdatedCallback;
+    private IOnBuyerLinkageUpdatedCallback _linkageUpdatedCallback;
 
     public BuyerFamilySyncViewModel(BuyerService service, Buyer buyer,
-        OnBuyerLinkageUpdatedCallback linkageUpdatedCallback)
+        IOnBuyerLinkageUpdatedCallback linkageUpdatedCallback)
     {
         _service = service;
         _currentBuyer = buyer;
         _linkageUpdatedCallback = linkageUpdatedCallback;
     }
 
-    public ObservableCollection<BuyerLinkageViewModel> Items
+    public async Task LoadLinkages()
     {
-        get
-        {
-            if (_items == null)
-            {
-                _allItems = LoadLinkages();
-                _items = new ObservableCollection<BuyerLinkageViewModel>(_allItems);
-            }
-
-            return _items;
-        }
+        
+        _allItems = await LoadAllPossibleLinkages();
+        Items = new ObservableCollection<BuyerLinkageViewModel>(_allItems);
+        OnPropertyChanged(nameof(Items));
     }
-
-    private List<BuyerLinkageViewModel> LoadLinkages()
+    private async Task<List<BuyerLinkageViewModel>> LoadAllPossibleLinkages()
     {
-        var household = _service.FindBuyersWithShippingAddress(_currentBuyer.ShippingAddress)
+        var household = (await _service.FindBuyersWithShippingAddress(_currentBuyer.ShippingAddress))
             .Where(householdBuyer => householdBuyer.Id != _currentBuyer.Id).ToList();
         var linkages = _currentBuyer.Linkages;
         var availableLinkages = household.Select(buyer => NewBuyerLinkageViewModel(buyer, BuyerLinkageStatus.Possible));
@@ -64,10 +59,9 @@ public class BuyerFamilySyncViewModel : INotifyPropertyChanged
         };
     }
 
-
     public event PropertyChangedEventHandler? PropertyChanged;
 
-    private void OnPropertyChanged(string propertyName)
+    protected virtual void OnPropertyChanged([CallerMemberName] string? propertyName = null)
     {
         PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
     }

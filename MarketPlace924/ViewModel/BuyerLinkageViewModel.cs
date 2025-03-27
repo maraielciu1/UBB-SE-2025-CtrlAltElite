@@ -1,5 +1,6 @@
 ﻿using System.ComponentModel;
 using System.Diagnostics.CodeAnalysis;
+using System.Threading.Tasks;
 using MarketPlace924.Domain;
 using MarketPlace924.Service;
 using Microsoft.UI.Xaml;
@@ -21,7 +22,7 @@ public class BuyerLinkageViewModel : INotifyPropertyChanged
     public Buyer LinkedBuyer { get; set; } = null!;
     public string DisplayName { get; private set; } = null!;
 
-    public OnBuyerLinkageUpdatedCallback LinkageUpdatedCallback { get; set; } = null!;
+    public IOnBuyerLinkageUpdatedCallback LinkageUpdatedCallback { get; set; } = null!;
 
     public BuyerLinkageStatus Status
     {
@@ -89,40 +90,41 @@ public class BuyerLinkageViewModel : INotifyPropertyChanged
         PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
     }
 
-    public void RequestSync()
+    public async Task RequestSync()
     {
-        Service.CreateLinkageRequest(UserBuyer, LinkedBuyer);
+        await Service.CreateLinkageRequest(UserBuyer, LinkedBuyer);
         Status = BuyerLinkageStatus.PendingOther;
     }
 
-    public void Unsync()
+    public async Task Unsync()
     {
         if (_status == BuyerLinkageStatus.Confirmed)
         {
-            Service.BreakLinkage(UserBuyer, LinkedBuyer);
-            LinkageUpdatedCallback.OnBuyerLinkageUpdated();
+            await Service.BreakLinkage(UserBuyer, LinkedBuyer);
         }
 
         if (_status == BuyerLinkageStatus.PendingOther)
         {
-            Service.CancelLinkageRequest(UserBuyer, LinkedBuyer);
+            await Service.CancelLinkageRequest(UserBuyer, LinkedBuyer);
+            
         }
-
+        await LinkageUpdatedCallback.OnBuyerLinkageUpdated();
         Status = BuyerLinkageStatus.Possible;
     }
 
-    public void Accept()
+    public async Task Accept()
     {
-        Service.AcceptLinkageRequest(UserBuyer, LinkedBuyer);
+        await Service.AcceptLinkageRequest(UserBuyer, LinkedBuyer);
         Status = BuyerLinkageStatus.Confirmed;
-        LinkageUpdatedCallback.OnBuyerLinkageUpdated();
+        await LinkageUpdatedCallback.OnBuyerLinkageUpdated();
     }
 
-    public void Decline()
+    public async Task Decline()
     {
         if (_status == BuyerLinkageStatus.PendingSelf)
         {
-            Service.RefuseLinkageRequest(UserBuyer, LinkedBuyer);
+            await Service.RefuseLinkageRequest(UserBuyer, LinkedBuyer);
+            await LinkageUpdatedCallback.OnBuyerLinkageUpdated();
         }
 
         Status = BuyerLinkageStatus.Possible;

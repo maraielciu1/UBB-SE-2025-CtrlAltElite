@@ -1,15 +1,15 @@
-using Microsoft.UI.Xaml;
+using System.Threading.Tasks;
+using MarketPlace924.DBConnection;
+using MarketPlace924.Domain;
 using MarketPlace924.Repository;
 using MarketPlace924.Service;
 using MarketPlace924.View;
-using MarketPlace924.DBConnection;
-using MarketPlace924.Domain;
-using MarketPlace924.ViewModel;
 using MarketPlace924.View.Admin;
+using MarketPlace924.ViewModel;
 using MarketPlace924.ViewModel.Admin;
+using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
-using System.Windows.Input;
-using System.ComponentModel;
+
 // To learn more about WinUI, the WinUI project structure,
 // and more about our project templates, see: http://aka.ms/winui-project-info.
 
@@ -18,14 +18,14 @@ namespace MarketPlace924
     /// <summary>
     /// An empty window that can be used on its own or navigated to within a Frame.
     /// </summary>
-    public sealed partial class MainWindow : Window, OnLoginSuccessCallback
+    public sealed partial class MainWindow : Window, IOnLoginSuccessCallback
     {
         private UserService _userService;
         private BuyerService _buyerService;
         private SellerService _sellerService;
         private User? _user;
-		private AdminService _adminService;
-		private AnalyticsService _analyticsService;
+        private AdminService _adminService;
+        private AnalyticsService _analyticsService;
 
         public MainWindow()
         {
@@ -41,15 +41,15 @@ namespace MarketPlace924
             _userService = new UserService(userRepo);
             _buyerService = new BuyerService(buyerRepo, userRepo);
 
-			_adminService = new AdminService(userRepo);
-			_analyticsService = new AnalyticsService(userRepo, buyerRepo);
+            _adminService = new AdminService(userRepo);
+            _analyticsService = new AnalyticsService(userRepo, buyerRepo);
 
             _sellerService = new SellerService(sellerRepo);
 
             LoginFrame.Navigate(typeof(LoginView), new LoginViewModel(_userService, this));
         }
 
-        public void OnLoginSuccess(User user)
+        public async Task OnLoginSuccess(User user)
         {
             LoginFrame.Visibility = Visibility.Collapsed;
             MenuAndStage.Visibility = Visibility.Visible;
@@ -65,8 +65,7 @@ namespace MarketPlace924
             switch (user.Role)
             {
                 case UserRole.Buyer:
-                    NavigateToBuyerProfile();
-                    break;
+                    await NavigateToBuyerProfile();break;
                 case UserRole.Seller:
                     NavigateToSellerProfile();
                     break;
@@ -75,7 +74,7 @@ namespace MarketPlace924
                     break;
             }
 
-        }
+            }
 
 
         private void NavigateToLogin()
@@ -90,32 +89,46 @@ namespace MarketPlace924
 
         private void NavigateToMyMarket()
         {
-            Stage.Navigate(typeof(MyMarketView), new MyMarketViewModel(_buyerService, _user));
+            Stage.Navigate(typeof(MyMarketView), new MyMarketViewModel(_buyerService, _user!));
         }
 
-        private void NavigateToSellerProfile()
+private void NavigateToSellerProfile()
         {
             Stage.Navigate(typeof(SellerProfileView), new SellerProfileViewModel(_user, _userService, _sellerService));
         }
 
-        private void NavigateToBuyerProfile()
+        private async Task NavigateToBuyerProfile()
         {
-            Stage.Navigate(typeof(BuyerProfileView), new BuyerProfileViewModel(_buyerService, _user, new BuyerWishlistItemDetailsProvider()));
+            var buyerVm = new BuyerProfileViewModel
+            {
+                BuyerService = _buyerService,
+                User = _user!,
+                WishlistItemDetailsProvider = new BuyerWishlistItemDetailsProvider()
+            };
+            await buyerVm.LoadBuyerProfile();
+            Stage.Navigate(typeof(BuyerProfileView), buyerVm);
         }
 
-		private void NavigateToAdminProfile()
+        private void NavigateToAdminProfile()
         {
-			Stage.Navigate(typeof(AdminView), new AdminViewModel(_adminService, _analyticsService, _userService));
-		}
+            Stage.Navigate(typeof(AdminView), new AdminViewModel(_adminService, _analyticsService, _userService));
+        }
 
-        private void NavigateToProfile(object sender, RoutedEventArgs e)
+        private async Task NavigateToProfile()
         {
             if (_user == null) return;
 
             switch (_user.Role)
             {
                 case UserRole.Buyer:
-                    Stage.Navigate(typeof(BuyerProfileView), new BuyerProfileViewModel(_buyerService, _user, new BuyerWishlistItemDetailsProvider()));
+                    var buyerProfileVm = new BuyerProfileViewModel
+                    {
+                        BuyerService = _buyerService,
+                        User = _user,
+                        WishlistItemDetailsProvider = new BuyerWishlistItemDetailsProvider()
+                    };
+                    await buyerProfileVm.LoadBuyerProfile();
+                    Stage.Navigate(typeof(BuyerProfileView), buyerProfileVm);
                     break;
                 case UserRole.Seller:
                     Stage.Navigate(typeof(SellerProfileView), new SellerProfileViewModel(_user, _userService, _sellerService));

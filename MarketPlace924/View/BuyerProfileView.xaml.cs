@@ -5,10 +5,8 @@ using Microsoft.UI.Xaml.Navigation;
 namespace MarketPlace924.View;
 
 public sealed partial class  BuyerProfileView: Page
-{
-    private BuyerProfileViewModel _viewModel;
-    
-    public BuyerProfileViewModel ViewModel => _viewModel;
+{ 
+    public BuyerProfileViewModel? ViewModel { get; set; }
 
     public BuyerProfileView()
     {
@@ -21,7 +19,7 @@ public sealed partial class  BuyerProfileView: Page
         base.OnNavigatedTo(e);
         if (e.Parameter is BuyerProfileViewModel viewModel)
         {
-          _viewModel = viewModel;
+            ViewModel = viewModel;
         }
             
     }

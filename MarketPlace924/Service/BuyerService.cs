@@ -1,185 +1,239 @@
-﻿using MarketPlace924.Domain;
-using MarketPlace924.Repository;
-using System;
+﻿using System;
 using System.Collections.Generic;
-using System.ComponentModel.DataAnnotations;
 using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
+using MarketPlace924.Domain;
+using MarketPlace924.Repository;
 
-namespace MarketPlace924.Service
+namespace MarketPlace924.Service;
+
+public class BuyerService
 {
-    public class BuyerService
+    // Repository instances for managing buyer and user data
+    private BuyerRepository _buyerRepo;
+    private UserRepository _userRepo;
+
+    // Constructor initializing repositories
+    public BuyerService(BuyerRepository buyerRepo, UserRepository userRepo)
     {
-        // Repository instances for managing buyer and user data
-        private BuyerRepository _buyerRepo;
-        private UserRepository _userRepo;
+        _buyerRepo = buyerRepo;
+        _userRepo = userRepo;
+    }
 
-        // Constructor initializing repositories
-        public BuyerService(BuyerRepository buyerRepo, UserRepository userRepo)
+    // Retrieves a Buyer object associated with the given User.
+    public async Task<Buyer> GetBuyerByUser(User user)
+    {
+        var buyer = new Buyer();
+        buyer.User = user;
+        await LoadBuyer(buyer, BuyerDataSegments.BasicInfo | BuyerDataSegments.Wishlist | BuyerDataSegments.Linkages);
+        return buyer;
+    }
+
+
+    public async Task CreateBuyer(Buyer buyer)
+    {
+        ValidateBuyerInfo(buyer);
+        //TODO run this atomically. put the A in ACID
+        await _buyerRepo.CreateBuyer(buyer);
+        await _userRepo.UpdateContactInfo(buyer.User);
+    }
+
+    public async Task SaveInfo(Buyer buyer)
+    {
+        ValidateBuyerInfo(buyer);
+        //TODO run this atomically. put the A in ACID
+        await _buyerRepo.SaveInfo(buyer);
+        await _userRepo.UpdateContactInfo(buyer.User);
+    }
+
+
+    public async Task<List<Buyer>> FindBuyersWithShippingAddress(Address currentBuyerShippingAddress)
+    {
+        if (currentBuyerShippingAddress.Country == null) //i.e. its an empty address
         {
-            _buyerRepo = buyerRepo;
-            _userRepo = userRepo;
+            return new List<Buyer>();
         }
 
-        // Retrieves a Buyer object associated with the given User.
-        public Buyer GetBuyerByUser(User user)
+        var buyers = await _buyerRepo.FindBuyersWithShippingAddress(currentBuyerShippingAddress);
+        foreach (var buyer in buyers)
         {
-            // TODO Handle Buyer Not Found; Exception?
-            var buyer = new Buyer();
-            buyer.User = user;
-            LoadBuyer(buyer, BuyerDataSegments.BasicInfo | BuyerDataSegments.Wishlist | BuyerDataSegments.Linkages);
-            return buyer;
+            await LoadBuyer(buyer, BuyerDataSegments.BasicInfo | BuyerDataSegments.User);
         }
 
+        return buyers;
+    }
 
-        public void CreateBuyer(Buyer buyer)
+    public async Task LoadBuyer(Buyer buyer, BuyerDataSegments buyerDataSegments)
+    {
+        if ((buyerDataSegments & BuyerDataSegments.BasicInfo) == BuyerDataSegments.BasicInfo)
         {
-            //TODO run this atomically. put the A in ACID
-            _buyerRepo.CreateBuyer(buyer);
-            _userRepo.UpdateContactInfo(buyer.User);
+            await _buyerRepo.LoadBuyerInfo(buyer);
         }
 
-        public void SaveInfo(Buyer buyer)
+        if ((buyerDataSegments & BuyerDataSegments.User) == BuyerDataSegments.User)
         {
-            //TODO run this atomically. put the A in ACID
-            _buyerRepo.SaveInfo(buyer);
-            _userRepo.UpdateContactInfo(buyer.User);
+           await _userRepo.LoadUserContactById(buyer.User);
         }
 
-
-        public List<Buyer> FindBuyersWithShippingAddress(Address currentBuyerShippingAddress)
+        if ((buyerDataSegments & BuyerDataSegments.Wishlist) == BuyerDataSegments.Wishlist)
         {
-            if (currentBuyerShippingAddress.Country == null) //i.e. its an empty address
-            {
-                return new List<Buyer>();
-            }
-            var buyers = _buyerRepo.FindBuyersWithShippingAddress(currentBuyerShippingAddress);
-            buyers.ForEach(buyer => LoadBuyer(buyer, BuyerDataSegments.BasicInfo | BuyerDataSegments.User));
-            return buyers;
+            buyer.Wishlist = await _buyerRepo.GetWishlist(buyer.Id);
         }
 
-        public void LoadBuyer(Buyer buyer, BuyerDataSegments buyerDataSegments)
+        if ((buyerDataSegments & BuyerDataSegments.Linkages) == BuyerDataSegments.Linkages)
         {
-            if ((buyerDataSegments & BuyerDataSegments.BasicInfo) == BuyerDataSegments.BasicInfo)
-            {
-                _buyerRepo.LoadBuyerInfo(buyer);
-            }
-
-            if ((buyerDataSegments & BuyerDataSegments.User) == BuyerDataSegments.User)
-            {
-                _userRepo.LoadUserContactById(buyer.User);
-            }
-
-            if ((buyerDataSegments & BuyerDataSegments.Wishlist) == BuyerDataSegments.Wishlist)
-            {
-                buyer.Wishlist = _buyerRepo.GetWishlist(buyer.Id);
-            }
-
-            if ((buyerDataSegments & BuyerDataSegments.Linkages) == BuyerDataSegments.Linkages)
-            {
-                buyer.Linkages = _buyerRepo.GetBuyerLinkages(buyer.Id);
-                buyer.Linkages.Select(linkage => linkage.Buyer).ToList().ForEach(linikedBuyer =>
-                    LoadBuyer(linikedBuyer,
-                        BuyerDataSegments.BasicInfo | BuyerDataSegments.User | BuyerDataSegments.Wishlist));
-            }
+            buyer.Linkages = await _buyerRepo.GetBuyerLinkages(buyer.Id);
+           var linkedBuyers = buyer.Linkages.Select(linkage => linkage.Buyer).ToList();
+           foreach (var linkedBuyer in linkedBuyers)
+           {
+               await LoadBuyer(linkedBuyer,
+                   BuyerDataSegments.BasicInfo | BuyerDataSegments.User | BuyerDataSegments.Wishlist);
+           }
         }
+    }
 
 
-        public void CreateLinkageRequest(Buyer userBuyer, Buyer linkedBuyer)
+    public async Task CreateLinkageRequest(Buyer userBuyer, Buyer linkedBuyer)
+    {
+        await _buyerRepo.CreateLinkageRequest(userBuyer.Id, linkedBuyer.Id);
+    }
+
+    public async Task BreakLinkage(Buyer userBuyer, Buyer linkedBuyer)
+    {
+        _ = await _buyerRepo.DeleteLinkageRequest(userBuyer.Id, linkedBuyer.Id) ||
+            await _buyerRepo.DeleteLinkageRequest(linkedBuyer.Id, userBuyer.Id);
+    }
+
+    public async Task CancelLinkageRequest(Buyer userBuyer, Buyer linkedBuyer)
+    {
+        _ = await _buyerRepo.DeleteLinkageRequest(userBuyer.Id, linkedBuyer.Id);
+    }
+
+    public async Task AcceptLinkageRequest(Buyer userBuyer, Buyer linkedBuyer)
+    {
+        await _buyerRepo.UpdateLinkageRequest(linkedBuyer.Id, userBuyer.Id);
+    }
+
+    public async Task RefuseLinkageRequest(Buyer userBuyer, Buyer linkedBuyer)
+    {
+        await _buyerRepo.DeleteLinkageRequest(linkedBuyer.Id, userBuyer.Id);
+    }
+
+
+    // My Market Functionalities
+
+
+    // Retrieves the list of seller IDs that the buyer follows.
+    public async Task<List<int>> GetFollowingUsersIDs(int buyerId)
+    {
+        return await _buyerRepo.GetFollowingUsersIds(buyerId);
+    }
+
+    // Retrieves all products from the sellers that the buyer follows.
+    public async Task<List<Product>> GetProductsFromFollowedSellers(List<int> followedSellersIDs)
+    {
+        List<Product> allProducts = new List<Product>();
+        foreach (var sellerId in followedSellersIDs)
         {
-            _buyerRepo.CreateLinkageRequest(userBuyer.Id, linkedBuyer.Id);
-        }
-
-        public void BreakLinkage(Buyer userBuyer, Buyer linkedBuyer)
-        {
-            _ = _buyerRepo.DeleteLinkageRequest(userBuyer.Id, linkedBuyer.Id) ||
-                _buyerRepo.DeleteLinkageRequest(linkedBuyer.Id, userBuyer.Id);
-        }
-
-        public void CancelLinkageRequest(Buyer userBuyer, Buyer linkedBuyer)
-        {
-            _ = _buyerRepo.DeleteLinkageRequest(userBuyer.Id, linkedBuyer.Id);
-        }
-
-        public void AcceptLinkageRequest(Buyer userBuyer, Buyer linkedBuyer)
-        {
-            _buyerRepo.UpdateLinkageRequest(linkedBuyer.Id, userBuyer.Id);
-        }
-
-        public void RefuseLinkageRequest(Buyer userBuyer, Buyer linkedBuyer)
-        {
-            _buyerRepo.DeleteLinkageRequest(linkedBuyer.Id, userBuyer.Id);
-        }
-
-
-
-
-        // My Market Functionalities
-
-
-        // Retrieves the list of seller IDs that the buyer follows.
-        public async Task<List<int>> GetFollowingUsersIDs(int buyerId)
-        {
-            return await _buyerRepo.GetFollowingUsersIds(buyerId);
-        }
-
-        // Retrieves all products from the sellers that the buyer follows.
-        public async Task<List<Product>> GetProductsFromFollowedSellers(List<int> followedSellersIDs)
-        {
-            List<Product> allProducts = new List<Product>();
-            foreach (var sellerId in followedSellersIDs)
-            {
-                var products = await _buyerRepo.GetProductsFromSeller(sellerId);
-                allProducts.AddRange(products); // Aggregate products from all followed sellers
-            }
-            return allProducts;
-        }
-
-        // Retrieves the list of followed sellers based on buyer's followed seller IDs.
-        public async Task<List<Seller>> GetFollowedSellers(List<int> followingUsersID)
-        {
-            return await _buyerRepo.GetFollowedSellers(followingUsersID);
-        }
-
-        // Retrieves the list of all sellers.
-        public async Task<List<Seller>> GetAllSellers()
-        {
-            return await _buyerRepo.GetAllSellers();
-        }
-
-        // Retrieves products of the seller that the buyer is currently viewing.
-        public async Task<List<Product>> GetProductsForViewProfile(int sellerId)
-        {
-            List<Product> allProducts = new List<Product>();
             var products = await _buyerRepo.GetProductsFromSeller(sellerId);
-            allProducts.AddRange(products);
-            return allProducts;
+            allProducts.AddRange(products); // Aggregate products from all followed sellers
         }
 
-        // Checks if buyer exists in the database
-        public async Task<bool> CheckIfBuyerExists(int buyerId)
+        return allProducts;
+    }
+
+    // Retrieves the list of followed sellers based on buyer's followed seller IDs.
+    public async Task<List<Seller>> GetFollowedSellers(List<int> followingUserIds)
+    {
+        return await _buyerRepo.GetFollowedSellers(followingUserIds);
+    }
+
+    // Retrieves the list of all sellers.
+    public async Task<List<Seller>> GetAllSellers()
+    {
+        return await _buyerRepo.GetAllSellers();
+    }
+
+    public async Task UpdateAfterPurchase(Buyer buyer, decimal purchaseAmount)
+    {
+        buyer.UpdateAfterPurchase(purchaseAmount);
+        await _buyerRepo.UpdateAfterPurchase(buyer);
+    }
+
+    public async Task RemoveWishilistItem(Buyer buyer, int productId)
+    {
+        await _buyerRepo.RemoveWishilistItem(buyer.Id, productId);
+        var foundItem = buyer.Wishlist.Items.Find(item => item.ProductId == productId);
+        if (foundItem != null)
         {
-            return await _buyerRepo.CheckIfBuyerExists(buyerId);
+            buyer.Wishlist.Items.Remove(foundItem);
         }
+    }
 
-
-        // Checks if a buyer is following a specific seller.
-        public async Task<bool> IsFollowing(int buyerId, int sellerId)
+    private void ValidateBuyerInfo(Buyer buyer)
+    {
+        ValidateMandatoryField("First Name", buyer.FirstName);
+        ValidateMandatoryField("Last Name", buyer.LastName);
+        if (!UserValidator.ValidatePhone(buyer.PhoneNumber))
         {
-            return await _buyerRepo.IsFollowing(buyerId, sellerId);
+            throw new ArgumentException("Invalid Phone Number");
         }
 
-        // Adds a seller to the buyer's following list.
-        public async Task FollowSeller(int buyerId, int sellerId)
+        ValidateAddress(buyer.BillingAddress);
+        if (!buyer.UseSameAddress)
         {
-            await _buyerRepo.FollowSeller(buyerId, sellerId);
+            ValidateAddress(buyer.ShippingAddress);
         }
+    }
 
-        // Removes a seller from the buyer's following list.
-        public async Task UnfollowSeller(int buyerId, int sellerId)
+    private void ValidateAddress(Address addr)
+    {
+        ValidateMandatoryField("Stree Name", addr.StreetLine);
+        ValidateMandatoryField("Postal Code", addr.PostalCode);
+        ValidateMandatoryField("City", addr.City);
+        ValidateMandatoryField("Country", addr.Country);
+    }
+
+
+    private void ValidateMandatoryField(string fieldName, string? fieldValue)
+    {
+        if (string.IsNullOrWhiteSpace(fieldValue))
         {
-            await _buyerRepo.UnfollowSeller(buyerId, sellerId);
+            throw new ArgumentException(fieldName + " is required");
         }
+    }
+
+    // Retrieves products of the seller that the buyer is currently viewing.
+    public async Task<List<Product>> GetProductsForViewProfile(int sellerId)
+    {
+        List<Product> allProducts = new List<Product>();
+        var products = await _buyerRepo.GetProductsFromSeller(sellerId);
+        allProducts.AddRange(products);
+        return allProducts;
+    }
+
+    // Checks if buyer exists in the database
+    public async Task<bool> CheckIfBuyerExists(int buyerId)
+    {
+        return await _buyerRepo.CheckIfBuyerExists(buyerId);
+    }
+
+
+    // Checks if a buyer is following a specific seller.
+    public async Task<bool> IsFollowing(int buyerId, int sellerId)
+    {
+        return await _buyerRepo.IsFollowing(buyerId, sellerId);
+    }
+
+    // Adds a seller to the buyer's following list.
+    public async Task FollowSeller(int buyerId, int sellerId)
+    {
+        await _buyerRepo.FollowSeller(buyerId, sellerId);
+    }
+
+    // Removes a seller from the buyer's following list.
+    public async Task UnfollowSeller(int buyerId, int sellerId)
+    {
+        await _buyerRepo.UnfollowSeller(buyerId, sellerId);
     }
 }

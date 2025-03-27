@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 
 namespace MarketPlace924.Domain
@@ -46,6 +47,32 @@ namespace MarketPlace924.Domain
             Wishlist = new BuyerWishlist();
             FollowingUsersIds = new List<int>();
         }
+
+        public void UpdateAfterPurchase(decimal purchaseAmount)
+        {
+            TotalSpending += purchaseAmount;
+            NumberOfPurchases++;
+            if (0 <= BadgeProgress && BadgeProgress < 25)
+            {
+                Badge = BuyerBadge.BRONZE;
+                Discount = 5.00m;
+            } else if (BadgeProgress < 50)
+            {
+                Badge = BuyerBadge.SILVER;
+                Discount = 10.00m;
+            } else if (BadgeProgress < 75)
+            {
+                Badge = BuyerBadge.GOLD;
+                Discount = 15.00m;
+            }else if (BadgeProgress <= 100)
+            {
+                Badge = BuyerBadge.PLATINUM;
+                Discount = 20.00m;
+            }
+        }
+
+        public int BadgeProgress => (int)(Math.Min(1.0m,
+            ((TotalSpending / 1000.0m) * 0.8m + (NumberOfPurchases / 100.0m) * 0.2m)) * 100);
     }
 }
 

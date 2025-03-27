@@ -28,10 +28,10 @@
                         <Button Grid.Column="0" Content="Home"
                                 Click="{x:Bind NavigateToHome}"
                                 Style="{StaticResource MainMenuButton}"/>
-                        <Button Grid.Column="1" Content="Profile" x:Name="ProfileButton"
-                                Click="NavigateToProfile"
+                        <Button Grid.Column="1" Content="Profile"
+                                Click="{x:Bind NavigateToProfile}"
                                 Style="{StaticResource MainMenuButton}"/>
-                        <Button Grid.Column="2" x:Name="MyMarketButton" Content="My Market"
+                        <Button Grid.Column="2" Content="My Market"
                                 Click="{x:Bind NavigateToMyMarket}"
                                 Style="{StaticResource MainMenuButton}" />
                     </Grid>

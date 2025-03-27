@@ -171,8 +171,16 @@ public class BuyerWishlistItemDetailsProvider
             }
         };
 
-    public BuyerWishlistItemViewModel GetWishlistItemDetails(int productId)
+    public BuyerWishlistItemViewModel LoadWishlistItemDetails(BuyerWishlistItemViewModel item)
     {
-        return _mockProductDetails.ContainsKey(productId) ? _mockProductDetails[productId] : null;
+        var existingItem = _mockProductDetails[item.ProductId];
+        if (_mockProductDetails.ContainsKey(item.ProductId))
+        {
+            item.Title = existingItem.Title;
+            item.Description = existingItem.Description;
+            item.Price = existingItem.Price;
+            item.ImageSource = existingItem.ImageSource;
+        }
+        return item;
     }
 }
