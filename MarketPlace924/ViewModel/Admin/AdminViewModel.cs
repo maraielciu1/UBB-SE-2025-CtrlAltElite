@@ -68,13 +68,13 @@ namespace MarketPlace924.ViewModel.Admin
 				{
 					Values = new List<double> { buyersCount },
 					Name = "Buyers",
-					Fill = new SolidColorPaint(SKColors.LightYellow)
+					Fill = new SolidColorPaint(new SKColor(25, 118, 210))
 				},
 				new PieSeries<double>
 				{
 					Values = new List<double> { TotalUsersCount - buyersCount },
 					Name = "Sellers",
-					Fill = new SolidColorPaint(SKColors.LightGreen)
+					Fill = new SolidColorPaint(new SKColor(10, 56, 113))
 				}
 			};
 		}

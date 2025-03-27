@@ -15,7 +15,7 @@
 		</Grid.RowDefinitions>
 
 		<!-- Header Row -->
-		<Grid Grid.Row="0" Background="Black">
+        <Grid Grid.Row="0" Background="#0D47A1">
 			<Grid.ColumnDefinitions>
 				<ColumnDefinition Width="150"/>
 				<ColumnDefinition Width="50"/>
@@ -28,16 +28,16 @@
 				<ColumnDefinition Width="150" />
 				<ColumnDefinition Width="150"/>
 			</Grid.ColumnDefinitions>
-			<TextBlock Text="User ID" VerticalAlignment="Center" HorizontalAlignment="Center" Foreground="White" Padding="10"/>
-			<TextBlock Text="Role" VerticalAlignment="Center" HorizontalAlignment="Center" Grid.Column="1" Foreground="White" Padding="10"/>
-			<TextBlock Text="Username" VerticalAlignment="Center" HorizontalAlignment="Center" Grid.Column="2" Foreground="White" Padding="10"/>
-			<TextBlock Text="Email" VerticalAlignment="Center" HorizontalAlignment="Center" Grid.Column="3" Foreground="White" Padding="10"/>
-			<TextBlock Text="Password" VerticalAlignment="Center" HorizontalAlignment="Center" Grid.Column="4" Foreground="White" Padding="10"/>
-			<TextBlock Text="Phone Number" VerticalAlignment="Center" HorizontalAlignment="Center" Grid.Column="5" Foreground="White" Padding="10"/>
-			<TextBlock Text="Failed Logins" VerticalAlignment="Center" HorizontalAlignment="Center" Grid.Column="6" Foreground="White" Padding="10"/>
-			<TextBlock Text="Banned Until" VerticalAlignment="Center" HorizontalAlignment="Center" Grid.Column="7" Foreground="White" Padding="10"/>
-			<TextBlock Text="Banned" VerticalAlignment="Center" HorizontalAlignment="Center" Grid.Column="8" Foreground="White" Padding="10"/>
-			<TextBlock Text="Actions" VerticalAlignment="Center" HorizontalAlignment="Center" Grid.Column="9" Foreground="White" Padding="10"/>
+            <TextBlock Text="User ID" VerticalAlignment="Center" HorizontalAlignment="Center" Foreground="White" Padding="10"  FontSize="18" />
+            <TextBlock Text="Role" VerticalAlignment="Center" HorizontalAlignment="Center" Grid.Column="1" Foreground="White" Padding="10" FontSize="18"/>
+            <TextBlock Text="Username" VerticalAlignment="Center" HorizontalAlignment="Center" Grid.Column="2" Foreground="White" Padding="10" FontSize="18"/>
+            <TextBlock Text="Email" VerticalAlignment="Center" HorizontalAlignment="Center" Grid.Column="3" Foreground="White" Padding="10" FontSize="18"/>
+            <TextBlock Text="Password" VerticalAlignment="Center" HorizontalAlignment="Center" Grid.Column="4" Foreground="White" Padding="10" FontSize="18"/>
+            <TextBlock Text="Phone Number" VerticalAlignment="Center" HorizontalAlignment="Center" Grid.Column="5" Foreground="White" Padding="10" FontSize="18"/>
+            <TextBlock Text="Failed Logins" VerticalAlignment="Center" HorizontalAlignment="Center" Grid.Column="6" Foreground="White" Padding="10" FontSize="18"/>
+            <TextBlock Text="Banned Until" VerticalAlignment="Center" HorizontalAlignment="Center" Grid.Column="7" Foreground="White" Padding="10" FontSize="18"/>
+            <TextBlock Text="Banned" VerticalAlignment="Center" HorizontalAlignment="Center" Grid.Column="8" Foreground="White" Padding="10" FontSize="18"/>
+            <TextBlock Text="Actions" VerticalAlignment="Center" HorizontalAlignment="Center" Grid.Column="9" Foreground="White" Padding="10" FontSize="18"/>
 		</Grid>
 
 		<!-- User Data Rows -->
@@ -89,9 +89,9 @@
 				<TextBlock Text="{Binding ViewModel.TotalUsersCount}" VerticalAlignment="Center"/>
 			</StackPanel>
 
-			<Grid Grid.Column="2">
-				<lvc:PieChart Series="{Binding PieSeries}" Width="300" Height="300"/>
-			</Grid>
+            <Grid Grid.Column="2">
+                <lvc:PieChart Series="{Binding PieSeries}" Width="300" Height="300"/>
+            </Grid>
 		</Grid>
 	</Grid>
 </Page>
